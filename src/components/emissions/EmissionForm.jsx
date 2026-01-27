@@ -317,14 +317,15 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] p-0 gap-0 rounded-2xl overflow-hidden">
-        <DialogHeader className="p-6 pb-4 border-b border-slate-100">
+      <DialogContent className="sm:max-w-[520px] max-h-[90vh] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
+        <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex-shrink-0">
           <DialogTitle className="text-xl font-semibold text-slate-900">
             Add Emission Record
           </DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-6 space-y-5 overflow-y-auto flex-1">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Scope</Label>
@@ -566,7 +567,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          </div>
+          
+          <div className="flex gap-3 p-6 pt-4 border-t border-slate-100 flex-shrink-0 bg-white">
             <Button 
               type="button" 
               variant="outline" 
