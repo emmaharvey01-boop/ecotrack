@@ -21,7 +21,12 @@ import { X, Leaf, Zap } from "lucide-react";
 
 const SCOPE_1_CATEGORIES = [
   { value: "stationary_combustion", label: "Stationary Combustion", sources: ["Natural Gas", "Diesel", "Propane", "Fuel Oil", "Coal"] },
-  { value: "mobile_combustion", label: "Mobile Combustion", sources: ["Fleet Vehicles - Gasoline", "Fleet Vehicles - Diesel", "Company Aircraft", "Company Vessels"] },
+  { 
+    value: "mobile_combustion", 
+    label: "Mobile Combustion", 
+    sources: ["Mobile Combustion"],
+    needsDetailedFields: true
+  },
   { value: "fugitive_emissions", label: "Fugitive Emissions", sources: ["Refrigerants", "Air Conditioning Units", "Fire Suppressants"] },
   { value: "process_emissions", label: "Process Emissions", sources: ["Chemical Processes", "Manufacturing", "Waste Treatment"] }
 ];
@@ -68,7 +73,12 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     source: "",
     amount: "",
     reporting_period: "",
-    notes: ""
+    notes: "",
+    source_area: "",
+    fuel_combusted: "",
+    fuel_state: "",
+    quantity_combusted: "",
+    combustion_units: ""
   });
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
@@ -77,9 +87,13 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const selectedCategory = categories.find(c => c.value === formData.category);
   const sources = selectedCategory?.sources || [];
   const emissionFactor = EMISSION_FACTORS[formData.source];
+  const isMobileCombustion = formData.category === "mobile_combustion";
 
-  const calculatedEmissions = formData.amount && emissionFactor 
+  // For mobile combustion, we'll calculate later once you provide emission factors
+  const calculatedEmissions = !isMobileCombustion && formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
+    : isMobileCombustion && formData.quantity_combusted
+    ? "0.0000" // Placeholder until emission factors are provided
     : null;
 
   const handleSubmit = (e) => {
@@ -89,13 +103,26 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       scope: formData.scope,
       category: selectedCategory?.label || formData.category,
       source: formData.source,
-      amount: parseFloat(formData.amount),
-      unit: emissionFactor?.unit || "",
-      emission_factor: emissionFactor?.factor || 0,
-      co2e_tonnes: parseFloat(calculatedEmissions) || 0,
       reporting_period: formData.reporting_period,
       notes: formData.notes
     };
+
+    if (isMobileCombustion) {
+      record.source_area = formData.source_area;
+      record.fuel_combusted = formData.fuel_combusted;
+      record.fuel_state = formData.fuel_state;
+      record.quantity_combusted = parseFloat(formData.quantity_combusted);
+      record.combustion_units = formData.combustion_units;
+      record.amount = parseFloat(formData.quantity_combusted);
+      record.unit = formData.combustion_units;
+      record.emission_factor = 0; // Will be calculated with actual factors
+      record.co2e_tonnes = 0; // Will be calculated with actual factors
+    } else {
+      record.amount = parseFloat(formData.amount);
+      record.unit = emissionFactor?.unit || "";
+      record.emission_factor = emissionFactor?.factor || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    }
 
     onSubmit(record);
     setFormData({
@@ -104,7 +131,12 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       source: "",
       amount: "",
       reporting_period: "",
-      notes: ""
+      notes: "",
+      source_area: "",
+      fuel_combusted: "",
+      fuel_state: "",
+      quantity_combusted: "",
+      combustion_units: ""
     });
   };
 
@@ -192,7 +224,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && (
+            {formData.category && !isMobileCombustion && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -217,8 +249,99 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
             )}
           </AnimatePresence>
 
+          {/* Mobile Combustion Detailed Fields */}
           <AnimatePresence mode="wait">
-            {formData.source && emissionFactor && (
+            {isMobileCombustion && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Source Area</Label>
+                  <Input
+                    value={formData.source_area}
+                    onChange={(e) => setFormData({ ...formData, source_area: e.target.value, source: e.target.value })}
+                    placeholder="e.g., Company Fleet, Delivery Trucks"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Fuel Combusted</Label>
+                  <Input
+                    value={formData.fuel_combusted}
+                    onChange={(e) => setFormData({ ...formData, fuel_combusted: e.target.value })}
+                    placeholder="e.g., Diesel, Gasoline, Natural Gas"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Fuel State</Label>
+                  <Select 
+                    value={formData.fuel_state} 
+                    onValueChange={(value) => setFormData({ ...formData, fuel_state: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select fuel state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="solid">Solid</SelectItem>
+                      <SelectItem value="liquid">Liquid</SelectItem>
+                      <SelectItem value="gas">Gas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">Quantity Combusted</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.quantity_combusted}
+                      onChange={(e) => setFormData({ ...formData, quantity_combusted: e.target.value })}
+                      placeholder="Enter quantity"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">Units</Label>
+                    <Select 
+                      value={formData.combustion_units} 
+                      onValueChange={(value) => setFormData({ ...formData, combustion_units: value })}
+                    >
+                      <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                        <SelectValue placeholder="Select unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SCF">SCF</SelectItem>
+                        <SelectItem value="therm">therm</SelectItem>
+                        <SelectItem value="MmBTU">MmBTU</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {formData.quantity_combusted && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-amber-50 rounded-xl"
+                  >
+                    <span className="text-sm text-amber-700 font-medium">Awaiting emission factors</span>
+                    <span className="text-sm text-amber-600">Provide factors to calculate emissions</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            {formData.source && emissionFactor && !isMobileCombustion && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -273,7 +396,16 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
             </Button>
             <Button 
               type="submit"
-              disabled={!formData.scope || !formData.category || !formData.source || !formData.amount || !formData.reporting_period || isSubmitting}
+              disabled={
+                !formData.scope || 
+                !formData.category || 
+                !formData.reporting_period || 
+                (isMobileCombustion 
+                  ? (!formData.source_area || !formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
+                  : (!formData.source || !formData.amount)
+                ) ||
+                isSubmitting
+              }
               className="flex-1 h-11 rounded-xl bg-[#1B4332] hover:bg-[#143728] text-white"
             >
               {isSubmitting ? "Adding..." : "Add Record"}
