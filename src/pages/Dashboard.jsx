@@ -1,0 +1,148 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Plus, Leaf, Zap, Activity, TrendingDown } from "lucide-react";
+
+import StatsCard from "@/components/emissions/StatsCard";
+import EmissionChart from "@/components/emissions/EmissionChart";
+import EmissionForm from "@/components/emissions/EmissionForm";
+import EmissionTable from "@/components/emissions/EmissionTable";
+import ScopeBreakdown from "@/components/emissions/ScopeBreakdown";
+
+export default function Dashboard() {
+  const [showForm, setShowForm] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: records = [], isLoading } = useQuery({
+    queryKey: ["emissions"],
+    queryFn: () => base44.entities.EmissionRecord.list("-created_date"),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.EmissionRecord.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+      setShowForm(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.EmissionRecord.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+    },
+  });
+
+  // Calculate totals
+  const totalEmissions = records.reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+  const scope1Total = records.filter(r => r.scope === "scope_1").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+  const scope2Total = records.filter(r => r.scope === "scope_2").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+
+  return (
+    <div className="min-h-screen bg-[#FAFAF8]">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <motion.h1 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"
+              >
+                Climate Disclosures
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-slate-500 mt-1"
+              >
+                Track and report your greenhouse gas emissions
+              </motion.p>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-5 shadow-sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Emission
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatsCard
+            title="Total Emissions"
+            value={totalEmissions.toFixed(2)}
+            unit="tCO₂e"
+            icon={Activity}
+            delay={0}
+          />
+          <StatsCard
+            title="Scope 1"
+            value={scope1Total.toFixed(2)}
+            unit="tCO₂e"
+            icon={Leaf}
+            delay={0.1}
+            className="border-l-4 border-l-[#1B4332]"
+          />
+          <StatsCard
+            title="Scope 2"
+            value={scope2Total.toFixed(2)}
+            unit="tCO₂e"
+            icon={Zap}
+            delay={0.2}
+            className="border-l-4 border-l-[#52796F]"
+          />
+          <StatsCard
+            title="Records"
+            value={records.length}
+            unit="entries"
+            icon={TrendingDown}
+            delay={0.3}
+          />
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <EmissionChart records={records} />
+          <ScopeBreakdown records={records} scope="scope_1" />
+          <ScopeBreakdown records={records} scope="scope_2" />
+        </div>
+
+        {/* Table Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-900">Emission Records</h2>
+          </div>
+          <EmissionTable 
+            records={records} 
+            onDelete={deleteMutation.mutate}
+            isDeleting={deleteMutation.isPending}
+          />
+        </div>
+      </main>
+
+      {/* Form Modal */}
+      <EmissionForm
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        onSubmit={createMutation.mutate}
+        isSubmitting={createMutation.isPending}
+      />
+    </div>
+  );
+}
