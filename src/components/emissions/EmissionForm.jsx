@@ -37,6 +37,138 @@ const SCOPE_2_CATEGORIES = [
   { value: "purchased_cooling", label: "Purchased Cooling", sources: ["District Cooling", "Chilled Water"] }
 ];
 
+const MOBILE_COMBUSTION_FUELS = [
+  { name: "Natural Gas", state: "gas" },
+  { name: "Anthracite Coal", state: "solid" },
+  { name: "Bituminous Coal", state: "solid" },
+  { name: "Sub-bituminous Coal", state: "solid" },
+  { name: "Lignite Coal", state: "solid" },
+  { name: "Mixed (Commercial Sector)", state: "solid" },
+  { name: "Mixed (Electric Power Sector)", state: "solid" },
+  { name: "Mixed (Industrial Coking)", state: "solid" },
+  { name: "Mixed (Industrial Sector)", state: "solid" },
+  { name: "Coal Coke", state: "solid" },
+  { name: "Agricultural Byproducts", state: "solid" },
+  { name: "Peat", state: "solid" },
+  { name: "Solid Byproducts", state: "solid" },
+  { name: "Wood and Wood Residuals", state: "solid" },
+  { name: "Municipal Solid Waste", state: "solid" },
+  { name: "Petroleum Coke (Solid)", state: "solid" },
+  { name: "Plastics", state: "solid" },
+  { name: "Tires", state: "solid" },
+  { name: "Distillate Fuel Oil No. 2", state: "liquid" },
+  { name: "Residual Fuel Oil No. 6", state: "liquid" },
+  { name: "Kerosene", state: "liquid" },
+  { name: "Liquefied Petroleum Gases (LPG)", state: "liquid" },
+  { name: "Biodiesel (100%)", state: "liquid" },
+  { name: "Ethanol (100%)", state: "liquid" },
+  { name: "Rendered Animal Fat", state: "liquid" },
+  { name: "Vegetable Oil", state: "liquid" },
+  { name: "Propane Gas", state: "gas" },
+  { name: "Landfill Gas", state: "gas" },
+  { name: "Steam", state: "gas" }
+];
+
+const MOBILE_COMBUSTION_FACTORS = {
+  "Natural Gas": {
+    "mmBtu": { toScf: 974.7, co2Factor: 53.06 },
+    "therm": { toScf: 97.5, co2Factor: 53.06 },
+    "ccf": { toScf: 100, co2Factor: 53.06 },
+    "Mcf": { toScf: 1000, co2Factor: 53.06 },
+    "cubic meter": { toScf: 35.31, co2Factor: 53.06 },
+    "kWh": { toScf: 3.326, co2Factor: 53.06 },
+    "SCF": { toScf: 1, co2Factor: 53.06 }
+  },
+  "Anthracite Coal": {
+    "mmBtu": { toShortTon: 0.03986, co2Factor: 103.69 }
+  },
+  "Bituminous Coal": {
+    "mmBtu": { toShortTon: 0.04011, co2Factor: 93.28 }
+  },
+  "Sub-bituminous Coal": {
+    "mmBtu": { toShortTon: 0.05797, co2Factor: 97.17 }
+  },
+  "Lignite Coal": {
+    "mmBtu": { toShortTon: 0.07037, co2Factor: 96.57 }
+  },
+  "Mixed (Commercial Sector)": {
+    "mmBtu": { toShortTon: 0.04675, co2Factor: 95.35 }
+  },
+  "Mixed (Electric Power Sector)": {
+    "mmBtu": { toShortTon: 0.05068, co2Factor: 95.15 }
+  },
+  "Mixed (Industrial Coking)": {
+    "mmBtu": { toShortTon: 0.03805, co2Factor: 93.90 }
+  },
+  "Mixed (Industrial Sector)": {
+    "mmBtu": { toShortTon: 0.04474, co2Factor: 93.92 }
+  },
+  "Coal Coke": {
+    "mmBtu": { toShortTon: 0.04032, co2Factor: 113.67 }
+  },
+  "Agricultural Byproducts": {
+    "mmBtu": { toShortTon: 0.12121, co2Factor: 0 }
+  },
+  "Peat": {
+    "mmBtu": { toShortTon: 0.12500, co2Factor: 95.52 }
+  },
+  "Solid Byproducts": {
+    "mmBtu": { toShortTon: 0.09625, co2Factor: 93.90 }
+  },
+  "Wood and Wood Residuals": {
+    "mmBtu": { toShortTon: 0.05721, co2Factor: 0 }
+  },
+  "Municipal Solid Waste": {
+    "mmBtu": { toShortTon: 0.10050, co2Factor: 89.98 }
+  },
+  "Petroleum Coke (Solid)": {
+    "mmBtu": { toShortTon: 0.03333, co2Factor: 102.41 }
+  },
+  "Plastics": {
+    "mmBtu": { toShortTon: 0.02632, co2Factor: 75.02 }
+  },
+  "Tires": {
+    "mmBtu": { toShortTon: 0.03571, co2Factor: 85.97 }
+  },
+  "Distillate Fuel Oil No. 2": {
+    "mmBtu": { toGallon: 7.2464, co2Factor: 73.96 }
+  },
+  "Residual Fuel Oil No. 6": {
+    "mmBtu": { toGallon: 6.667, co2Factor: 75.10 }
+  },
+  "Kerosene": {
+    "mmBtu": { toGallon: 7.407, co2Factor: 72.31 }
+  },
+  "Liquefied Petroleum Gases (LPG)": {
+    "mmBtu": { toGallon: 10.870, co2Factor: 61.71 }
+  },
+  "Biodiesel (100%)": {
+    "mmBtu": { toGallon: 7.813, co2Factor: 0 }
+  },
+  "Ethanol (100%)": {
+    "mmBtu": { toGallon: 11.905, co2Factor: 0 }
+  },
+  "Rendered Animal Fat": {
+    "mmBtu": { toGallon: 8.000, co2Factor: 0 }
+  },
+  "Vegetable Oil": {
+    "mmBtu": { toGallon: 8.333, co2Factor: 0 }
+  },
+  "Propane Gas": {
+    "mmBtu": { toScf: 397, co2Factor: 61.71 },
+    "therm": { toScf: 39.7, co2Factor: 61.71 },
+    "SCF": { toScf: 1, co2Factor: 61.71 }
+  },
+  "Landfill Gas": {
+    "mmBtu": { toScf: 2062, co2Factor: 52.07 },
+    "therm": { toScf: 206.2, co2Factor: 52.07 },
+    "SCF": { toScf: 1, co2Factor: 52.07 }
+  },
+  "Steam": {
+    "mmBtu": { toMmBtu: 1, co2Factor: 0 }
+  }
+};
+
 const EMISSION_FACTORS = {
   "Natural Gas": { factor: 0.00205, unit: "therms" },
   "Diesel": { factor: 0.00268, unit: "liters" },
@@ -89,11 +221,43 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const emissionFactor = EMISSION_FACTORS[formData.source];
   const isMobileCombustion = formData.category === "mobile_combustion";
 
-  // For mobile combustion, we'll calculate later once you provide emission factors
-  const calculatedEmissions = !isMobileCombustion && formData.amount && emissionFactor 
+  // Calculate emissions for mobile combustion
+  const calculateMobileCombustionEmissions = () => {
+    if (!formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units) {
+      return null;
+    }
+
+    const fuelData = MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted];
+    if (!fuelData) return null;
+
+    const unitData = fuelData[formData.combustion_units];
+    if (!unitData) return null;
+
+    const quantity = parseFloat(formData.quantity_combusted);
+    
+    // Calculate mmBtu first
+    let mmBtu;
+    if (formData.combustion_units === "mmBtu") {
+      mmBtu = quantity;
+    } else if (formData.combustion_units === "MmBTU") {
+      mmBtu = quantity;
+    } else {
+      // For other units, we need to convert through the conversion factor
+      // The formula is: quantity / conversion_factor = mmBtu
+      const conversionFactor = Object.values(unitData)[0]; // Get the conversion value
+      mmBtu = quantity / conversionFactor;
+    }
+
+    // CO2 factor is in kg CO2 per mmBtu, convert to metric tonnes
+    const co2Tonnes = (mmBtu * unitData.co2Factor) / 1000;
+    
+    return co2Tonnes.toFixed(4);
+  };
+
+  const calculatedEmissions = isMobileCombustion 
+    ? calculateMobileCombustionEmissions()
+    : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
-    : isMobileCombustion && formData.quantity_combusted
-    ? "0.0000" // Placeholder until emission factors are provided
     : null;
 
   const handleSubmit = (e) => {
@@ -108,6 +272,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     };
 
     if (isMobileCombustion) {
+      const fuelData = MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted];
+      const unitData = fuelData?.[formData.combustion_units];
+      
       record.source_area = formData.source_area;
       record.fuel_combusted = formData.fuel_combusted;
       record.fuel_state = formData.fuel_state;
@@ -115,8 +282,8 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       record.combustion_units = formData.combustion_units;
       record.amount = parseFloat(formData.quantity_combusted);
       record.unit = formData.combustion_units;
-      record.emission_factor = 0; // Will be calculated with actual factors
-      record.co2e_tonnes = 0; // Will be calculated with actual factors
+      record.emission_factor = unitData?.co2Factor || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -270,29 +437,40 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Fuel Combusted</Label>
-                  <Input
-                    value={formData.fuel_combusted}
-                    onChange={(e) => setFormData({ ...formData, fuel_combusted: e.target.value })}
-                    placeholder="e.g., Diesel, Gasoline, Natural Gas"
-                    className="h-11 rounded-xl border-slate-200"
-                  />
+                  <Select 
+                    value={formData.fuel_combusted} 
+                    onValueChange={(value) => {
+                      const fuel = MOBILE_COMBUSTION_FUELS.find(f => f.name === value);
+                      setFormData({ 
+                        ...formData, 
+                        fuel_combusted: value,
+                        fuel_state: fuel?.state || "",
+                        quantity_combusted: "",
+                        combustion_units: ""
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select fuel type" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {MOBILE_COMBUSTION_FUELS.map(fuel => (
+                        <SelectItem key={fuel.name} value={fuel.name}>
+                          {fuel.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Fuel State</Label>
-                  <Select 
-                    value={formData.fuel_state} 
-                    onValueChange={(value) => setFormData({ ...formData, fuel_state: value })}
-                  >
-                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                      <SelectValue placeholder="Select fuel state" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="solid">Solid</SelectItem>
-                      <SelectItem value="liquid">Liquid</SelectItem>
-                      <SelectItem value="gas">Gas</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={formData.fuel_state}
+                    readOnly
+                    className="h-11 rounded-xl border-slate-200 bg-slate-50 capitalize"
+                    placeholder="Auto-filled based on fuel"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -312,28 +490,31 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                     <Label className="text-sm font-medium text-slate-700">Units</Label>
                     <Select 
                       value={formData.combustion_units} 
-                      onValueChange={(value) => setFormData({ ...formData, combustion_units: value })}
+                      onValueChange={(value) => setFormData({ ...formData, combustion_units: value, quantity_combusted: "" })}
+                      disabled={!formData.fuel_combusted}
                     >
                       <SelectTrigger className="h-11 rounded-xl border-slate-200">
                         <SelectValue placeholder="Select unit" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="SCF">SCF</SelectItem>
-                        <SelectItem value="therm">therm</SelectItem>
-                        <SelectItem value="MmBTU">MmBTU</SelectItem>
+                        {formData.fuel_combusted && MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted] && 
+                          Object.keys(MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted]).map(unit => (
+                            <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                          ))
+                        }
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
-                {formData.quantity_combusted && (
+{calculatedEmissions && (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="flex items-center justify-between p-4 bg-amber-50 rounded-xl"
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
                   >
-                    <span className="text-sm text-amber-700 font-medium">Awaiting emission factors</span>
-                    <span className="text-sm text-amber-600">Provide factors to calculate emissions</span>
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
                   </motion.div>
                 )}
               </motion.div>
