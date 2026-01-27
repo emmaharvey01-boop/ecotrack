@@ -585,7 +585,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                 !formData.category || 
                 !formData.reporting_period || 
                 (isMobileCombustion 
-                  ? (!formData.source_area || !formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
+                  ? (!formData.source_area || !formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
