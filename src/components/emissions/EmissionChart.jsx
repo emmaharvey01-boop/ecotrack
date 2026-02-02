@@ -62,7 +62,7 @@ export default function EmissionChart({ records }) {
               cy="50%"
               innerRadius={60}
               outerRadius={100}
-              paddingAngle={4}
+              paddingAngle={chartData.length === 1 ? 0 : 4}
               dataKey="value"
             >
               {chartData.map((entry, index) => (
