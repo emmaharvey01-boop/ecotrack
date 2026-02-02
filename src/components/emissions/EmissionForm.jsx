@@ -491,7 +491,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                     <Label className="text-sm font-medium text-slate-700">Units</Label>
                     <Select 
                       value={formData.combustion_units} 
-                      onValueChange={(value) => setFormData({ ...formData, combustion_units: value, quantity_combusted: "" })}
+                      onValueChange={(value) => setFormData({ ...formData, combustion_units: value })}
                       disabled={!formData.fuel_combusted}
                     >
                       <SelectTrigger className="h-11 rounded-xl border-slate-200">
