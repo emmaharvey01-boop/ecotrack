@@ -200,6 +200,7 @@ const REPORTING_PERIODS = [
 
 export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState({
+    company_name: "",
     scope: "",
     category: "",
     source: "",
@@ -264,6 +265,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     e.preventDefault();
     
     const record = {
+      company_name: formData.company_name,
       scope: formData.scope,
       category: selectedCategory?.label || formData.category,
       source: formData.source,
@@ -293,6 +295,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
     onSubmit(record);
     setFormData({
+      company_name: "",
       scope: "",
       category: "",
       source: "",
@@ -326,6 +329,16 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
         
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="p-6 space-y-5 overflow-y-auto flex-1">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Company Name (Optional)</Label>
+            <Input
+              value={formData.company_name}
+              onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+              placeholder="Enter company name"
+              className="h-11 rounded-xl border-slate-200"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-slate-700">Scope</Label>

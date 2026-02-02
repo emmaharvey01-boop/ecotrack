@@ -68,6 +68,7 @@ export default function EmissionTable({ records, onDelete, isDeleting }) {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/50">
+                <TableHead className="font-semibold text-slate-600">Company</TableHead>
                 <TableHead className="font-semibold text-slate-600">Scope</TableHead>
                 <TableHead className="font-semibold text-slate-600">Category</TableHead>
                 <TableHead className="font-semibold text-slate-600">Source</TableHead>
@@ -88,6 +89,9 @@ export default function EmissionTable({ records, onDelete, isDeleting }) {
                     transition={{ delay: index * 0.05 }}
                     className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
                   >
+                    <TableCell className="text-slate-600 font-medium">
+                      {record.company_name || "-"}
+                    </TableCell>
                     <TableCell>
                       <Badge 
                         variant="secondary"
