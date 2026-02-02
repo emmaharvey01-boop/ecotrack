@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, Leaf, Zap, Activity, TrendingDown } from "lucide-react";
+import { Plus, Leaf, Zap, Activity, TrendingDown, Building2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import StatsCard from "@/components/emissions/StatsCard";
 import EmissionChart from "@/components/emissions/EmissionChart";
@@ -13,12 +20,25 @@ import ScopeBreakdown from "@/components/emissions/ScopeBreakdown";
 
 export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState("all");
   const queryClient = useQueryClient();
 
-  const { data: records = [], isLoading } = useQuery({
+  const { data: allRecords = [], isLoading } = useQuery({
     queryKey: ["emissions"],
     queryFn: () => base44.entities.EmissionRecord.list("-created_date"),
   });
+
+  // Get unique company names
+  const companies = useMemo(() => {
+    const uniqueCompanies = [...new Set(allRecords.map(r => r.company_name).filter(Boolean))];
+    return uniqueCompanies.sort();
+  }, [allRecords]);
+
+  // Filter records by selected company
+  const records = useMemo(() => {
+    if (selectedCompany === "all") return allRecords;
+    return allRecords.filter(r => r.company_name === selectedCompany);
+  }, [allRecords, selectedCompany]);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.EmissionRecord.create(data),
@@ -46,7 +66,7 @@ export default function Dashboard() {
       <header className="bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
+            <div className="flex-1">
               <motion.h1 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -63,6 +83,28 @@ export default function Dashboard() {
                 Track and report your greenhouse gas emissions
               </motion.p>
             </div>
+            
+            {companies.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 }}
+                className="flex items-center gap-2"
+              >
+                <Building2 className="w-4 h-4 text-slate-500" />
+                <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                  <SelectTrigger className="w-[200px] h-11 rounded-xl border-slate-200">
+                    <SelectValue placeholder="Select company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Companies</SelectItem>
+                    {companies.map(company => (
+                      <SelectItem key={company} value={company}>{company}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </motion.div>
+            )}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
