@@ -37,6 +37,15 @@ const SCOPE_2_CATEGORIES = [
   { value: "purchased_cooling", label: "Purchased Cooling", sources: ["District Cooling", "Chilled Water"] }
 ];
 
+const VEHICLE_TYPES = [
+  { name: "Passenger Cars", mpg: 24.8 },
+  { name: "Other 2-Axle, 4-Tire Vehicles", mpg: 18.1 },
+  { name: "Motorcycles", mpg: 44.0 },
+  { name: "Single unit 2-Axle 6-Tire or More Trucks", mpg: 7.9 },
+  { name: "Combination Trucks", mpg: 6.9 },
+  { name: "Diesel Buses (Diesel Heavy-Duty Vehicles)", mpg: 7.4 }
+];
+
 const MOBILE_COMBUSTION_FUELS = [
   { name: "Natural Gas", state: "gas" },
   { name: "Anthracite Coal", state: "solid" },
@@ -210,7 +219,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     fuel_combusted: "",
     fuel_state: "",
     quantity_combusted: "",
-    combustion_units: ""
+    combustion_units: "",
+    vehicle_type: "",
+    miles_driven: ""
   });
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
@@ -220,6 +231,25 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const sources = selectedCategory?.sources || [];
   const emissionFactor = EMISSION_FACTORS[formData.source];
   const isMobileCombustion = formData.category === "mobile_combustion";
+
+  // Calculate emissions for vehicles (using mpg)
+  const calculateVehicleEmissions = () => {
+    if (!formData.vehicle_type || !formData.miles_driven) {
+      return null;
+    }
+
+    const vehicleData = VEHICLE_TYPES.find(v => v.name === formData.vehicle_type);
+    if (!vehicleData) return null;
+
+    const miles = parseFloat(formData.miles_driven);
+    const gallonsUsed = miles / vehicleData.mpg;
+    
+    // Gasoline emission factor: 8.887 kg CO2 per gallon
+    const co2Kg = gallonsUsed * 8.887;
+    const co2Tonnes = co2Kg / 1000;
+    
+    return co2Tonnes.toFixed(4);
+  };
 
   // Calculate emissions for mobile combustion
   const calculateMobileCombustionEmissions = () => {
@@ -255,7 +285,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   };
 
   const calculatedEmissions = isMobileCombustion 
-    ? calculateMobileCombustionEmissions()
+    ? (formData.vehicle_type ? calculateVehicleEmissions() : calculateMobileCombustionEmissions())
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -273,18 +303,33 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     };
 
     if (isMobileCombustion) {
-      const fuelData = MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted];
-      const unitData = fuelData?.[formData.combustion_units];
-      
-      record.source_area = formData.source_area;
-      record.fuel_combusted = formData.fuel_combusted;
-      record.fuel_state = formData.fuel_state;
-      record.quantity_combusted = parseFloat(formData.quantity_combusted);
-      record.combustion_units = formData.combustion_units;
-      record.amount = parseFloat(formData.quantity_combusted);
-      record.unit = formData.combustion_units;
-      record.emission_factor = unitData?.co2Factor || 0;
-      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+      if (formData.vehicle_type) {
+        // Vehicle-based calculation
+        const vehicleData = VEHICLE_TYPES.find(v => v.name === formData.vehicle_type);
+        record.source_area = formData.vehicle_type;
+        record.fuel_combusted = "Gasoline";
+        record.fuel_state = "liquid";
+        record.quantity_combusted = parseFloat(formData.miles_driven);
+        record.combustion_units = "miles";
+        record.amount = parseFloat(formData.miles_driven);
+        record.unit = "miles";
+        record.emission_factor = 8.887 / (vehicleData?.mpg || 1) / 1000; // kg CO2 per mile in tonnes
+        record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+      } else {
+        // Fuel-based calculation
+        const fuelData = MOBILE_COMBUSTION_FACTORS[formData.fuel_combusted];
+        const unitData = fuelData?.[formData.combustion_units];
+        
+        record.source_area = formData.source_area;
+        record.fuel_combusted = formData.fuel_combusted;
+        record.fuel_state = formData.fuel_state;
+        record.quantity_combusted = parseFloat(formData.quantity_combusted);
+        record.combustion_units = formData.combustion_units;
+        record.amount = parseFloat(formData.quantity_combusted);
+        record.unit = formData.combustion_units;
+        record.emission_factor = unitData?.co2Factor || 0;
+        record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+      }
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -305,7 +350,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       fuel_combusted: "",
       fuel_state: "",
       quantity_combusted: "",
-      combustion_units: ""
+      combustion_units: "",
+      vehicle_type: "",
+      miles_driven: ""
     });
   };
 
@@ -439,14 +486,84 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                 className="space-y-4 pt-2"
               >
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Source Area</Label>
-                  <Input
-                    value={formData.source_area}
-                    onChange={(e) => setFormData({ ...formData, source_area: e.target.value, source: e.target.value })}
-                    placeholder="e.g., Company Fleet, Delivery Trucks"
-                    className="h-11 rounded-xl border-slate-200"
-                  />
+                  <Label className="text-sm font-medium text-slate-700">Calculation Method</Label>
+                  <Select 
+                    value={formData.vehicle_type ? "vehicle" : formData.fuel_combusted ? "fuel" : ""} 
+                    onValueChange={(value) => {
+                      if (value === "vehicle") {
+                        setFormData({ 
+                          ...formData, 
+                          fuel_combusted: "",
+                          fuel_state: "",
+                          quantity_combusted: "",
+                          combustion_units: "",
+                          source_area: ""
+                        });
+                      } else {
+                        setFormData({ 
+                          ...formData, 
+                          vehicle_type: "",
+                          miles_driven: ""
+                        });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select calculation method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="vehicle">Vehicle Type & Miles</SelectItem>
+                      <SelectItem value="fuel">Fuel Type & Quantity</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {formData.vehicle_type !== undefined && !formData.fuel_combusted && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Vehicle Type</Label>
+                      <Select 
+                        value={formData.vehicle_type} 
+                        onValueChange={(value) => setFormData({ ...formData, vehicle_type: value, source: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                          <SelectValue placeholder="Select vehicle type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {VEHICLE_TYPES.map(vehicle => (
+                            <SelectItem key={vehicle.name} value={vehicle.name}>
+                              {vehicle.name} ({vehicle.mpg} mpg)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Miles Driven</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.miles_driven}
+                        onChange={(e) => setFormData({ ...formData, miles_driven: e.target.value })}
+                        placeholder="Enter miles driven"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {!formData.vehicle_type && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Source Area</Label>
+                      <Input
+                        value={formData.source_area}
+                        onChange={(e) => setFormData({ ...formData, source_area: e.target.value, source: e.target.value })}
+                        placeholder="e.g., Company Fleet, Delivery Trucks"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Fuel Combusted</Label>
@@ -597,7 +714,10 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                 !formData.category || 
                 !formData.reporting_period || 
                 (isMobileCombustion 
-                  ? (!formData.source_area || !formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units)
+                  ? (formData.vehicle_type 
+                      ? (!formData.vehicle_type || !formData.miles_driven)
+                      : (!formData.source_area || !formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units)
+                    )
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
