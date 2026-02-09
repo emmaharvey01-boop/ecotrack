@@ -232,11 +232,15 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
-    if (!formData.fuel_usage || !formData.fuel_units) {
+    if (!formData.fuel_usage || !formData.fuel_units || !formData.miles_travelled) {
       return null;
     }
 
     const fuelUsage = parseFloat(formData.fuel_usage);
+    const miles = parseFloat(formData.miles_travelled);
+    
+    // Calculate actual MPG
+    const actualMpg = miles / fuelUsage;
     
     // Emission factors
     const emissionFactors = {
