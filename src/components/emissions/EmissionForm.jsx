@@ -636,8 +636,10 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                     </Select>
                   </div>
                 </div>
+                  </>
+                )}
 
-{calculatedEmissions && (
+                {calculatedEmissions && (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
