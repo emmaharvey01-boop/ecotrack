@@ -22,13 +22,13 @@ import { X, Leaf, Zap } from "lucide-react";
 const SCOPE_1_CATEGORIES = [
   { value: "stationary_combustion", label: "Stationary Combustion", sources: ["Natural Gas", "Diesel", "Propane", "Fuel Oil", "Coal"] },
   { 
-    value: "mobile_combustion", 
-    label: "Mobile Combustion", 
-    sources: ["Mobile Combustion"],
+    value: "mobile_sources", 
+    label: "Mobile Sources", 
+    sources: ["Mobile Sources"],
     needsDetailedFields: true
   },
-  { value: "fugitive_emissions", label: "Fugitive Emissions", sources: ["Refrigerants", "Air Conditioning Units", "Fire Suppressants"] },
-  { value: "process_emissions", label: "Process Emissions", sources: ["Chemical Processes", "Manufacturing", "Waste Treatment"] }
+  { value: "refrigeration_ac", label: "Refrigeration and A/C Equipment Use", sources: ["Refrigerants", "Air Conditioning Units"] },
+  { value: "fire_suppression", label: "Fire Suppression and Purchased Gases", sources: ["Fire Suppressants", "Purchased Gases"] }
 ];
 
 const SCOPE_2_CATEGORIES = [
@@ -227,9 +227,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const selectedCategory = categories.find(c => c.value === formData.category);
   const sources = selectedCategory?.sources || [];
   const emissionFactor = EMISSION_FACTORS[formData.source];
-  const isMobileCombustion = formData.category === "mobile_combustion";
+  const isMobileCombustion = formData.category === "mobile_sources";
 
-  // Calculate emissions for mobile combustion
+  // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
     if (!formData.fuel_usage || !formData.fuel_units) {
       return null;
@@ -426,7 +426,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
             )}
           </AnimatePresence>
 
-          {/* Mobile Combustion Detailed Fields */}
+          {/* Mobile Sources Detailed Fields */}
           <AnimatePresence mode="wait">
             {isMobileCombustion && (
               <motion.div
