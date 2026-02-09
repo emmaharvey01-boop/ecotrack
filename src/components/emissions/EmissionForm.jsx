@@ -121,104 +121,35 @@ const MOBILE_COMBUSTION_FUELS = [
   { name: "Steam", state: "gas" }
 ];
 
-const MOBILE_COMBUSTION_FACTORS = {
-  "Natural Gas": {
-    "mmBtu": { toScf: 974.7, co2Factor: 53.06 },
-    "therm": { toScf: 97.5, co2Factor: 53.06 },
-    "ccf": { toScf: 100, co2Factor: 53.06 },
-    "Mcf": { toScf: 1000, co2Factor: 53.06 },
-    "cubic meter": { toScf: 35.31, co2Factor: 53.06 },
-    "kWh": { toScf: 3.326, co2Factor: 53.06 },
-    "SCF": { toScf: 1, co2Factor: 53.06 }
-  },
-  "Anthracite Coal": {
-    "mmBtu": { toShortTon: 0.03986, co2Factor: 103.69 }
-  },
-  "Bituminous Coal": {
-    "mmBtu": { toShortTon: 0.04011, co2Factor: 93.28 }
-  },
-  "Sub-bituminous Coal": {
-    "mmBtu": { toShortTon: 0.05797, co2Factor: 97.17 }
-  },
-  "Lignite Coal": {
-    "mmBtu": { toShortTon: 0.07037, co2Factor: 96.57 }
-  },
-  "Mixed (Commercial Sector)": {
-    "mmBtu": { toShortTon: 0.04675, co2Factor: 95.35 }
-  },
-  "Mixed (Electric Power Sector)": {
-    "mmBtu": { toShortTon: 0.05068, co2Factor: 95.15 }
-  },
-  "Mixed (Industrial Coking)": {
-    "mmBtu": { toShortTon: 0.03805, co2Factor: 93.90 }
-  },
-  "Mixed (Industrial Sector)": {
-    "mmBtu": { toShortTon: 0.04474, co2Factor: 93.92 }
-  },
-  "Coal Coke": {
-    "mmBtu": { toShortTon: 0.04032, co2Factor: 113.67 }
-  },
-  "Agricultural Byproducts": {
-    "mmBtu": { toShortTon: 0.12121, co2Factor: 0 }
-  },
-  "Peat": {
-    "mmBtu": { toShortTon: 0.12500, co2Factor: 95.52 }
-  },
-  "Solid Byproducts": {
-    "mmBtu": { toShortTon: 0.09625, co2Factor: 93.90 }
-  },
-  "Wood and Wood Residuals": {
-    "mmBtu": { toShortTon: 0.05721, co2Factor: 0 }
-  },
-  "Municipal Solid Waste": {
-    "mmBtu": { toShortTon: 0.10050, co2Factor: 89.98 }
-  },
-  "Petroleum Coke (Solid)": {
-    "mmBtu": { toShortTon: 0.03333, co2Factor: 102.41 }
-  },
-  "Plastics": {
-    "mmBtu": { toShortTon: 0.02632, co2Factor: 75.02 }
-  },
-  "Tires": {
-    "mmBtu": { toShortTon: 0.03571, co2Factor: 85.97 }
-  },
-  "Distillate Fuel Oil No. 2": {
-    "mmBtu": { toGallon: 7.2464, co2Factor: 73.96 }
-  },
-  "Residual Fuel Oil No. 6": {
-    "mmBtu": { toGallon: 6.667, co2Factor: 75.10 }
-  },
-  "Kerosene": {
-    "mmBtu": { toGallon: 7.407, co2Factor: 72.31 }
-  },
-  "Liquefied Petroleum Gases (LPG)": {
-    "mmBtu": { toGallon: 10.870, co2Factor: 61.71 }
-  },
-  "Biodiesel (100%)": {
-    "mmBtu": { toGallon: 7.813, co2Factor: 0 }
-  },
-  "Ethanol (100%)": {
-    "mmBtu": { toGallon: 11.905, co2Factor: 0 }
-  },
-  "Rendered Animal Fat": {
-    "mmBtu": { toGallon: 8.000, co2Factor: 0 }
-  },
-  "Vegetable Oil": {
-    "mmBtu": { toGallon: 8.333, co2Factor: 0 }
-  },
-  "Propane Gas": {
-    "mmBtu": { toScf: 397, co2Factor: 61.71 },
-    "therm": { toScf: 39.7, co2Factor: 61.71 },
-    "SCF": { toScf: 1, co2Factor: 61.71 }
-  },
-  "Landfill Gas": {
-    "mmBtu": { toScf: 2062, co2Factor: 52.07 },
-    "therm": { toScf: 206.2, co2Factor: 52.07 },
-    "SCF": { toScf: 1, co2Factor: 52.07 }
-  },
-  "Steam": {
-    "mmBtu": { toMmBtu: 1, co2Factor: 0 }
-  }
+const STATIONARY_COMBUSTION_FACTORS = {
+  "Natural Gas": { co2PerMmBtu: 53.06 },
+  "Distillate Fuel Oil No. 2": { co2PerMmBtu: 73.96 },
+  "Residual Fuel Oil No. 6": { co2PerMmBtu: 75.10 },
+  "Kerosene": { co2PerMmBtu: 75.20 },
+  "Liquefied Petroleum Gases (LPG)": { co2PerMmBtu: 61.71 },
+  "Anthracite Coal": { co2PerMmBtu: 103.69 },
+  "Bituminous Coal": { co2PerMmBtu: 93.28 },
+  "Sub-bituminous Coal": { co2PerMmBtu: 97.17 },
+  "Lignite Coal": { co2PerMmBtu: 97.72 },
+  "Mixed (Commercial Sector)": { co2PerMmBtu: 94.27 },
+  "Mixed (Electric Power Sector)": { co2PerMmBtu: 95.52 },
+  "Mixed (Industrial Coking)": { co2PerMmBtu: 93.9 },
+  "Mixed (Industrial Sector)": { co2PerMmBtu: 94.67 },
+  "Coal Coke": { co2PerMmBtu: 113.67 },
+  "Municipal Solid Waste": { co2PerMmBtu: 90.7 },
+  "Petroleum Coke (Solid)": { co2PerMmBtu: 102.41 },
+  "Plastics": { co2PerMmBtu: 75 },
+  "Tires": { co2PerMmBtu: 85.97 },
+  "Agricultural Byproducts": { co2PerMmBtu: 118.17 },
+  "Peat": { co2PerMmBtu: 111.84 },
+  "Solid Byproducts": { co2PerMmBtu: 105.51 },
+  "Wood and Wood Residuals": { co2PerMmBtu: 0 },
+  "Propane Gas": { co2PerMmBtu: 61.46 },
+  "Landfill Gas": { co2PerMmBtu: 0 },
+  "Biodiesel (100%)": { co2PerMmBtu: 73.84 },
+  "Ethanol (100%)": { co2PerMmBtu: 68.44 },
+  "Rendered Animal Fat": { co2PerMmBtu: 71.06 },
+  "Vegetable Oil": { co2PerMmBtu: 81.55 }
 };
 
 const EMISSION_FACTORS = {
@@ -297,8 +228,67 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     return co2Tonnes.toFixed(4);
   };
 
+  // Calculate emissions for stationary combustion
+  const calculateStationaryCombustionEmissions = () => {
+    if (!formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units) {
+      return null;
+    }
+
+    const quantity = parseFloat(formData.quantity_combusted);
+    const fuelData = STATIONARY_COMBUSTION_FACTORS[formData.fuel_combusted];
+    
+    if (!fuelData) return null;
+
+    // Convert to mmBtu based on unit type
+    let mmBtu = 0;
+    
+    switch (formData.combustion_units) {
+      case "mmBtu":
+        mmBtu = quantity;
+        break;
+      case "therm":
+        mmBtu = quantity * 0.1; // 1 therm = 0.1 mmBtu
+        break;
+      case "SCF":
+        // Natural Gas: 1 mmBtu ≈ 1,000 SCF
+        // Propane: 1 mmBtu ≈ 11,000 SCF
+        if (formData.fuel_combusted === "Natural Gas") {
+          mmBtu = quantity / 1000;
+        } else if (formData.fuel_combusted === "Propane Gas") {
+          mmBtu = quantity / 11000;
+        } else if (formData.fuel_combusted === "Landfill Gas") {
+          mmBtu = quantity / 1000;
+        }
+        break;
+      case "short ton":
+        // For solid fuels, approximate 25 mmBtu per short ton (varies by fuel)
+        mmBtu = quantity * 25;
+        break;
+      case "gallon":
+        // For liquid fuels, approximate 0.138 mmBtu per gallon (varies by fuel)
+        if (formData.fuel_combusted.includes("Fuel Oil")) {
+          mmBtu = quantity * 0.138;
+        } else if (formData.fuel_combusted === "Kerosene") {
+          mmBtu = quantity * 0.135;
+        } else {
+          mmBtu = quantity * 0.09; // Default for other liquids
+        }
+        break;
+      default:
+        return null;
+    }
+
+    // Calculate CO2 in kg, then convert to tonnes
+    const co2Kg = mmBtu * fuelData.co2PerMmBtu;
+    const co2Tonnes = co2Kg / 1000;
+    
+    return co2Tonnes.toFixed(4);
+  };
+
   const calculatedEmissions = isMobileCombustion 
     ? calculateMobileCombustionEmissions()
+    : isStationaryCombustion
+    ? calculateStationaryCombustionEmissions()
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -332,6 +322,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       record.emission_factor = emissionFactors[formData.fuel_units] || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else if (isStationaryCombustion) {
+      const fuelData = STATIONARY_COMBUSTION_FACTORS[formData.fuel_combusted];
       record.source = formData.fuel_combusted;
       record.fuel_combusted = formData.fuel_combusted;
       record.fuel_state = formData.fuel_state;
@@ -339,8 +330,8 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       record.combustion_units = formData.combustion_units;
       record.amount = parseFloat(formData.quantity_combusted);
       record.unit = formData.combustion_units;
-      record.emission_factor = 0; // Will calculate based on fuel type
-      record.co2e_tonnes = 0; // Will calculate based on fuel type and quantity
+      record.emission_factor = fuelData?.co2PerMmBtu || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -573,6 +564,17 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                         </Select>
                       </div>
                     </div>
+
+                    {calculatedEmissions && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                      >
+                        <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                        <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                      </motion.div>
+                    )}
                   </>
                 )}
               </motion.div>
