@@ -232,24 +232,19 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
-    if (!formData.fuel_usage || !formData.fuel_units || !formData.miles_travelled) {
+    if (!formData.miles_travelled || !formData.fuel_units) {
       return null;
     }
 
-    const fuelUsage = parseFloat(formData.fuel_usage);
     const miles = parseFloat(formData.miles_travelled);
     
-    // Calculate actual MPG
-    const actualMpg = miles / fuelUsage;
-    
-    // Emission factors
-    const emissionFactors = {
-      "gallons": 8.887, // kg CO2 per gallon of gasoline
-      "scf": 0.0551 // kg CO2 per SCF of natural gas
+    // Emission factors per mile
+    const emissionFactorsPerMile = {
+      "gallons": 0.000404, // tonnes CO2 per mile for gasoline vehicles (assuming ~22 mpg average)
+      "scf": 0.000355 // tonnes CO2 per mile for CNG vehicles
     };
     
-    const co2Kg = fuelUsage * (emissionFactors[formData.fuel_units] || 0);
-    const co2Tonnes = co2Kg / 1000;
+    const co2Tonnes = miles * (emissionFactorsPerMile[formData.fuel_units] || 0);
     
     return co2Tonnes.toFixed(4);
   };
