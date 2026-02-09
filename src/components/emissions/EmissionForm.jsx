@@ -534,11 +534,62 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                         <SelectTrigger className="h-11 rounded-xl border-slate-200">
                           <SelectValue placeholder="Select gas type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="max-h-[300px]">
                           <SelectItem value="Carbon Dioxide">Carbon Dioxide</SelectItem>
                           <SelectItem value="Sulphur hexafluoride">Sulphur hexafluoride</SelectItem>
                           <SelectItem value="Nitrogen Trifluoride">Nitrogen Trifluoride</SelectItem>
-                          <SelectItem value="PFC types">PFC types</SelectItem>
+                          
+                          {/* PFC Types */}
+                          <SelectItem value="CF4">CF4 (Perfluoromethane)</SelectItem>
+                          <SelectItem value="C2F6">C2F6 (Perfluoroethane)</SelectItem>
+                          <SelectItem value="C3F8">C3F8 (Perfluoropropane)</SelectItem>
+                          <SelectItem value="C4F10">C4F10 (Perfluorobutane)</SelectItem>
+                          <SelectItem value="C5F12">C5F12 (Perfluoropentane)</SelectItem>
+                          <SelectItem value="C6F14">C6F14 (Perfluorohexane)</SelectItem>
+                          
+                          {/* R- Types */}
+                          <SelectItem value="R-11">R-11</SelectItem>
+                          <SelectItem value="R-12">R-12</SelectItem>
+                          <SelectItem value="R-13">R-13</SelectItem>
+                          <SelectItem value="R-14">R-14</SelectItem>
+                          <SelectItem value="R-22">R-22</SelectItem>
+                          <SelectItem value="R-23">R-23</SelectItem>
+                          <SelectItem value="R-32">R-32</SelectItem>
+                          <SelectItem value="R-113">R-113</SelectItem>
+                          <SelectItem value="R-114">R-114</SelectItem>
+                          <SelectItem value="R-115">R-115</SelectItem>
+                          <SelectItem value="R-123">R-123</SelectItem>
+                          <SelectItem value="R-124">R-124</SelectItem>
+                          <SelectItem value="R-125">R-125</SelectItem>
+                          <SelectItem value="R-134a">R-134a</SelectItem>
+                          <SelectItem value="R-141b">R-141b</SelectItem>
+                          <SelectItem value="R-142b">R-142b</SelectItem>
+                          <SelectItem value="R-143a">R-143a</SelectItem>
+                          <SelectItem value="R-152a">R-152a</SelectItem>
+                          <SelectItem value="R-218">R-218</SelectItem>
+                          <SelectItem value="R-227ea">R-227ea</SelectItem>
+                          <SelectItem value="R-236fa">R-236fa</SelectItem>
+                          <SelectItem value="R-245fa">R-245fa</SelectItem>
+                          <SelectItem value="R-404A">R-404A</SelectItem>
+                          <SelectItem value="R-407C">R-407C</SelectItem>
+                          <SelectItem value="R-410A">R-410A</SelectItem>
+                          <SelectItem value="R-507A">R-507A</SelectItem>
+                          
+                          {/* HFC Types */}
+                          <SelectItem value="HFC-23">HFC-23</SelectItem>
+                          <SelectItem value="HFC-32">HFC-32</SelectItem>
+                          <SelectItem value="HFC-41">HFC-41</SelectItem>
+                          <SelectItem value="HFC-125">HFC-125</SelectItem>
+                          <SelectItem value="HFC-134">HFC-134</SelectItem>
+                          <SelectItem value="HFC-134a">HFC-134a</SelectItem>
+                          <SelectItem value="HFC-143">HFC-143</SelectItem>
+                          <SelectItem value="HFC-143a">HFC-143a</SelectItem>
+                          <SelectItem value="HFC-152a">HFC-152a</SelectItem>
+                          <SelectItem value="HFC-227ea">HFC-227ea</SelectItem>
+                          <SelectItem value="HFC-236fa">HFC-236fa</SelectItem>
+                          <SelectItem value="HFC-245fa">HFC-245fa</SelectItem>
+                          <SelectItem value="HFC-365mfc">HFC-365mfc</SelectItem>
+                          <SelectItem value="HFC-43-10mee">HFC-43-10mee</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
