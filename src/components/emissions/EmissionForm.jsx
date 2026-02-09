@@ -28,7 +28,8 @@ const SCOPE_1_CATEGORIES = [
     needsDetailedFields: true
   },
   { value: "refrigeration_ac", label: "Refrigeration and A/C Equipment Use", sources: ["Refrigerants", "Air Conditioning Units"] },
-  { value: "fire_suppression", label: "Fire Suppression and Purchased Gases", sources: ["Fire Suppressants", "Purchased Gases"] }
+  { value: "fire_suppression", label: "Fire Suppression", sources: ["Fire Suppressants", "Halon", "CO2 Systems"] },
+  { value: "purchased_gases", label: "Purchased Gases", sources: ["Nitrogen", "Oxygen", "Argon", "Other Industrial Gases"] }
 ];
 
 const SCOPE_2_CATEGORIES = [
