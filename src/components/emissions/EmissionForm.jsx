@@ -19,8 +19,50 @@ import {
 } from "@/components/ui/dialog";
 import { X, Leaf, Zap } from "lucide-react";
 
+const STATIONARY_COMBUSTION_FUELS = [
+  // Coal and Coke - Solid
+  { name: "Anthracite Coal", state: "solid" },
+  { name: "Bituminous Coal", state: "solid" },
+  { name: "Sub-bituminous Coal", state: "solid" },
+  { name: "Lignite Coal", state: "solid" },
+  { name: "Mixed (Commercial Sector)", state: "solid" },
+  { name: "Mixed (Electric Power Sector)", state: "solid" },
+  { name: "Mixed (Industrial Coking)", state: "solid" },
+  { name: "Mixed (Industrial Sector)", state: "solid" },
+  { name: "Coal Coke", state: "solid" },
+  // Other Fuels - Solid
+  { name: "Municipal Solid Waste", state: "solid" },
+  { name: "Petroleum Coke (Solid)", state: "solid" },
+  { name: "Plastics", state: "solid" },
+  { name: "Tires", state: "solid" },
+  // Biomass Fuels - Solid
+  { name: "Agricultural Byproducts", state: "solid" },
+  { name: "Peat", state: "solid" },
+  { name: "Solid Byproducts", state: "solid" },
+  { name: "Wood and Wood Residuals", state: "solid" },
+  // Gaseous Fuels
+  { name: "Natural Gas", state: "gas" },
+  { name: "Propane Gas", state: "gas" },
+  { name: "Landfill Gas", state: "gas" },
+  // Petroleum Products
+  { name: "Distillate Fuel Oil No. 2", state: "liquid" },
+  { name: "Residual Fuel Oil No. 6", state: "liquid" },
+  { name: "Kerosene", state: "liquid" },
+  { name: "Liquefied Petroleum Gases (LPG)", state: "liquid" },
+  // Biomass Fuels - Liquid
+  { name: "Biodiesel (100%)", state: "liquid" },
+  { name: "Ethanol (100%)", state: "liquid" },
+  { name: "Rendered Animal Fat", state: "liquid" },
+  { name: "Vegetable Oil", state: "liquid" }
+];
+
 const SCOPE_1_CATEGORIES = [
-  { value: "stationary_combustion", label: "Stationary Combustion", sources: ["Natural Gas", "Diesel", "Propane", "Fuel Oil", "Coal"] },
+  { 
+    value: "stationary_combustion", 
+    label: "Stationary Combustion", 
+    sources: STATIONARY_COMBUSTION_FUELS.map(f => f.name),
+    needsDetailedFields: true
+  },
   { 
     value: "mobile_sources", 
     label: "Mobile Sources", 
@@ -219,7 +261,11 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     vehicle_type: "",
     fuel_usage: "",
     fuel_units: "",
-    miles_travelled: ""
+    miles_travelled: "",
+    fuel_combusted: "",
+    fuel_state: "",
+    combustion_units: "",
+    quantity_combusted: ""
   });
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
@@ -229,6 +275,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const sources = selectedCategory?.sources || [];
   const emissionFactor = EMISSION_FACTORS[formData.source];
   const isMobileCombustion = formData.category === "mobile_sources";
+  const isStationaryCombustion = formData.category === "stationary_combustion";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -284,6 +331,16 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       };
       record.emission_factor = emissionFactors[formData.fuel_units] || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    } else if (isStationaryCombustion) {
+      record.source = formData.fuel_combusted;
+      record.fuel_combusted = formData.fuel_combusted;
+      record.fuel_state = formData.fuel_state;
+      record.quantity_combusted = parseFloat(formData.quantity_combusted);
+      record.combustion_units = formData.combustion_units;
+      record.amount = parseFloat(formData.quantity_combusted);
+      record.unit = formData.combustion_units;
+      record.emission_factor = 0; // Will calculate based on fuel type
+      record.co2e_tonnes = 0; // Will calculate based on fuel type and quantity
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -303,7 +360,11 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       vehicle_type: "",
       fuel_usage: "",
       fuel_units: "",
-      miles_travelled: ""
+      miles_travelled: "",
+      fuel_combusted: "",
+      fuel_state: "",
+      combustion_units: "",
+      quantity_combusted: ""
     });
   };
 
@@ -402,7 +463,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -423,6 +484,97 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Stationary Combustion Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isStationaryCombustion && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Fuel Combusted</Label>
+                  <Select 
+                    value={formData.fuel_combusted} 
+                    onValueChange={(value) => {
+                      const fuelData = STATIONARY_COMBUSTION_FUELS.find(f => f.name === value);
+                      setFormData({ 
+                        ...formData, 
+                        fuel_combusted: value, 
+                        fuel_state: fuelData?.state || "",
+                        source: value 
+                      });
+                    }}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select fuel type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATIONARY_COMBUSTION_FUELS.map(fuel => (
+                        <SelectItem key={fuel.name} value={fuel.name}>{fuel.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.fuel_combusted && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Fuel State</Label>
+                      <Select 
+                        value={formData.fuel_state} 
+                        onValueChange={(value) => setFormData({ ...formData, fuel_state: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="solid">Solid</SelectItem>
+                          <SelectItem value="liquid">Liquid</SelectItem>
+                          <SelectItem value="gas">Gas</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Quantity Combusted</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formData.quantity_combusted}
+                          onChange={(e) => setFormData({ ...formData, quantity_combusted: e.target.value })}
+                          placeholder="Enter quantity"
+                          className="h-11 rounded-xl border-slate-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Units</Label>
+                        <Select 
+                          value={formData.combustion_units} 
+                          onValueChange={(value) => setFormData({ ...formData, combustion_units: value })}
+                        >
+                          <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="therm">Therm</SelectItem>
+                            <SelectItem value="mmBtu">mmBtu</SelectItem>
+                            <SelectItem value="SCF">SCF</SelectItem>
+                            <SelectItem value="short ton">Short Ton</SelectItem>
+                            <SelectItem value="gallon">Gallon</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -572,7 +724,9 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                 !formData.category || 
                 !formData.reporting_period || 
                 (isMobileCombustion 
-                  ? (!formData.vehicle_type || !formData.fuel_usage || !formData.fuel_units || !formData.miles_travelled)
+                  ? (!formData.vehicle_type || !formData.fuel_usage || !formData.fuel_units)
+                  : isStationaryCombustion
+                  ? (!formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
