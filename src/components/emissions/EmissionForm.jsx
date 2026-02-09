@@ -196,7 +196,12 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     fuel_combusted: "",
     fuel_state: "",
     combustion_units: "",
-    quantity_combusted: ""
+    quantity_combusted: "",
+    refrigeration_method: "",
+    gas_type: "",
+    inventory_change: "",
+    transfer_amount: "",
+    capacity_change: ""
   });
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
@@ -207,6 +212,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
   const emissionFactor = EMISSION_FACTORS[formData.source];
   const isMobileCombustion = formData.category === "mobile_sources";
   const isStationaryCombustion = formData.category === "stationary_combustion";
+  const isRefrigeration = formData.category === "refrigeration_ac";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -355,7 +361,12 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       fuel_combusted: "",
       fuel_state: "",
       combustion_units: "",
-      quantity_combusted: ""
+      quantity_combusted: "",
+      refrigeration_method: "",
+      gas_type: "",
+      inventory_change: "",
+      transfer_amount: "",
+      capacity_change: ""
     });
   };
 
@@ -454,7 +465,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -475,6 +486,94 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Refrigeration Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isRefrigeration && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Calculation Method</Label>
+                  <Select 
+                    value={formData.refrigeration_method} 
+                    onValueChange={(value) => setFormData({ 
+                      ...formData, 
+                      refrigeration_method: value,
+                      gas_type: "",
+                      inventory_change: "",
+                      transfer_amount: "",
+                      capacity_change: ""
+                    })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select calculation method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="material_balance">Material Balance Method</SelectItem>
+                      <SelectItem value="simplified_material_balance">Simplified Material Balance Method</SelectItem>
+                      <SelectItem value="screening">Screening Method</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.refrigeration_method === "material_balance" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Gas Type</Label>
+                      <Input
+                        value={formData.gas_type}
+                        onChange={(e) => setFormData({ ...formData, gas_type: e.target.value })}
+                        placeholder="Enter gas type (e.g., R-134a)"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Inventory Change (kg)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formData.inventory_change}
+                          onChange={(e) => setFormData({ ...formData, inventory_change: e.target.value })}
+                          placeholder="Enter amount"
+                          className="h-11 rounded-xl border-slate-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Transfer Amount (kg)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formData.transfer_amount}
+                          onChange={(e) => setFormData({ ...formData, transfer_amount: e.target.value })}
+                          placeholder="Enter amount"
+                          className="h-11 rounded-xl border-slate-200"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Capacity Change (kg)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.capacity_change}
+                        onChange={(e) => setFormData({ ...formData, capacity_change: e.target.value })}
+                        placeholder="Enter amount"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -729,6 +828,10 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                   ? (!formData.vehicle_type || !formData.fuel_usage || !formData.fuel_units)
                   : isStationaryCombustion
                   ? (!formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
+                  : isRefrigeration
+                  ? (!formData.refrigeration_method || 
+                      (formData.refrigeration_method === "material_balance" && 
+                        (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change)))
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
