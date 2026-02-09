@@ -194,8 +194,7 @@ const EMISSION_FACTORS = {
 };
 
 const REPORTING_PERIODS = [
-  "Q1 2024", "Q2 2024", "Q3 2024", "Q4 2024", 
-  "2024", "Q1 2025", "Q2 2025", "Q3 2025", "Q4 2025", "2025"
+  "2024", "2025", "2026", "2027", "2028"
 ];
 
 export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) {
