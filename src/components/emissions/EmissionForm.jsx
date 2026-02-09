@@ -527,12 +527,20 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                   <>
                     <div className="space-y-2">
                       <Label className="text-sm font-medium text-slate-700">Gas Type</Label>
-                      <Input
-                        value={formData.gas_type}
-                        onChange={(e) => setFormData({ ...formData, gas_type: e.target.value })}
-                        placeholder="Enter gas type (e.g., R-134a)"
-                        className="h-11 rounded-xl border-slate-200"
-                      />
+                      <Select 
+                        value={formData.gas_type} 
+                        onValueChange={(value) => setFormData({ ...formData, gas_type: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                          <SelectValue placeholder="Select gas type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Carbon Dioxide">Carbon Dioxide</SelectItem>
+                          <SelectItem value="Sulphur hexafluoride">Sulphur hexafluoride</SelectItem>
+                          <SelectItem value="Nitrogen Trifluoride">Nitrogen Trifluoride</SelectItem>
+                          <SelectItem value="PFC types">PFC types</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
