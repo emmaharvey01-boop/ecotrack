@@ -232,19 +232,20 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
-    if (!formData.miles_travelled || !formData.fuel_units) {
+    if (!formData.fuel_usage || !formData.fuel_units) {
       return null;
     }
 
-    const miles = parseFloat(formData.miles_travelled);
+    const fuelUsage = parseFloat(formData.fuel_usage);
     
-    // Emission factors per mile
-    const emissionFactorsPerMile = {
-      "gallons": 0.000404, // tonnes CO2 per mile for gasoline vehicles (assuming ~22 mpg average)
-      "scf": 0.000355 // tonnes CO2 per mile for CNG vehicles
+    // Emission factors
+    const emissionFactors = {
+      "gallons": 8.887, // kg CO2 per gallon of gasoline
+      "scf": 0.0551 // kg CO2 per SCF of natural gas
     };
     
-    const co2Tonnes = miles * (emissionFactorsPerMile[formData.fuel_units] || 0);
+    const co2Kg = fuelUsage * (emissionFactors[formData.fuel_units] || 0);
+    const co2Tonnes = co2Kg / 1000;
     
     return co2Tonnes.toFixed(4);
   };
@@ -437,12 +438,19 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
               >
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Vehicle Type</Label>
-                  <Input
-                    value={formData.vehicle_type}
-                    onChange={(e) => setFormData({ ...formData, vehicle_type: e.target.value, source: e.target.value })}
-                    placeholder="e.g., Passenger Cars, Delivery Trucks"
-                    className="h-11 rounded-xl border-slate-200"
-                  />
+                  <Select 
+                    value={formData.vehicle_type} 
+                    onValueChange={(value) => setFormData({ ...formData, vehicle_type: value, source: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select vehicle type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VEHICLE_TYPES.map(vehicle => (
+                        <SelectItem key={vehicle.name} value={vehicle.name}>{vehicle.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
