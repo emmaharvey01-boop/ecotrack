@@ -407,18 +407,8 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                   <SelectValue placeholder="Select scope" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="scope_1">
-                    <div className="flex items-center gap-2">
-                      <Leaf className="w-4 h-4 text-emerald-600" />
-                      <span>Scope 1 (Direct)</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="scope_2">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-amber-600" />
-                      <span>Scope 2 (Indirect)</span>
-                    </div>
-                  </SelectItem>
+                  <SelectItem value="scope_1">Scope 1 (Direct)</SelectItem>
+                  <SelectItem value="scope_2">Scope 2 (Indirect)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
