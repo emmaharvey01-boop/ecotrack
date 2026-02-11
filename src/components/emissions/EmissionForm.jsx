@@ -644,40 +644,50 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // For purchased electricity, create records based on available data
+    // For purchased electricity, create both market-based and location-based records
     if (isPurchasedElectricity) {
       const kWh = parseFloat(formData.electricity_kwh);
       const mWh = kWh / 1000;
-      const records = [];
+      const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+      const locationTotalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
       
-      // Market-based record (only if supplier factor is provided)
+      // Market-based record
+      let marketBasedTonnes, marketBasedFactor, marketBasedSource;
+      
       if (formData.custom_emission_factor !== "") {
+        // Use custom supplier factor
         const customFactor = parseFloat(formData.custom_emission_factor) || 0;
         const marketBasedLbs = mWh * customFactor;
-        const marketBasedTonnes = marketBasedLbs / 2204.62;
-        
-        records.push({
-          company_name: formData.company_name,
-          scope: "scope_2",
-          scope_2_method: "market_based",
-          category: "Purchased Electricity",
-          source: "Custom Supplier",
-          amount: kWh,
-          unit: "kWh",
-          emission_factor: customFactor / 1000,
-          co2e_tonnes: marketBasedTonnes,
-          reporting_period: formData.reporting_period,
-          notes: formData.notes
-        });
+        marketBasedTonnes = marketBasedLbs / 2204.62;
+        marketBasedFactor = customFactor / 1000;
+        marketBasedSource = "Custom Supplier";
+      } else {
+        // No supplier data: market-based equals location-based
+        const locationBasedLbs = mWh * locationTotalFactor;
+        marketBasedTonnes = locationBasedLbs / 2204.62;
+        marketBasedFactor = locationTotalFactor / 1000;
+        marketBasedSource = formData.egrid_subregion;
       }
       
-      // Location-based record (always create)
-      const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
-      const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
-      const locationBasedLbs = mWh * totalFactor;
+      const marketBasedRecord = {
+        company_name: formData.company_name,
+        scope: "scope_2",
+        scope_2_method: "market_based",
+        category: "Purchased Electricity",
+        source: marketBasedSource,
+        amount: kWh,
+        unit: "kWh",
+        emission_factor: marketBasedFactor,
+        co2e_tonnes: marketBasedTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      };
+      
+      // Location-based record
+      const locationBasedLbs = mWh * locationTotalFactor;
       const locationBasedTonnes = locationBasedLbs / 2204.62;
       
-      records.push({
+      const locationBasedRecord = {
         company_name: formData.company_name,
         scope: "scope_2",
         scope_2_method: "location_based",
@@ -685,14 +695,14 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         source: formData.egrid_subregion,
         amount: kWh,
         unit: "kWh",
-        emission_factor: totalFactor / 1000,
+        emission_factor: locationTotalFactor / 1000,
         co2e_tonnes: locationBasedTonnes,
         reporting_period: formData.reporting_period,
         notes: formData.notes
-      });
+      };
       
-      // Submit record(s)
-      onSubmit(records.length > 1 ? records : records[0]);
+      // Submit both records
+      onSubmit([marketBasedRecord, locationBasedRecord]);
       
       setFormData({
         company_name: "",
@@ -964,7 +974,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
               >
                 <div className="p-4 bg-blue-50 rounded-xl mb-2">
                   <p className="text-sm text-blue-800">
-                    Location-based method is always calculated. Market-based is optional if you have supplier data.
+                    Both methods will be calculated. If no supplier factor is provided, market-based will equal location-based.
                   </p>
                 </div>
 
