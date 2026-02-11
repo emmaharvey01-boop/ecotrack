@@ -683,13 +683,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const hasMarketN2OFactor = formData.steam_market_n2o_factor !== "";
       
       if (hasMarketCO2Factor || hasMarketCH4Factor || hasMarketN2OFactor) {
-        // Use custom market-based factors (CO2 in lb/mmBtu, CH4 and N2O in g/mmBtu)
+        // Use custom market-based factors (CO2 in kg/mmBtu, CH4 and N2O in g/mmBtu)
         const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
         const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
         const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
         
-        // Convert CH4 and N2O from g/mmBtu to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
-        const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
+        // Convert all to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
+        const totalFactor = (co2Factor * 2.20462) + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
         const marketBasedLbs = mmBtuConsumed * totalFactor;
         marketBasedTonnes = marketBasedLbs / 2204.62;
       } else {
@@ -724,13 +724,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const hasLocationN2OFactor = formData.steam_location_n2o_factor !== "";
       
       if (hasLocationCO2Factor || hasLocationCH4Factor || hasLocationN2OFactor) {
-        // Use custom location-based factors (CO2 in lb/mmBtu, CH4 and N2O in g/mmBtu)
+        // Use custom location-based factors (CO2 in kg/mmBtu, CH4 and N2O in g/mmBtu)
         const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
         const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
         const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
         
-        // Convert CH4 and N2O from g/mmBtu to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
-        const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
+        // Convert all to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
+        const totalFactor = (co2Factor * 2.20462) + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
         const locationBasedLbs = mmBtuConsumed * totalFactor;
         locationBasedTonnes = locationBasedLbs / 2204.62;
       } else {
@@ -1205,7 +1205,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                         placeholder="CO₂"
                         className="h-11 rounded-xl border-slate-200"
                       />
-                      <p className="text-xs text-slate-400">lb/mmBtu</p>
+                      <p className="text-xs text-slate-400">kg/mmBtu</p>
                     </div>
                     <div className="space-y-1">
                       <Input
@@ -1244,7 +1244,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                         placeholder="CO₂"
                         className="h-11 rounded-xl border-slate-200"
                       />
-                      <p className="text-xs text-slate-400">lb/mmBtu</p>
+                      <p className="text-xs text-slate-400">kg/mmBtu</p>
                     </div>
                     <div className="space-y-1">
                       <Input
@@ -1294,7 +1294,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                             const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
                             const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
                             const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
-                            const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
+                            const totalFactor = (co2Factor * 2.20462) + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
                             const lbsCO2e = mmBtuConsumed * totalFactor;
                             const metricTonnes = lbsCO2e / 2204.62;
                             return metricTonnes.toFixed(4);
@@ -1329,7 +1329,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                             const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
                             const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
                             const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
-                            const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
+                            const totalFactor = (co2Factor * 2.20462) + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
                             const lbsCO2e = mmBtuConsumed * totalFactor;
                             const metricTonnes = lbsCO2e / 2204.62;
                             return metricTonnes.toFixed(4);
