@@ -361,7 +361,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     purchased_gas_amount: "",
     egrid_subregion: "",
     electricity_kwh: "",
-    custom_emission_factor: ""
+    custom_emission_factor: "",
+    steam_mmbtu: "",
+    steam_subregion: "",
+    steam_supplier_factor: ""
   });
 
   // Populate form when editing
@@ -440,7 +443,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         purchased_gas_amount: "",
         egrid_subregion: "",
         electricity_kwh: "",
-        custom_emission_factor: ""
+        custom_emission_factor: "",
+        steam_mmbtu: "",
+        steam_subregion: "",
+        steam_supplier_factor: ""
       });
     }
   }, [editingRecord, open]);
@@ -457,6 +463,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isFireSuppression = formData.category === "fire_suppression";
   const isPurchasedGases = formData.category === "purchased_gases";
   const isPurchasedElectricity = formData.category === "purchased_electricity";
+  const isPurchasedSteam = formData.category === "purchased_heating" && formData.source === "Steam";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -644,6 +651,104 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // For purchased steam, create both market-based and location-based records
+    if (isPurchasedSteam) {
+      const mmBtu = parseFloat(formData.steam_mmbtu);
+      const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
+      const locationTotalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+      
+      // Market-based record
+      let marketBasedTonnes, marketBasedFactor, marketBasedSource;
+      
+      if (formData.steam_supplier_factor !== "") {
+        // Use custom supplier factor (in lb CO2e/mmBtu)
+        const customFactor = parseFloat(formData.steam_supplier_factor) || 0;
+        const marketBasedLbs = mmBtu * customFactor;
+        marketBasedTonnes = marketBasedLbs / 2204.62;
+        marketBasedFactor = customFactor / 1000; // per mmBtu
+        marketBasedSource = "Custom Supplier";
+      } else {
+        // No supplier data: market-based equals location-based
+        const locationBasedLbs = mmBtu * locationTotalFactor;
+        marketBasedTonnes = locationBasedLbs / 2204.62;
+        marketBasedFactor = locationTotalFactor / 1000;
+        marketBasedSource = formData.steam_subregion;
+      }
+      
+      const marketBasedRecord = {
+        company_name: formData.company_name,
+        scope: "scope_2",
+        scope_2_method: "market_based",
+        category: "Purchased Heating",
+        source: marketBasedSource,
+        amount: mmBtu,
+        unit: "mmBtu",
+        emission_factor: marketBasedFactor,
+        co2e_tonnes: marketBasedTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      };
+      
+      // Location-based record
+      const locationBasedLbs = mmBtu * locationTotalFactor;
+      const locationBasedTonnes = locationBasedLbs / 2204.62;
+      
+      const locationBasedRecord = {
+        company_name: formData.company_name,
+        scope: "scope_2",
+        scope_2_method: "location_based",
+        category: "Purchased Heating",
+        source: formData.steam_subregion,
+        amount: mmBtu,
+        unit: "mmBtu",
+        emission_factor: locationTotalFactor / 1000,
+        co2e_tonnes: locationBasedTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      };
+      
+      // Submit both records
+      onSubmit([marketBasedRecord, locationBasedRecord]);
+      
+      setFormData({
+        company_name: "",
+        scope: "",
+        scope_2_method: "",
+        category: "",
+        source: "",
+        amount: "",
+        reporting_period: "",
+        notes: "",
+        vehicle_type: "",
+        fuel_usage: "",
+        fuel_units: "",
+        miles_travelled: "",
+        fuel_combusted: "",
+        fuel_state: "",
+        combustion_units: "",
+        quantity_combusted: "",
+        refrigeration_method: "",
+        gas_type: "",
+        inventory_change: "",
+        transfer_amount: "",
+        capacity_change: "",
+        fire_suppression_method: "",
+        fire_suppression_gas: "",
+        fire_inventory_change: "",
+        fire_transfer_amount: "",
+        fire_capacity_change: "",
+        purchased_gas_type: "",
+        purchased_gas_amount: "",
+        egrid_subregion: "",
+        electricity_kwh: "",
+        custom_emission_factor: "",
+        steam_mmbtu: "",
+        steam_subregion: "",
+        steam_supplier_factor: ""
+      });
+      return;
+    }
+    
     // For purchased electricity, create both market-based and location-based records
     if (isPurchasedElectricity) {
       const kWh = parseFloat(formData.electricity_kwh);
@@ -735,7 +840,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         purchased_gas_amount: "",
         egrid_subregion: "",
         electricity_kwh: "",
-        custom_emission_factor: ""
+        custom_emission_factor: "",
+        steam_mmbtu: "",
+        steam_subregion: "",
+        steam_supplier_factor: ""
       });
       return;
     }
@@ -849,7 +957,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       purchased_gas_amount: "",
       egrid_subregion: "",
       electricity_kwh: "",
-      custom_emission_factor: ""
+      custom_emission_factor: "",
+      steam_mmbtu: "",
+      steam_subregion: "",
+      steam_supplier_factor: ""
     });
   };
 
@@ -938,7 +1049,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && !isPurchasedElectricity && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && !isPurchasedElectricity && !isPurchasedSteam && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -959,6 +1070,117 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Purchased Steam Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isPurchasedSteam && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="p-4 bg-blue-50 rounded-xl mb-2">
+                  <p className="text-sm text-blue-800">
+                    Both methods will be calculated. If no supplier factor is provided, market-based will equal location-based.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Steam Consumed (mmBtu)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.steam_mmbtu}
+                    onChange={(e) => setFormData({ ...formData, steam_mmbtu: e.target.value })}
+                    placeholder="Enter mmBtu"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">eGRID Subregion (for Location-Based)</Label>
+                  <Select 
+                    value={formData.steam_subregion} 
+                    onValueChange={(value) => setFormData({ ...formData, steam_subregion: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select eGRID subregion" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {Object.keys(EGRID_SUBREGIONS).map(region => (
+                        <SelectItem key={region} value={region}>{region}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/mmBtu) (Optional - for Market-Based)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.steam_supplier_factor}
+                    onChange={(e) => setFormData({ ...formData, steam_supplier_factor: e.target.value })}
+                    placeholder="Optional: Enter supplier factor or 0 for renewable"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                  <p className="text-xs text-slate-500">Leave blank to use location-based factor for both methods</p>
+                </div>
+
+                {formData.steam_mmbtu && formData.steam_subregion && (
+                  <div className="space-y-2">
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                    >
+                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
+                      <span className="text-lg font-semibold text-emerald-800">
+                        {(() => {
+                          const mmBtu = parseFloat(formData.steam_mmbtu) || 0;
+                          
+                          if (formData.steam_supplier_factor !== "") {
+                            // Use custom factor
+                            const customFactor = parseFloat(formData.steam_supplier_factor) || 0;
+                            const lbsCO2e = mmBtu * customFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          } else {
+                            // Use location-based
+                            const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
+                            if (!subregion) return "0.0000";
+                            const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+                            const lbsCO2e = mmBtu * totalFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          }
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-blue-50 rounded-xl"
+                    >
+                      <span className="text-sm text-blue-700 font-medium">Location-Based Emissions</span>
+                      <span className="text-lg font-semibold text-blue-800">
+                        {(() => {
+                          const mmBtu = parseFloat(formData.steam_mmbtu) || 0;
+                          const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
+                          if (!subregion) return "0.0000";
+                          const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+                          const lbsCO2e = mmBtu * totalFactor;
+                          const metricTonnes = lbsCO2e / 2204.62;
+                          return metricTonnes.toFixed(4);
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1713,6 +1935,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
                   : isPurchasedElectricity
                   ? (!formData.electricity_kwh || !formData.egrid_subregion)
+                  : isPurchasedSteam
+                  ? (!formData.steam_mmbtu || !formData.steam_subregion)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
