@@ -1022,25 +1022,35 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
 
                 {formData.electricity_kwh && formData.egrid_subregion && (
                   <div className="space-y-2">
-                    {formData.custom_emission_factor && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
-                      >
-                        <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
-                        <span className="text-lg font-semibold text-emerald-800">
-                          {(() => {
-                            const kWh = parseFloat(formData.electricity_kwh) || 0;
-                            const mWh = kWh / 1000;
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                    >
+                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
+                      <span className="text-lg font-semibold text-emerald-800">
+                        {(() => {
+                          const kWh = parseFloat(formData.electricity_kwh) || 0;
+                          const mWh = kWh / 1000;
+                          
+                          if (formData.custom_emission_factor !== "") {
+                            // Use custom factor
                             const customFactor = parseFloat(formData.custom_emission_factor) || 0;
                             const lbsCO2e = mWh * customFactor;
                             const metricTonnes = lbsCO2e / 2204.62;
                             return metricTonnes.toFixed(4);
-                          })()} tCO₂e
-                        </span>
-                      </motion.div>
-                    )}
+                          } else {
+                            // Use location-based
+                            const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+                            if (!subregion) return "0.0000";
+                            const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+                            const lbsCO2e = mWh * totalFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          }
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
