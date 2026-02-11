@@ -551,9 +551,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     const amount = parseFloat(formData.purchased_gas_amount) || 0;
     const gwpFactor = PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type] || 0;
     
-    // CO2e in kg, then convert to tonnes
-    const co2eKg = amount * gwpFactor;
-    const co2eTonnes = co2eKg / 1000;
+    // CO2e in lbs, then convert to tonnes
+    const co2eLbs = amount * gwpFactor;
+    const co2eTonnes = co2eLbs / 2204.62;
     
     return co2eTonnes.toFixed(4);
   };
@@ -953,7 +953,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     } else if (isPurchasedGases) {
       record.source = formData.purchased_gas_type;
       record.amount = parseFloat(formData.purchased_gas_amount);
-      record.unit = "kg";
+      record.unit = "lbs";
       record.emission_factor = PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type] || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else if (isPurchasedElectricity) {
@@ -1512,7 +1512,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Amount (kg)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Amount (lbs)</Label>
                   <Input
                     type="number"
                     step="0.01"
