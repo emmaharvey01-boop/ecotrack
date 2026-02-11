@@ -121,6 +121,85 @@ const MOBILE_COMBUSTION_FUELS = [
   { name: "Steam", state: "gas" }
 ];
 
+const REFRIGERANT_GWP_FACTORS = {
+  "Carbon Dioxide": 1,
+  "Sulphur hexafluoride": 23500,
+  "Nitrogen Trifluoride": 16100,
+  "CF4": 6630,
+  "C2F6": 11100,
+  "C3F8": 8900,
+  "C4F10": 9200,
+  "C5F12": 8550,
+  "C6F14": 7910,
+  "R-11": 4660,
+  "R-12": 10200,
+  "R-13": 14000,
+  "R-14": 6630,
+  "R-22": 1760,
+  "R-23": 12400,
+  "R-32": 677,
+  "R-113": 5820,
+  "R-114": 9800,
+  "R-115": 7670,
+  "R-123": 79,
+  "R-124": 527,
+  "R-125": 3170,
+  "R-134a": 1300,
+  "R-141b": 700,
+  "R-142b": 2000,
+  "R-143a": 4800,
+  "R-152a": 138,
+  "R-218": 8900,
+  "R-227ea": 3350,
+  "R-236fa": 8060,
+  "R-245fa": 858,
+  "R-404A": 3943,
+  "R-407C": 1624,
+  "R-410A": 1924,
+  "R-507A": 3985,
+  "HFC-23": 12400,
+  "HFC-32": 677,
+  "HFC-41": 116,
+  "HFC-125": 3170,
+  "HFC-134": 1120,
+  "HFC-134a": 1300,
+  "HFC-143": 328,
+  "HFC-143a": 4800,
+  "HFC-152a": 138,
+  "HFC-227ea": 3350,
+  "HFC-236fa": 8060,
+  "HFC-245fa": 858,
+  "HFC-365mfc": 804,
+  "HFC-43-10mee": 1650,
+  "R-401A": 18,
+  "R-401B": 15,
+  "R-401C": 21,
+  "R-402A": 1902,
+  "R-402B": 1205,
+  "R-403B": 3471,
+  "R-406A": 0,
+  "R-407A": 1923,
+  "R-407B": 2547,
+  "R-407D": 1487,
+  "R-408A": 2430,
+  "R-409A": 0,
+  "R-410B": 2048,
+  "R-411A": 15,
+  "R-411B": 4,
+  "R-414A": 0,
+  "R-414B": 0,
+  "R-417A": 2127,
+  "R-422A": 2847,
+  "R-422D": 2473,
+  "R-424A": 3104,
+  "R-426A": 1371,
+  "R-428A": 3417,
+  "R-434A": 3075,
+  "R-507A": 3985,
+  "R-508A": 11607,
+  "R-508B": 11698
+};
+
 const STATIONARY_COMBUSTION_FACTORS = {
   "Natural Gas": { co2PerMmBtu: 53.06 },
   "Distillate Fuel Oil No. 2": { co2PerMmBtu: 73.96 },
@@ -234,6 +313,26 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     return co2Tonnes.toFixed(4);
   };
 
+  // Calculate emissions for refrigeration Material Balance
+  const calculateRefrigerationEmissions = () => {
+    if (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change) {
+      return null;
+    }
+
+    const inventoryChange = parseFloat(formData.inventory_change) || 0;
+    const transferAmount = parseFloat(formData.transfer_amount) || 0;
+    const capacityChange = parseFloat(formData.capacity_change) || 0;
+
+    const totalKg = inventoryChange + transferAmount + capacityChange;
+    const gwpFactor = REFRIGERANT_GWP_FACTORS[formData.gas_type] || 0;
+    
+    // CO2e in kg, then convert to tonnes
+    const co2eKg = totalKg * gwpFactor;
+    const co2eTonnes = co2eKg / 1000;
+    
+    return co2eTonnes.toFixed(4);
+  };
+
   // Calculate emissions for stationary combustion
   const calculateStationaryCombustionEmissions = () => {
     if (!formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units) {
@@ -295,6 +394,8 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     ? calculateMobileCombustionEmissions()
     : isStationaryCombustion
     ? calculateStationaryCombustionEmissions()
+    : isRefrigeration && formData.refrigeration_method === "material_balance"
+    ? calculateRefrigerationEmissions()
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -565,6 +666,34 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                           <SelectItem value="R-410A">R-410A</SelectItem>
                           <SelectItem value="R-507A">R-507A</SelectItem>
                           
+                          {/* Blended Refrigerants */}
+                          <SelectItem value="R-401A">R-401A</SelectItem>
+                          <SelectItem value="R-401B">R-401B</SelectItem>
+                          <SelectItem value="R-401C">R-401C</SelectItem>
+                          <SelectItem value="R-402A">R-402A</SelectItem>
+                          <SelectItem value="R-402B">R-402B</SelectItem>
+                          <SelectItem value="R-403B">R-403B</SelectItem>
+                          <SelectItem value="R-406A">R-406A</SelectItem>
+                          <SelectItem value="R-407A">R-407A</SelectItem>
+                          <SelectItem value="R-407B">R-407B</SelectItem>
+                          <SelectItem value="R-407D">R-407D</SelectItem>
+                          <SelectItem value="R-408A">R-408A</SelectItem>
+                          <SelectItem value="R-409A">R-409A</SelectItem>
+                          <SelectItem value="R-410B">R-410B</SelectItem>
+                          <SelectItem value="R-411A">R-411A</SelectItem>
+                          <SelectItem value="R-411B">R-411B</SelectItem>
+                          <SelectItem value="R-414A">R-414A</SelectItem>
+                          <SelectItem value="R-414B">R-414B</SelectItem>
+                          <SelectItem value="R-417A">R-417A</SelectItem>
+                          <SelectItem value="R-422A">R-422A</SelectItem>
+                          <SelectItem value="R-422D">R-422D</SelectItem>
+                          <SelectItem value="R-424A">R-424A</SelectItem>
+                          <SelectItem value="R-426A">R-426A</SelectItem>
+                          <SelectItem value="R-428A">R-428A</SelectItem>
+                          <SelectItem value="R-434A">R-434A</SelectItem>
+                          <SelectItem value="R-508A">R-508A</SelectItem>
+                          <SelectItem value="R-508B">R-508B</SelectItem>
+                          
                           {/* HFC Types */}
                           <SelectItem value="HFC-23">HFC-23</SelectItem>
                           <SelectItem value="HFC-32">HFC-32</SelectItem>
@@ -621,6 +750,17 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
                         className="h-11 rounded-xl border-slate-200"
                       />
                     </div>
+
+                    {calculatedEmissions && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                      >
+                        <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                        <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                      </motion.div>
+                    )}
                   </>
                 )}
               </motion.div>
