@@ -11,29 +11,55 @@ const CATEGORY_COLORS = {
   "Purchased Cooling": "#95C4B1"
 };
 
-export default function ScopeBreakdown({ records, scope, method, title }) {
-  const scopeRecords = records.filter(r => {
-    if (scope === "scope_2" && method) {
-      return r.scope === scope && r.scope_2_method === method;
-    }
-    return r.scope === scope;
-  });
+export default function ScopeBreakdown({ records, scope }) {
+  const scopeRecords = records.filter(r => r.scope === scope);
   
-  const categoryTotals = scopeRecords.reduce((acc, record) => {
-    acc[record.category] = (acc[record.category] || 0) + (record.co2e_tonnes || 0);
-    return acc;
-  }, {});
+  let categoryTotals;
+  let chartData;
 
-  const chartData = Object.entries(categoryTotals)
-    .map(([category, value]) => ({
-      category: category.length > 20 ? category.slice(0, 18) + '...' : category,
-      fullCategory: category,
-      value: Math.round(value * 1000) / 1000
-    }))
-    .sort((a, b) => b.value - a.value);
+  if (scope === "scope_2") {
+    // For Scope 2, group by category AND method
+    const categoryMethodTotals = scopeRecords.reduce((acc, record) => {
+      const key = record.category;
+      if (!acc[key]) {
+        acc[key] = { market_based: 0, location_based: 0 };
+      }
+      if (record.scope_2_method === "market_based") {
+        acc[key].market_based += (record.co2e_tonnes || 0);
+      } else if (record.scope_2_method === "location_based") {
+        acc[key].location_based += (record.co2e_tonnes || 0);
+      }
+      return acc;
+    }, {});
 
-  const total = chartData.reduce((sum, item) => sum + item.value, 0);
-  const scopeLabel = title || (scope === "scope_1" ? "Scope 1" : "Scope 2");
+    chartData = Object.entries(categoryMethodTotals)
+      .map(([category, values]) => ({
+        category: category.length > 20 ? category.slice(0, 18) + '...' : category,
+        fullCategory: category,
+        marketBased: Math.round(values.market_based * 1000) / 1000,
+        locationBased: Math.round(values.location_based * 1000) / 1000
+      }))
+      .sort((a, b) => (b.marketBased + b.locationBased) - (a.marketBased + a.locationBased));
+  } else {
+    // For Scope 1, group by category only
+    categoryTotals = scopeRecords.reduce((acc, record) => {
+      acc[record.category] = (acc[record.category] || 0) + (record.co2e_tonnes || 0);
+      return acc;
+    }, {});
+
+    chartData = Object.entries(categoryTotals)
+      .map(([category, value]) => ({
+        category: category.length > 20 ? category.slice(0, 18) + '...' : category,
+        fullCategory: category,
+        value: Math.round(value * 1000) / 1000
+      }))
+      .sort((a, b) => b.value - a.value);
+  }
+
+  const total = scope === "scope_2" 
+    ? chartData.reduce((sum, item) => sum + item.marketBased + item.locationBased, 0)
+    : chartData.reduce((sum, item) => sum + item.value, 0);
+  const scopeLabel = scope === "scope_1" ? "Scope 1" : "Scope 2";
   const scopeDescription = scope === "scope_1" 
     ? "Direct emissions from owned or controlled sources" 
     : "Indirect emissions from purchased energy";
@@ -81,7 +107,10 @@ export default function ScopeBreakdown({ records, scope, method, title }) {
               tick={{ fontSize: 12 }}
             />
             <Tooltip 
-              formatter={(value, name, props) => [`${value} tCO₂e`, props.payload.fullCategory]}
+              formatter={(value, name) => {
+                const label = name === "marketBased" ? "Market-Based" : name === "locationBased" ? "Location-Based" : name;
+                return [`${value} tCO₂e`, label];
+              }}
               contentStyle={{ 
                 borderRadius: '12px', 
                 border: 'none', 
@@ -89,14 +118,21 @@ export default function ScopeBreakdown({ records, scope, method, title }) {
                 padding: '12px 16px'
               }}
             />
-            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
-              {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={CATEGORY_COLORS[entry.fullCategory] || (scope === "scope_1" ? "#1B4332" : "#52796F")} 
-                />
-              ))}
-            </Bar>
+            {scope === "scope_2" ? (
+              <>
+                <Bar dataKey="marketBased" fill="#52796F" radius={[0, 6, 6, 0]} name="Market-Based" />
+                <Bar dataKey="locationBased" fill="#74A892" radius={[0, 6, 6, 0]} name="Location-Based" />
+              </>
+            ) : (
+              <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                {chartData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={CATEGORY_COLORS[entry.fullCategory] || "#1B4332"} 
+                  />
+                ))}
+              </Bar>
+            )}
           </BarChart>
         </ResponsiveContainer>
       </div>

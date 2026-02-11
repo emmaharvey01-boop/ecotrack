@@ -164,6 +164,12 @@ export default function Dashboard() {
             icon={Zap}
             delay={0.2}
             className="border-l-4 border-l-[#52796F]"
+            subtitle={
+              <div className="text-xs text-slate-400 mt-1 space-y-0.5">
+                <div>Market: {scope2MarketBased.toFixed(2)} tCO₂e</div>
+                <div>Location: {scope2LocationBased.toFixed(2)} tCO₂e</div>
+              </div>
+            }
           />
           <StatsCard
             title="Records"
@@ -178,10 +184,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <EmissionChart records={records} />
           <ScopeBreakdown records={records} scope="scope_1" />
-          <div className="space-y-6">
-            <ScopeBreakdown records={records} scope="scope_2" method="market_based" title="Scope 2 - Market-Based" />
-            <ScopeBreakdown records={records} scope="scope_2" method="location_based" title="Scope 2 - Location-Based" />
-          </div>
+          <ScopeBreakdown records={records} scope="scope_2" />
         </div>
 
         {/* Table Section */}
