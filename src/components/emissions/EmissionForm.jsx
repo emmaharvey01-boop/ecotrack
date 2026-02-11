@@ -1282,7 +1282,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                         {(() => {
                           const steamPurchased = parseFloat(formData.steam_purchased) || 0;
                           const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
-                          const mmBtuConsumed = steamPurchased * boilerEfficiency;
+                          const mmBtuConsumed = steamPurchased / boilerEfficiency;
                           
                           const hasMarketCO2 = formData.steam_market_co2_factor !== "";
                           const hasMarketCH4 = formData.steam_market_ch4_factor !== "";
