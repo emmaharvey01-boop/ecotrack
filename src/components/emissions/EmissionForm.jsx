@@ -302,6 +302,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const [formData, setFormData] = useState({
     company_name: "",
     scope: "",
+    scope_2_method: "",
     category: "",
     source: "",
     amount: "",
@@ -335,6 +336,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       setFormData({
         company_name: editingRecord.company_name || "",
         scope: editingRecord.scope || "",
+        scope_2_method: editingRecord.scope_2_method || "",
         category: editingRecord.category === "Stationary Combustion" ? "stationary_combustion" 
                 : editingRecord.category === "Mobile Sources" ? "mobile_sources"
                 : editingRecord.category === "Refrigeration and A/C Equipment Use" ? "refrigeration_ac"
@@ -373,6 +375,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       setFormData({
         company_name: "",
         scope: "",
+        scope_2_method: "",
         category: "",
         source: "",
         amount: "",
@@ -567,6 +570,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     const record = {
       company_name: formData.company_name,
       scope: formData.scope,
+      scope_2_method: formData.scope === "scope_2" ? formData.scope_2_method : undefined,
       category: selectedCategory?.label || formData.category,
       source: formData.source,
       reporting_period: formData.reporting_period,
@@ -658,7 +662,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   };
 
   const handleScopeChange = (value) => {
-    setFormData({ ...formData, scope: value, category: "", source: "" });
+    setFormData({ ...formData, scope: value, scope_2_method: "", category: "", source: "" });
   };
 
   const handleCategoryChange = (value) => {
@@ -719,7 +723,29 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </div>
 
           <AnimatePresence mode="wait">
-            {formData.scope && (
+            {formData.scope === "scope_2" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2"
+              >
+                <Label className="text-sm font-medium text-slate-700">Calculation Method</Label>
+                <Select value={formData.scope_2_method} onValueChange={(value) => setFormData({ ...formData, scope_2_method: value })}>
+                  <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="market_based">Market-Based</SelectItem>
+                    <SelectItem value="location_based">Location-Based</SelectItem>
+                  </SelectContent>
+                </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            {formData.scope && (formData.scope === "scope_1" || (formData.scope === "scope_2" && formData.scope_2_method)) && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -1386,6 +1412,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
               type="submit"
               disabled={
                 !formData.scope || 
+                (formData.scope === "scope_2" && !formData.scope_2_method) ||
                 !formData.category || 
                 !formData.reporting_period || 
                 (isMobileCombustion 

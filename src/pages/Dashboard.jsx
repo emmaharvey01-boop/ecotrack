@@ -70,6 +70,8 @@ export default function Dashboard() {
   const totalEmissions = records.reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
   const scope1Total = records.filter(r => r.scope === "scope_1").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
   const scope2Total = records.filter(r => r.scope === "scope_2").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+  const scope2MarketBased = records.filter(r => r.scope === "scope_2" && r.scope_2_method === "market_based").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+  const scope2LocationBased = records.filter(r => r.scope === "scope_2" && r.scope_2_method === "location_based").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
 
   return (
     <div className="min-h-screen bg-[#0f172a] font-['Inter',system-ui,sans-serif]">
@@ -176,7 +178,10 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <EmissionChart records={records} />
           <ScopeBreakdown records={records} scope="scope_1" />
-          <ScopeBreakdown records={records} scope="scope_2" />
+          <div className="space-y-6">
+            <ScopeBreakdown records={records} scope="scope_2" method="market_based" title="Scope 2 - Market-Based" />
+            <ScopeBreakdown records={records} scope="scope_2" method="location_based" title="Scope 2 - Location-Based" />
+          </div>
         </div>
 
         {/* Table Section */}

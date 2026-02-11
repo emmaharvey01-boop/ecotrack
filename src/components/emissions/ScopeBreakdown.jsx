@@ -11,8 +11,13 @@ const CATEGORY_COLORS = {
   "Purchased Cooling": "#95C4B1"
 };
 
-export default function ScopeBreakdown({ records, scope }) {
-  const scopeRecords = records.filter(r => r.scope === scope);
+export default function ScopeBreakdown({ records, scope, method, title }) {
+  const scopeRecords = records.filter(r => {
+    if (scope === "scope_2" && method) {
+      return r.scope === scope && r.scope_2_method === method;
+    }
+    return r.scope === scope;
+  });
   
   const categoryTotals = scopeRecords.reduce((acc, record) => {
     acc[record.category] = (acc[record.category] || 0) + (record.co2e_tonnes || 0);
