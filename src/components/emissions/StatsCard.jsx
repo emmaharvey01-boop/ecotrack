@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-export default function StatsCard({ title, value, unit, icon: Icon, trend, trendValue, className, delay = 0 }) {
+export default function StatsCard({ title, value, unit, icon: Icon, trend, trendValue, className, delay = 0, subtitle }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -19,6 +19,7 @@ export default function StatsCard({ title, value, unit, icon: Icon, trend, trend
             <span className="text-3xl font-semibold text-slate-900 tracking-tight">{value}</span>
             <span className="text-sm text-slate-400 font-medium">{unit}</span>
           </div>
+          {subtitle && <div className="mt-1">{subtitle}</div>}
           {trend && (
             <div className={cn(
               "inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
