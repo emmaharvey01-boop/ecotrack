@@ -132,6 +132,34 @@ const FIRE_SUPPRESSION_GWP_FACTORS = {
   "PFC-31-10": 9200
 };
 
+const PURCHASED_GASES_GWP_FACTORS = {
+  "Carbon Dioxide (CO2)": 1,
+  "Methane (CH4)": 28,
+  "Nitrous Oxide (N2O)": 265,
+  "Sulphur hexafluoride (SF6)": 23500,
+  "Nitrogen Trifluoride (NF3)": 16100,
+  "CF4 (PFC)": 6630,
+  "C2F6 (PFC)": 11100,
+  "C3F8 (PFC)": 8900,
+  "C4F10 (PFC)": 9200,
+  "C5F12 (PFC)": 8550,
+  "C6F14 (PFC)": 7910,
+  "HFC-23": 12400,
+  "HFC-32": 677,
+  "HFC-41": 116,
+  "HFC-125": 3170,
+  "HFC-134": 1120,
+  "HFC-134a": 1300,
+  "HFC-143": 328,
+  "HFC-143a": 4800,
+  "HFC-152a": 138,
+  "HFC-227ea": 3350,
+  "HFC-236fa": 8060,
+  "HFC-245fa": 858,
+  "HFC-365mfc": 804,
+  "HFC-43-10mee": 1650
+};
+
 const REFRIGERANT_GWP_FACTORS = {
   "Carbon Dioxide": 1,
   "Sulphur hexafluoride": 23500,
@@ -296,7 +324,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     fire_suppression_gas: "",
     fire_inventory_change: "",
     fire_transfer_amount: "",
-    fire_capacity_change: ""
+    fire_capacity_change: "",
+    purchased_gas_type: "",
+    purchased_gas_amount: ""
   });
 
   // Populate form when editing
@@ -335,7 +365,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         fire_suppression_gas: "",
         fire_inventory_change: "",
         fire_transfer_amount: "",
-        fire_capacity_change: ""
+        fire_capacity_change: "",
+        purchased_gas_type: "",
+        purchased_gas_amount: ""
       });
     } else if (!open) {
       setFormData({
@@ -363,7 +395,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         fire_suppression_gas: "",
         fire_inventory_change: "",
         fire_transfer_amount: "",
-        fire_capacity_change: ""
+        fire_capacity_change: "",
+        purchased_gas_type: "",
+        purchased_gas_amount: ""
       });
     }
   }, [editingRecord, open]);
@@ -378,6 +412,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isStationaryCombustion = formData.category === "stationary_combustion";
   const isRefrigeration = formData.category === "refrigeration_ac";
   const isFireSuppression = formData.category === "fire_suppression";
+  const isPurchasedGases = formData.category === "purchased_gases";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -435,6 +470,22 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     // CO2e in lbs, then convert to tonnes (1 ton = 2204.62 lbs)
     const co2eLbs = totalLbs * gwpFactor;
     const co2eTonnes = co2eLbs / 2204.62;
+    
+    return co2eTonnes.toFixed(4);
+  };
+
+  // Calculate emissions for purchased gases
+  const calculatePurchasedGasesEmissions = () => {
+    if (!formData.purchased_gas_type || !formData.purchased_gas_amount) {
+      return null;
+    }
+
+    const amount = parseFloat(formData.purchased_gas_amount) || 0;
+    const gwpFactor = PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type] || 0;
+    
+    // CO2e in kg, then convert to tonnes
+    const co2eKg = amount * gwpFactor;
+    const co2eTonnes = co2eKg / 1000;
     
     return co2eTonnes.toFixed(4);
   };
@@ -504,6 +555,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     ? calculateRefrigerationEmissions()
     : isFireSuppression && formData.fire_suppression_method === "material_balance"
     ? calculateFireSuppressionEmissions()
+    : isPurchasedGases
+    ? calculatePurchasedGasesEmissions()
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -559,6 +612,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       record.unit = "lbs";
       record.emission_factor = FIRE_SUPPRESSION_GWP_FACTORS[formData.fire_suppression_gas] || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    } else if (isPurchasedGases) {
+      record.source = formData.purchased_gas_type;
+      record.amount = parseFloat(formData.purchased_gas_amount);
+      record.unit = "kg";
+      record.emission_factor = PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type] || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -587,7 +646,14 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       gas_type: "",
       inventory_change: "",
       transfer_amount: "",
-      capacity_change: ""
+      capacity_change: "",
+      fire_suppression_method: "",
+      fire_suppression_gas: "",
+      fire_inventory_change: "",
+      fire_transfer_amount: "",
+      fire_capacity_change: "",
+      purchased_gas_type: "",
+      purchased_gas_amount: ""
     });
   };
 
@@ -676,7 +742,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -697,6 +763,84 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Purchased Gases Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isPurchasedGases && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Gas Type</Label>
+                  <Select 
+                    value={formData.purchased_gas_type} 
+                    onValueChange={(value) => setFormData({ ...formData, purchased_gas_type: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select gas type" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      <SelectItem value="Carbon Dioxide (CO2)">Carbon Dioxide (CO₂)</SelectItem>
+                      <SelectItem value="Methane (CH4)">Methane (CH₄)</SelectItem>
+                      <SelectItem value="Nitrous Oxide (N2O)">Nitrous Oxide (N₂O)</SelectItem>
+                      <SelectItem value="Sulphur hexafluoride (SF6)">Sulphur hexafluoride (SF₆)</SelectItem>
+                      <SelectItem value="Nitrogen Trifluoride (NF3)">Nitrogen Trifluoride (NF₃)</SelectItem>
+                      
+                      {/* PFCs */}
+                      <SelectItem value="CF4 (PFC)">CF₄ (PFC)</SelectItem>
+                      <SelectItem value="C2F6 (PFC)">C₂F₆ (PFC)</SelectItem>
+                      <SelectItem value="C3F8 (PFC)">C₃F₈ (PFC)</SelectItem>
+                      <SelectItem value="C4F10 (PFC)">C₄F₁₀ (PFC)</SelectItem>
+                      <SelectItem value="C5F12 (PFC)">C₅F₁₂ (PFC)</SelectItem>
+                      <SelectItem value="C6F14 (PFC)">C₆F₁₄ (PFC)</SelectItem>
+                      
+                      {/* HFCs */}
+                      <SelectItem value="HFC-23">HFC-23</SelectItem>
+                      <SelectItem value="HFC-32">HFC-32</SelectItem>
+                      <SelectItem value="HFC-41">HFC-41</SelectItem>
+                      <SelectItem value="HFC-125">HFC-125</SelectItem>
+                      <SelectItem value="HFC-134">HFC-134</SelectItem>
+                      <SelectItem value="HFC-134a">HFC-134a</SelectItem>
+                      <SelectItem value="HFC-143">HFC-143</SelectItem>
+                      <SelectItem value="HFC-143a">HFC-143a</SelectItem>
+                      <SelectItem value="HFC-152a">HFC-152a</SelectItem>
+                      <SelectItem value="HFC-227ea">HFC-227ea</SelectItem>
+                      <SelectItem value="HFC-236fa">HFC-236fa</SelectItem>
+                      <SelectItem value="HFC-245fa">HFC-245fa</SelectItem>
+                      <SelectItem value="HFC-365mfc">HFC-365mfc</SelectItem>
+                      <SelectItem value="HFC-43-10mee">HFC-43-10mee</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Amount (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.purchased_gas_amount}
+                    onChange={(e) => setFormData({ ...formData, purchased_gas_amount: e.target.value })}
+                    placeholder="Enter amount"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                {calculatedEmissions && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1256,6 +1400,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   ? (!formData.fire_suppression_method || 
                       (formData.fire_suppression_method === "material_balance" && 
                         (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change)))
+                  : isPurchasedGases
+                  ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
