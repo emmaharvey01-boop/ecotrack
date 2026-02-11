@@ -365,9 +365,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     steam_fuel_type: "",
     steam_boiler_efficiency: "",
     steam_purchased: "",
-    steam_co2_factor: "",
-    steam_ch4_factor: "",
-    steam_n2o_factor: ""
+    steam_market_co2_factor: "",
+    steam_market_ch4_factor: "",
+    steam_market_n2o_factor: "",
+    steam_location_co2_factor: "",
+    steam_location_ch4_factor: "",
+    steam_location_n2o_factor: ""
   });
 
   // Populate form when editing
@@ -673,17 +676,17 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       // Calculate mmBtu consumed
       const mmBtuConsumed = steamPurchased * boilerEfficiency;
       
-      // Market-based calculation (using custom factors if provided)
+      // Market-based calculation
       let marketBasedTonnes;
-      const hasCO2Factor = formData.steam_co2_factor !== "";
-      const hasCH4Factor = formData.steam_ch4_factor !== "";
-      const hasN2OFactor = formData.steam_n2o_factor !== "";
+      const hasMarketCO2Factor = formData.steam_market_co2_factor !== "";
+      const hasMarketCH4Factor = formData.steam_market_ch4_factor !== "";
+      const hasMarketN2OFactor = formData.steam_market_n2o_factor !== "";
       
-      if (hasCO2Factor || hasCH4Factor || hasN2OFactor) {
-        // Use custom factors (in lb/mmBtu)
-        const co2Factor = parseFloat(formData.steam_co2_factor) || 0;
-        const ch4Factor = parseFloat(formData.steam_ch4_factor) || 0;
-        const n2oFactor = parseFloat(formData.steam_n2o_factor) || 0;
+      if (hasMarketCO2Factor || hasMarketCH4Factor || hasMarketN2OFactor) {
+        // Use custom market-based factors (in lb/mmBtu)
+        const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
+        const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
+        const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
         
         // Convert to CO2e using GWP (CH4=28, N2O=265)
         const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
@@ -714,7 +717,33 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         notes: formData.notes
       };
       
-      // Location-based calculation (same as market-based for steam)
+      // Location-based calculation
+      let locationBasedTonnes;
+      const hasLocationCO2Factor = formData.steam_location_co2_factor !== "";
+      const hasLocationCH4Factor = formData.steam_location_ch4_factor !== "";
+      const hasLocationN2OFactor = formData.steam_location_n2o_factor !== "";
+      
+      if (hasLocationCO2Factor || hasLocationCH4Factor || hasLocationN2OFactor) {
+        // Use custom location-based factors (in lb/mmBtu)
+        const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
+        const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
+        const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
+        
+        // Convert to CO2e using GWP (CH4=28, N2O=265)
+        const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+        const locationBasedLbs = mmBtuConsumed * totalFactor;
+        locationBasedTonnes = locationBasedLbs / 2204.62;
+      } else {
+        // Use fuel-based default factors (same as market-based)
+        const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
+        if (fuelFactor) {
+          const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
+          locationBasedTonnes = co2Kg / 1000;
+        } else {
+          locationBasedTonnes = 0;
+        }
+      }
+      
       const locationBasedRecord = {
         company_name: formData.company_name,
         scope: "scope_2",
@@ -723,8 +752,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         source: formData.steam_source_area,
         amount: steamPurchased,
         unit: "mmBtu",
-        emission_factor: marketBasedTonnes / steamPurchased,
-        co2e_tonnes: marketBasedTonnes,
+        emission_factor: locationBasedTonnes / steamPurchased,
+        co2e_tonnes: locationBasedTonnes,
         reporting_period: formData.reporting_period,
         notes: formData.notes
       };
@@ -1164,30 +1193,60 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Emission Factors (Optional - lb/mmBtu)</Label>
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-slate-700">Market-Based Emission Factors (Optional - lb/mmBtu)</Label>
                   <div className="grid grid-cols-3 gap-2">
                     <Input
                       type="number"
                       step="0.01"
-                      value={formData.steam_co2_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_co2_factor: e.target.value })}
+                      value={formData.steam_market_co2_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_market_co2_factor: e.target.value })}
                       placeholder="CO₂"
                       className="h-11 rounded-xl border-slate-200"
                     />
                     <Input
                       type="number"
                       step="0.01"
-                      value={formData.steam_ch4_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_ch4_factor: e.target.value })}
+                      value={formData.steam_market_ch4_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_market_ch4_factor: e.target.value })}
                       placeholder="CH₄"
                       className="h-11 rounded-xl border-slate-200"
                     />
                     <Input
                       type="number"
                       step="0.01"
-                      value={formData.steam_n2o_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_n2o_factor: e.target.value })}
+                      value={formData.steam_market_n2o_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_market_n2o_factor: e.target.value })}
+                      placeholder="N₂O"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-slate-700">Location-Based Emission Factors (Optional - lb/mmBtu)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_location_co2_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_location_co2_factor: e.target.value })}
+                      placeholder="CO₂"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_location_ch4_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_location_ch4_factor: e.target.value })}
+                      placeholder="CH₄"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_location_n2o_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_location_n2o_factor: e.target.value })}
                       placeholder="N₂O"
                       className="h-11 rounded-xl border-slate-200"
                     />
@@ -1196,41 +1255,78 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 </div>
 
                 {formData.steam_purchased && formData.steam_fuel_type && formData.steam_boiler_efficiency && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
-                  >
-                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
-                    <span className="text-lg font-semibold text-emerald-800">
-                      {(() => {
-                        const steamPurchased = parseFloat(formData.steam_purchased) || 0;
-                        const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
-                        const mmBtuConsumed = steamPurchased * boilerEfficiency;
-                        
-                        const hasCO2Factor = formData.steam_co2_factor !== "";
-                        const hasCH4Factor = formData.steam_ch4_factor !== "";
-                        const hasN2OFactor = formData.steam_n2o_factor !== "";
-                        
-                        if (hasCO2Factor || hasCH4Factor || hasN2OFactor) {
-                          const co2Factor = parseFloat(formData.steam_co2_factor) || 0;
-                          const ch4Factor = parseFloat(formData.steam_ch4_factor) || 0;
-                          const n2oFactor = parseFloat(formData.steam_n2o_factor) || 0;
-                          const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
-                          const lbsCO2e = mmBtuConsumed * totalFactor;
-                          const metricTonnes = lbsCO2e / 2204.62;
-                          return metricTonnes.toFixed(4);
-                        } else {
-                          const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
-                          if (fuelFactor) {
-                            const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
-                            return (co2Kg / 1000).toFixed(4);
+                  <div className="space-y-2">
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                    >
+                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
+                      <span className="text-lg font-semibold text-emerald-800">
+                        {(() => {
+                          const steamPurchased = parseFloat(formData.steam_purchased) || 0;
+                          const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
+                          const mmBtuConsumed = steamPurchased * boilerEfficiency;
+                          
+                          const hasMarketCO2 = formData.steam_market_co2_factor !== "";
+                          const hasMarketCH4 = formData.steam_market_ch4_factor !== "";
+                          const hasMarketN2O = formData.steam_market_n2o_factor !== "";
+                          
+                          if (hasMarketCO2 || hasMarketCH4 || hasMarketN2O) {
+                            const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
+                            const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
+                            const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
+                            const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+                            const lbsCO2e = mmBtuConsumed * totalFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          } else {
+                            const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
+                            if (fuelFactor) {
+                              const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
+                              return (co2Kg / 1000).toFixed(4);
+                            }
+                            return "0.0000";
                           }
-                          return "0.0000";
-                        }
-                      })()} tCO₂e
-                    </span>
-                  </motion.div>
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-blue-50 rounded-xl"
+                    >
+                      <span className="text-sm text-blue-700 font-medium">Location-Based Emissions</span>
+                      <span className="text-lg font-semibold text-blue-800">
+                        {(() => {
+                          const steamPurchased = parseFloat(formData.steam_purchased) || 0;
+                          const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
+                          const mmBtuConsumed = steamPurchased * boilerEfficiency;
+                          
+                          const hasLocationCO2 = formData.steam_location_co2_factor !== "";
+                          const hasLocationCH4 = formData.steam_location_ch4_factor !== "";
+                          const hasLocationN2O = formData.steam_location_n2o_factor !== "";
+                          
+                          if (hasLocationCO2 || hasLocationCH4 || hasLocationN2O) {
+                            const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
+                            const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
+                            const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
+                            const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+                            const lbsCO2e = mmBtuConsumed * totalFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          } else {
+                            const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
+                            if (fuelFactor) {
+                              const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
+                              return (co2Kg / 1000).toFixed(4);
+                            }
+                            return "0.0000";
+                          }
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                  </div>
                 )}
               </motion.div>
             )}
