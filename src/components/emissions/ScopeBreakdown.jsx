@@ -33,7 +33,7 @@ export default function ScopeBreakdown({ records, scope, method, title }) {
     .sort((a, b) => b.value - a.value);
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
-  const scopeLabel = scope === "scope_1" ? "Scope 1" : "Scope 2";
+  const scopeLabel = title || (scope === "scope_1" ? "Scope 1" : "Scope 2");
   const scopeDescription = scope === "scope_1" 
     ? "Direct emissions from owned or controlled sources" 
     : "Indirect emissions from purchased energy";
