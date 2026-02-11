@@ -42,7 +42,13 @@ export default function Dashboard() {
   }, [allRecords, selectedCompany]);
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.EmissionRecord.create(data),
+    mutationFn: async (data) => {
+      // Handle array of records (for electricity with both methods)
+      if (Array.isArray(data)) {
+        return Promise.all(data.map(record => base44.entities.EmissionRecord.create(record)));
+      }
+      return base44.entities.EmissionRecord.create(data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emissions"] });
       setShowForm(false);

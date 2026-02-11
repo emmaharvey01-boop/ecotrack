@@ -644,6 +644,89 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // For purchased electricity, create two records (market-based and location-based)
+    if (isPurchasedElectricity) {
+      const kWh = parseFloat(formData.electricity_kwh);
+      const mWh = kWh / 1000;
+      
+      // Market-based record
+      const customFactor = parseFloat(formData.custom_emission_factor) || 0;
+      const marketBasedLbs = mWh * customFactor;
+      const marketBasedTonnes = marketBasedLbs / 2204.62;
+      
+      const marketBasedRecord = {
+        company_name: formData.company_name,
+        scope: "scope_2",
+        scope_2_method: "market_based",
+        category: "Purchased Electricity",
+        source: "Custom Supplier",
+        amount: kWh,
+        unit: "kWh",
+        emission_factor: customFactor / 1000,
+        co2e_tonnes: marketBasedTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      };
+      
+      // Location-based record
+      const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+      const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+      const locationBasedLbs = mWh * totalFactor;
+      const locationBasedTonnes = locationBasedLbs / 2204.62;
+      
+      const locationBasedRecord = {
+        company_name: formData.company_name,
+        scope: "scope_2",
+        scope_2_method: "location_based",
+        category: "Purchased Electricity",
+        source: formData.egrid_subregion,
+        amount: kWh,
+        unit: "kWh",
+        emission_factor: totalFactor / 1000,
+        co2e_tonnes: locationBasedTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      };
+      
+      // Submit both records
+      onSubmit([marketBasedRecord, locationBasedRecord]);
+      
+      setFormData({
+        company_name: "",
+        scope: "",
+        scope_2_method: "",
+        category: "",
+        source: "",
+        amount: "",
+        reporting_period: "",
+        notes: "",
+        vehicle_type: "",
+        fuel_usage: "",
+        fuel_units: "",
+        miles_travelled: "",
+        fuel_combusted: "",
+        fuel_state: "",
+        combustion_units: "",
+        quantity_combusted: "",
+        refrigeration_method: "",
+        gas_type: "",
+        inventory_change: "",
+        transfer_amount: "",
+        capacity_change: "",
+        fire_suppression_method: "",
+        fire_suppression_gas: "",
+        fire_inventory_change: "",
+        fire_transfer_amount: "",
+        fire_capacity_change: "",
+        purchased_gas_type: "",
+        purchased_gas_amount: "",
+        egrid_subregion: "",
+        electricity_kwh: "",
+        custom_emission_factor: ""
+      });
+      return;
+    }
+    
     const record = {
       company_name: formData.company_name,
       scope: formData.scope,
@@ -819,29 +902,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </div>
 
           <AnimatePresence mode="wait">
-            {formData.scope === "scope_2" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-2"
-              >
-                <Label className="text-sm font-medium text-slate-700">Calculation Method</Label>
-                <Select value={formData.scope_2_method} onValueChange={(value) => setFormData({ ...formData, scope_2_method: value })}>
-                  <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                    <SelectValue placeholder="Select method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="market_based">Market-Based</SelectItem>
-                    <SelectItem value="location_based">Location-Based</SelectItem>
-                  </SelectContent>
-                </Select>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence mode="wait">
-            {formData.scope && (formData.scope === "scope_1" || (formData.scope === "scope_2" && formData.scope_2_method)) && (
+            {formData.scope && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -898,6 +959,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-4 pt-2"
               >
+                <div className="p-4 bg-blue-50 rounded-xl mb-2">
+                  <p className="text-sm text-blue-800">
+                    Both market-based and location-based emissions will be calculated automatically
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-700">Electricity Consumed (kWh)</Label>
                   <Input
@@ -910,49 +977,75 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   />
                 </div>
 
-                {formData.scope_2_method === "location_based" && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-700">eGRID Subregion</Label>
-                    <Select 
-                      value={formData.egrid_subregion} 
-                      onValueChange={(value) => setFormData({ ...formData, egrid_subregion: value })}
-                    >
-                      <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                        <SelectValue placeholder="Select eGRID subregion" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[300px]">
-                        {Object.keys(EGRID_SUBREGIONS).map(region => (
-                          <SelectItem key={region} value={region}>{region}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                {formData.scope_2_method === "market_based" && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-700">Emission Factor (lb CO₂e/MWh)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.custom_emission_factor}
-                      onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })}
-                      placeholder="Enter supplier emission factor or 0 for renewable"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
-                    <p className="text-xs text-slate-500">Enter 0 for 100% renewable energy purchases</p>
-                  </div>
-                )}
-
-                {calculatedEmissions && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">eGRID Subregion (for Location-Based)</Label>
+                  <Select 
+                    value={formData.egrid_subregion} 
+                    onValueChange={(value) => setFormData({ ...formData, egrid_subregion: value })}
                   >
-                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
-                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
-                  </motion.div>
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select eGRID subregion" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {Object.keys(EGRID_SUBREGIONS).map(region => (
+                        <SelectItem key={region} value={region}>{region}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (for Market-Based)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.custom_emission_factor}
+                    onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })}
+                    placeholder="Enter supplier emission factor or 0 for renewable"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                  <p className="text-xs text-slate-500">Enter 0 for 100% renewable energy purchases</p>
+                </div>
+
+                {formData.electricity_kwh && formData.egrid_subregion && formData.custom_emission_factor && (
+                  <div className="space-y-2">
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                    >
+                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
+                      <span className="text-lg font-semibold text-emerald-800">
+                        {(() => {
+                          const kWh = parseFloat(formData.electricity_kwh) || 0;
+                          const mWh = kWh / 1000;
+                          const customFactor = parseFloat(formData.custom_emission_factor) || 0;
+                          const lbsCO2e = mWh * customFactor;
+                          const metricTonnes = lbsCO2e / 2204.62;
+                          return metricTonnes.toFixed(4);
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center justify-between p-4 bg-blue-50 rounded-xl"
+                    >
+                      <span className="text-sm text-blue-700 font-medium">Location-Based Emissions</span>
+                      <span className="text-lg font-semibold text-blue-800">
+                        {(() => {
+                          const kWh = parseFloat(formData.electricity_kwh) || 0;
+                          const mWh = kWh / 1000;
+                          const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+                          if (!subregion) return "0.0000";
+                          const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+                          const lbsCO2e = mWh * totalFactor;
+                          const metricTonnes = lbsCO2e / 2204.62;
+                          return metricTonnes.toFixed(4);
+                        })()} tCO₂e
+                      </span>
+                    </motion.div>
+                  </div>
                 )}
               </motion.div>
             )}
@@ -1577,7 +1670,6 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
               type="submit"
               disabled={
                 !formData.scope || 
-                (formData.scope === "scope_2" && !formData.scope_2_method) ||
                 !formData.category || 
                 !formData.reporting_period || 
                 (isMobileCombustion 
@@ -1595,9 +1687,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   : isPurchasedGases
                   ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
                   : isPurchasedElectricity
-                  ? (!formData.electricity_kwh || 
-                      (formData.scope_2_method === "location_based" && !formData.egrid_subregion) ||
-                      (formData.scope_2_method === "market_based" && !formData.custom_emission_factor))
+                  ? (!formData.electricity_kwh || !formData.egrid_subregion || !formData.custom_emission_factor)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
