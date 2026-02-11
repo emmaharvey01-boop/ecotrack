@@ -259,7 +259,7 @@ const REPORTING_PERIODS = [
   "2024", "2025", "2026", "2027", "2028"
 ];
 
-export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) {
+export default function EmissionForm({ open, onClose, onSubmit, editingRecord, isSubmitting }) {
   const [formData, setFormData] = useState({
     company_name: "",
     scope: "",
@@ -282,6 +282,65 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
     transfer_amount: "",
     capacity_change: ""
   });
+
+  // Populate form when editing
+  React.useEffect(() => {
+    if (editingRecord && open) {
+      setFormData({
+        company_name: editingRecord.company_name || "",
+        scope: editingRecord.scope || "",
+        category: editingRecord.category === "Stationary Combustion" ? "stationary_combustion" 
+                : editingRecord.category === "Mobile Sources" ? "mobile_sources"
+                : editingRecord.category === "Refrigeration and A/C Equipment Use" ? "refrigeration_ac"
+                : editingRecord.category === "Fire Suppression" ? "fire_suppression"
+                : editingRecord.category === "Purchased Gases" ? "purchased_gases"
+                : editingRecord.category === "Purchased Electricity" ? "purchased_electricity"
+                : editingRecord.category === "Purchased Heating" ? "purchased_heating"
+                : editingRecord.category === "Purchased Cooling" ? "purchased_cooling"
+                : "",
+        source: editingRecord.source || "",
+        amount: editingRecord.amount?.toString() || "",
+        reporting_period: editingRecord.reporting_period || "",
+        notes: editingRecord.notes || "",
+        vehicle_type: editingRecord.source_area || "",
+        fuel_usage: editingRecord.quantity_combusted?.toString() || "",
+        fuel_units: editingRecord.combustion_units || "",
+        miles_travelled: "",
+        fuel_combusted: editingRecord.fuel_combusted || "",
+        fuel_state: editingRecord.fuel_state || "",
+        combustion_units: editingRecord.combustion_units || "",
+        quantity_combusted: editingRecord.quantity_combusted?.toString() || "",
+        refrigeration_method: "",
+        gas_type: "",
+        inventory_change: "",
+        transfer_amount: "",
+        capacity_change: ""
+      });
+    } else if (!open) {
+      setFormData({
+        company_name: "",
+        scope: "",
+        category: "",
+        source: "",
+        amount: "",
+        reporting_period: "",
+        notes: "",
+        vehicle_type: "",
+        fuel_usage: "",
+        fuel_units: "",
+        miles_travelled: "",
+        fuel_combusted: "",
+        fuel_state: "",
+        combustion_units: "",
+        quantity_combusted: "",
+        refrigeration_method: "",
+        gas_type: "",
+        inventory_change: "",
+        transfer_amount: "",
+        capacity_change: ""
+      });
+    }
+  }, [editingRecord, open]);
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
                      formData.scope === "scope_2" ? SCOPE_2_CATEGORIES : [];
@@ -484,7 +543,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
       <DialogContent className="sm:max-w-[520px] max-h-[90vh] p-0 gap-0 rounded-2xl overflow-hidden flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b border-slate-100 flex-shrink-0">
           <DialogTitle className="text-xl font-semibold text-slate-900">
-            Add Emission Record
+            {editingRecord ? "Edit Emission Record" : "Add Emission Record"}
           </DialogTitle>
         </DialogHeader>
         
@@ -1027,7 +1086,7 @@ export default function EmissionForm({ open, onClose, onSubmit, isSubmitting }) 
               }
               className="flex-1 h-11 rounded-xl bg-[#1B4332] hover:bg-[#143728] text-white"
             >
-              {isSubmitting ? "Adding..." : "Add Record"}
+              {isSubmitting ? (editingRecord ? "Updating..." : "Adding...") : (editingRecord ? "Update Record" : "Add Record")}
             </Button>
           </div>
         </form>

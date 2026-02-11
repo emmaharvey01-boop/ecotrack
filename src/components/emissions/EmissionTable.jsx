@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Leaf, Zap, MoreHorizontal } from "lucide-react";
+import { Trash2, Leaf, Zap, MoreHorizontal, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function EmissionTable({ records, onDelete, isDeleting }) {
+export default function EmissionTable({ records, onDelete, onEdit, isDeleting }) {
   const [deleteId, setDeleteId] = useState(null);
 
   const handleDelete = () => {
@@ -127,6 +127,10 @@ export default function EmissionTable({ records, onDelete, isDeleting }) {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onEdit(record)}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => setDeleteId(record.id)}
                             className="text-red-600 focus:text-red-600"

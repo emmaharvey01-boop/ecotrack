@@ -20,6 +20,7 @@ import ScopeBreakdown from "@/components/emissions/ScopeBreakdown";
 
 export default function Dashboard() {
   const [showForm, setShowForm] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState("all");
   const queryClient = useQueryClient();
 
@@ -45,6 +46,16 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emissions"] });
       setShowForm(false);
+      setEditingRecord(null);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.EmissionRecord.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+      setShowForm(false);
+      setEditingRecord(null);
     },
   });
 
@@ -111,7 +122,10 @@ export default function Dashboard() {
               transition={{ delay: 0.2 }}
             >
               <Button 
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  setEditingRecord(null);
+                  setShowForm(true);
+                }}
                 className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-5 shadow-sm"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -173,6 +187,10 @@ export default function Dashboard() {
           <EmissionTable 
             records={records} 
             onDelete={deleteMutation.mutate}
+            onEdit={(record) => {
+              setEditingRecord(record);
+              setShowForm(true);
+            }}
             isDeleting={deleteMutation.isPending}
           />
         </div>
@@ -181,9 +199,19 @@ export default function Dashboard() {
       {/* Form Modal */}
       <EmissionForm
         open={showForm}
-        onClose={() => setShowForm(false)}
-        onSubmit={createMutation.mutate}
-        isSubmitting={createMutation.isPending}
+        onClose={() => {
+          setShowForm(false);
+          setEditingRecord(null);
+        }}
+        onSubmit={(data) => {
+          if (editingRecord) {
+            updateMutation.mutate({ id: editingRecord.id, data });
+          } else {
+            createMutation.mutate(data);
+          }
+        }}
+        editingRecord={editingRecord}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
       />
     </div>
   );
