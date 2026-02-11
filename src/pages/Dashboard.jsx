@@ -61,16 +61,16 @@ export default function Dashboard() {
   const scope2Total = records.filter(r => r.scope === "scope_2").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
+    <div className="min-h-screen bg-[#0f172a] font-['Inter',system-ui,sans-serif]">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100">
+      <header className="bg-[#1e293b] border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex-1">
               <motion.h1 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight"
+                className="text-2xl sm:text-3xl font-bold text-white tracking-tight"
               >
                 Climate Disclosures
               </motion.h1>
@@ -78,7 +78,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="text-slate-500 mt-1"
+                className="text-slate-400 mt-1"
               >
                 Track and report your greenhouse gas emissions
               </motion.p>
@@ -91,9 +91,9 @@ export default function Dashboard() {
                 transition={{ delay: 0.15 }}
                 className="flex items-center gap-2"
               >
-                <Building2 className="w-4 h-4 text-slate-500" />
+                <Building2 className="w-4 h-4 text-slate-400" />
                 <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-                  <SelectTrigger className="w-[200px] h-11 rounded-xl border-slate-200">
+                  <SelectTrigger className="w-[200px] h-11 rounded-xl border-slate-600 bg-[#334155] text-white">
                     <SelectValue placeholder="Select company" />
                   </SelectTrigger>
                   <SelectContent>
@@ -168,7 +168,7 @@ export default function Dashboard() {
         {/* Table Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-900">Emission Records</h2>
+            <h2 className="text-lg font-semibold text-white">Emission Records</h2>
           </div>
           <EmissionTable 
             records={records} 
