@@ -75,9 +75,8 @@ const SCOPE_1_CATEGORIES = [
 ];
 
 const SCOPE_2_CATEGORIES = [
-  { value: "purchased_electricity", label: "Purchased Electricity", sources: ["Grid Electricity", "Renewable Electricity"] },
-  { value: "purchased_heating", label: "Purchased Heating", sources: ["District Heating", "Steam"] },
-  { value: "purchased_cooling", label: "Purchased Cooling", sources: ["District Cooling", "Chilled Water"] }
+  { value: "purchased_electricity", label: "Purchased Electricity", sources: [] },
+  { value: "purchased_steam", label: "Purchased Steam", sources: [] }
 ];
 
 const EGRID_SUBREGIONS = {
@@ -463,7 +462,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isFireSuppression = formData.category === "fire_suppression";
   const isPurchasedGases = formData.category === "purchased_gases";
   const isPurchasedElectricity = formData.category === "purchased_electricity";
-  const isPurchasedSteam = formData.category === "purchased_heating" && formData.source === "Steam";
+  const isPurchasedSteam = formData.category === "purchased_steam";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
