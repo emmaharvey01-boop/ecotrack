@@ -683,13 +683,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const hasMarketN2OFactor = formData.steam_market_n2o_factor !== "";
       
       if (hasMarketCO2Factor || hasMarketCH4Factor || hasMarketN2OFactor) {
-        // Use custom market-based factors (in lb/mmBtu)
+        // Use custom market-based factors (CO2 in lb/mmBtu, CH4 and N2O in g/mmBtu)
         const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
         const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
         const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
         
-        // Convert to CO2e using GWP (CH4=28, N2O=265)
-        const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+        // Convert CH4 and N2O from g/mmBtu to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
+        const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
         const marketBasedLbs = mmBtuConsumed * totalFactor;
         marketBasedTonnes = marketBasedLbs / 2204.62;
       } else {
@@ -724,13 +724,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const hasLocationN2OFactor = formData.steam_location_n2o_factor !== "";
       
       if (hasLocationCO2Factor || hasLocationCH4Factor || hasLocationN2OFactor) {
-        // Use custom location-based factors (in lb/mmBtu)
+        // Use custom location-based factors (CO2 in lb/mmBtu, CH4 and N2O in g/mmBtu)
         const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
         const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
         const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
         
-        // Convert to CO2e using GWP (CH4=28, N2O=265)
-        const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+        // Convert CH4 and N2O from g/mmBtu to lb/mmBtu, then apply GWP (CH4=28, N2O=265)
+        const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
         const locationBasedLbs = mmBtuConsumed * totalFactor;
         locationBasedTonnes = locationBasedLbs / 2204.62;
       } else {
@@ -1194,62 +1194,80 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-700">Market-Based Emission Factors (Optional - lb/mmBtu)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Market-Based Emission Factors (Optional)</Label>
                   <div className="grid grid-cols-3 gap-2">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_market_co2_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_market_co2_factor: e.target.value })}
-                      placeholder="CO₂"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_market_ch4_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_market_ch4_factor: e.target.value })}
-                      placeholder="CH₄"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_market_n2o_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_market_n2o_factor: e.target.value })}
-                      placeholder="N₂O"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_market_co2_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_market_co2_factor: e.target.value })}
+                        placeholder="CO₂"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">lb/mmBtu</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_market_ch4_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_market_ch4_factor: e.target.value })}
+                        placeholder="CH₄"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">g/mmBtu</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_market_n2o_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_market_n2o_factor: e.target.value })}
+                        placeholder="N₂O"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">g/mmBtu</p>
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-slate-700">Location-Based Emission Factors (Optional - lb/mmBtu)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Location-Based Emission Factors (Optional)</Label>
                   <div className="grid grid-cols-3 gap-2">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_location_co2_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_location_co2_factor: e.target.value })}
-                      placeholder="CO₂"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_location_ch4_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_location_ch4_factor: e.target.value })}
-                      placeholder="CH₄"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={formData.steam_location_n2o_factor}
-                      onChange={(e) => setFormData({ ...formData, steam_location_n2o_factor: e.target.value })}
-                      placeholder="N₂O"
-                      className="h-11 rounded-xl border-slate-200"
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_location_co2_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_location_co2_factor: e.target.value })}
+                        placeholder="CO₂"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">lb/mmBtu</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_location_ch4_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_location_ch4_factor: e.target.value })}
+                        placeholder="CH₄"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">g/mmBtu</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.steam_location_n2o_factor}
+                        onChange={(e) => setFormData({ ...formData, steam_location_n2o_factor: e.target.value })}
+                        placeholder="N₂O"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                      <p className="text-xs text-slate-400">g/mmBtu</p>
+                    </div>
                   </div>
                   <p className="text-xs text-slate-500">Leave blank to use default fuel-based factors</p>
                 </div>
@@ -1276,7 +1294,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                             const co2Factor = parseFloat(formData.steam_market_co2_factor) || 0;
                             const ch4Factor = parseFloat(formData.steam_market_ch4_factor) || 0;
                             const n2oFactor = parseFloat(formData.steam_market_n2o_factor) || 0;
-                            const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+                            const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
                             const lbsCO2e = mmBtuConsumed * totalFactor;
                             const metricTonnes = lbsCO2e / 2204.62;
                             return metricTonnes.toFixed(4);
@@ -1311,7 +1329,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                             const co2Factor = parseFloat(formData.steam_location_co2_factor) || 0;
                             const ch4Factor = parseFloat(formData.steam_location_ch4_factor) || 0;
                             const n2oFactor = parseFloat(formData.steam_location_n2o_factor) || 0;
-                            const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+                            const totalFactor = co2Factor + (ch4Factor * 0.00220462 * 28) + (n2oFactor * 0.00220462 * 265);
                             const lbsCO2e = mmBtuConsumed * totalFactor;
                             const metricTonnes = lbsCO2e / 2204.62;
                             return metricTonnes.toFixed(4);
