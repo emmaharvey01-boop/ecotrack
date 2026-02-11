@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -284,7 +284,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   });
 
   // Populate form when editing
-  React.useEffect(() => {
+  useEffect(() => {
     if (editingRecord && open) {
       setFormData({
         company_name: editingRecord.company_name || "",
