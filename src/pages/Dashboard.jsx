@@ -148,13 +148,29 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatsCard
-            title="Total Emissions"
-            value={totalEmissions.toFixed(2)}
-            unit="tCO₂e"
-            icon={Activity}
-            delay={0}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0 }}
+            className="bg-[#1e293b] rounded-2xl p-6 shadow-sm border border-slate-700"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-400">Total Emissions</h3>
+              <Activity className="w-5 h-5 text-slate-400" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Market-Based</div>
+                <div className="text-2xl font-bold text-white">{(scope1Total + scope2MarketBased).toFixed(2)}</div>
+                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Location-Based</div>
+                <div className="text-2xl font-bold text-white">{(scope1Total + scope2LocationBased).toFixed(2)}</div>
+                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+              </div>
+            </div>
+          </motion.div>
           <StatsCard
             title="Scope 1"
             value={scope1Total.toFixed(2)}
