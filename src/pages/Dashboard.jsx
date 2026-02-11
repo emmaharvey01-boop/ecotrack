@@ -163,20 +163,29 @@ export default function Dashboard() {
             delay={0.1}
             className="border-l-4 border-l-[#1B4332]"
           />
-          <StatsCard
-            title="Scope 2"
-            value={scope2Total.toFixed(2)}
-            unit="tCO₂e"
-            icon={Zap}
-            delay={0.2}
-            className="border-l-4 border-l-[#52796F]"
-            subtitle={
-              <div className="text-xs text-slate-400 mt-1 space-y-0.5">
-                <div>Market: {scope2MarketBased.toFixed(2)} tCO₂e</div>
-                <div>Location: {scope2LocationBased.toFixed(2)} tCO₂e</div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#1e293b] rounded-2xl p-6 shadow-sm border border-slate-700 border-l-4 border-l-[#52796F]"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-400">Scope 2</h3>
+              <Zap className="w-5 h-5 text-slate-400" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Market-Based</div>
+                <div className="text-2xl font-bold text-white">{scope2MarketBased.toFixed(2)}</div>
+                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
               </div>
-            }
-          />
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Location-Based</div>
+                <div className="text-2xl font-bold text-white">{scope2LocationBased.toFixed(2)}</div>
+                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+              </div>
+            </div>
+          </motion.div>
           <StatsCard
             title="Records"
             value={records.length}
