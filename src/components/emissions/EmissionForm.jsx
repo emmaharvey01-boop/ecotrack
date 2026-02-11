@@ -121,6 +121,17 @@ const MOBILE_COMBUSTION_FUELS = [
   { name: "Steam", state: "gas" }
 ];
 
+const FIRE_SUPPRESSION_GWP_FACTORS = {
+  "Carbon Dioxide": 1,
+  "HFC-23": 12400,
+  "HFC-125": 3170,
+  "HFC-134a": 1300,
+  "HFC-227ea": 3350,
+  "HFC-236fa": 8060,
+  "PFC-14": 6630,
+  "PFC-31-10": 9200
+};
+
 const REFRIGERANT_GWP_FACTORS = {
   "Carbon Dioxide": 1,
   "Sulphur hexafluoride": 23500,
@@ -280,7 +291,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     gas_type: "",
     inventory_change: "",
     transfer_amount: "",
-    capacity_change: ""
+    capacity_change: "",
+    fire_suppression_method: "",
+    fire_suppression_gas: "",
+    fire_inventory_change: "",
+    fire_transfer_amount: "",
+    fire_capacity_change: ""
   });
 
   // Populate form when editing
@@ -314,7 +330,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         gas_type: "",
         inventory_change: "",
         transfer_amount: "",
-        capacity_change: ""
+        capacity_change: "",
+        fire_suppression_method: "",
+        fire_suppression_gas: "",
+        fire_inventory_change: "",
+        fire_transfer_amount: "",
+        fire_capacity_change: ""
       });
     } else if (!open) {
       setFormData({
@@ -337,7 +358,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         gas_type: "",
         inventory_change: "",
         transfer_amount: "",
-        capacity_change: ""
+        capacity_change: "",
+        fire_suppression_method: "",
+        fire_suppression_gas: "",
+        fire_inventory_change: "",
+        fire_transfer_amount: "",
+        fire_capacity_change: ""
       });
     }
   }, [editingRecord, open]);
@@ -351,6 +377,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isMobileCombustion = formData.category === "mobile_sources";
   const isStationaryCombustion = formData.category === "stationary_combustion";
   const isRefrigeration = formData.category === "refrigeration_ac";
+  const isFireSuppression = formData.category === "fire_suppression";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -388,6 +415,26 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     // CO2e in kg, then convert to tonnes
     const co2eKg = totalKg * gwpFactor;
     const co2eTonnes = co2eKg / 1000;
+    
+    return co2eTonnes.toFixed(4);
+  };
+
+  // Calculate emissions for fire suppression Material Balance
+  const calculateFireSuppressionEmissions = () => {
+    if (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change) {
+      return null;
+    }
+
+    const inventoryChange = parseFloat(formData.fire_inventory_change) || 0;
+    const transferAmount = parseFloat(formData.fire_transfer_amount) || 0;
+    const capacityChange = parseFloat(formData.fire_capacity_change) || 0;
+
+    const totalLbs = inventoryChange + transferAmount + capacityChange;
+    const gwpFactor = FIRE_SUPPRESSION_GWP_FACTORS[formData.fire_suppression_gas] || 0;
+    
+    // CO2e in lbs, then convert to tonnes (1 ton = 2204.62 lbs)
+    const co2eLbs = totalLbs * gwpFactor;
+    const co2eTonnes = co2eLbs / 2204.62;
     
     return co2eTonnes.toFixed(4);
   };
@@ -455,6 +502,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     ? calculateStationaryCombustionEmissions()
     : isRefrigeration && formData.refrigeration_method === "material_balance"
     ? calculateRefrigerationEmissions()
+    : isFireSuppression && formData.fire_suppression_method === "material_balance"
+    ? calculateFireSuppressionEmissions()
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -615,7 +664,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -636,6 +685,117 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Fire Suppression Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isFireSuppression && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Calculation Method</Label>
+                  <Select 
+                    value={formData.fire_suppression_method} 
+                    onValueChange={(value) => setFormData({ 
+                      ...formData, 
+                      fire_suppression_method: value,
+                      fire_suppression_gas: "",
+                      fire_inventory_change: "",
+                      fire_transfer_amount: "",
+                      fire_capacity_change: ""
+                    })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select calculation method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="material_balance">Material Balance Method</SelectItem>
+                      <SelectItem value="simplified_material_balance">Simplified Material Balance Method</SelectItem>
+                      <SelectItem value="screening">Screening Method</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formData.fire_suppression_method === "material_balance" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Gas Type</Label>
+                      <Select 
+                        value={formData.fire_suppression_gas} 
+                        onValueChange={(value) => setFormData({ ...formData, fire_suppression_gas: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                          <SelectValue placeholder="Select gas type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Carbon Dioxide">Carbon Dioxide</SelectItem>
+                          <SelectItem value="HFC-23">HFC-23</SelectItem>
+                          <SelectItem value="HFC-125">HFC-125</SelectItem>
+                          <SelectItem value="HFC-134a">HFC-134a</SelectItem>
+                          <SelectItem value="HFC-227ea">HFC-227ea</SelectItem>
+                          <SelectItem value="HFC-236fa">HFC-236fa</SelectItem>
+                          <SelectItem value="PFC-14">PFC-14</SelectItem>
+                          <SelectItem value="PFC-31-10">PFC-31-10</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Inventory Change (lbs)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formData.fire_inventory_change}
+                          onChange={(e) => setFormData({ ...formData, fire_inventory_change: e.target.value })}
+                          placeholder="Enter amount"
+                          className="h-11 rounded-xl border-slate-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Transfer Amount (lbs)</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formData.fire_transfer_amount}
+                          onChange={(e) => setFormData({ ...formData, fire_transfer_amount: e.target.value })}
+                          placeholder="Enter amount"
+                          className="h-11 rounded-xl border-slate-200"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Capacity Change (lbs)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.fire_capacity_change}
+                        onChange={(e) => setFormData({ ...formData, fire_capacity_change: e.target.value })}
+                        placeholder="Enter amount"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+
+                    {calculatedEmissions && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                      >
+                        <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                        <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                      </motion.div>
+                    )}
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1080,6 +1240,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   ? (!formData.refrigeration_method || 
                       (formData.refrigeration_method === "material_balance" && 
                         (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change)))
+                  : isFireSuppression
+                  ? (!formData.fire_suppression_method || 
+                      (formData.fire_suppression_method === "material_balance" && 
+                        (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change)))
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
