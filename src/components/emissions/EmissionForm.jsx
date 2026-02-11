@@ -80,6 +80,37 @@ const SCOPE_2_CATEGORIES = [
   { value: "purchased_cooling", label: "Purchased Cooling", sources: ["District Cooling", "Chilled Water"] }
 ];
 
+const EGRID_SUBREGIONS = {
+  "ASCC Alaska Grid": { co2: 1052.1, ch4: 0.088, n2o: 0.012 },
+  "ASCC Miscellaneous": { co2: 495.8, ch4: 0.023, n2o: 0.004 },
+  "WECC Southwest": { co2: 776.0, ch4: 0.051, n2o: 0.007 },
+  "WECC California": { co2: 497.4, ch4: 0.030, n2o: 0.004 },
+  "ERCOT All": { co2: 771.1, ch4: 0.049, n2o: 0.007 },
+  "FRCC All": { co2: 813.8, ch4: 0.048, n2o: 0.006 },
+  "HICC Miscellaneous": { co2: 1155.5, ch4: 0.124, n2o: 0.019 },
+  "HICC Oahu": { co2: 1575.4, ch4: 0.183, n2o: 0.025 },
+  "MRO East": { co2: 1642.8, ch4: 0.123, n2o: 0.019 },
+  "MRO West": { co2: 936.5, ch4: 0.102, n2o: 0.015 },
+  "NPCC New England": { co2: 538.4, ch4: 0.063, n2o: 0.008 },
+  "WECC Northwest": { co2: 602.1, ch4: 0.056, n2o: 0.008 },
+  "NPCC NYC/Westchester": { co2: 885.2, ch4: 0.023, n2o: 0.003 },
+  "NPCC Long Island": { co2: 1200.7, ch4: 0.135, n2o: 0.018 },
+  "NPCC Upstate NY": { co2: 274.6, ch4: 0.015, n2o: 0.002 },
+  "Puerto Rico Miscellaneous": { co2: 1593.5, ch4: 0.087, n2o: 0.014 },
+  "RFC East": { co2: 657.4, ch4: 0.045, n2o: 0.006 },
+  "RFC Michigan": { co2: 1216.4, ch4: 0.116, n2o: 0.016 },
+  "RFC West": { co2: 1000.1, ch4: 0.087, n2o: 0.012 },
+  "WECC Rockies": { co2: 1124.9, ch4: 0.101, n2o: 0.014 },
+  "SPP North": { co2: 952.6, ch4: 0.100, n2o: 0.014 },
+  "SPP South": { co2: 970.4, ch4: 0.072, n2o: 0.010 },
+  "SERC Mississippi Valley": { co2: 801.0, ch4: 0.040, n2o: 0.006 },
+  "SERC Midwest": { co2: 1369.9, ch4: 0.151, n2o: 0.022 },
+  "SERC South": { co2: 893.3, ch4: 0.064, n2o: 0.009 },
+  "SERC Tennessee Valley": { co2: 933.1, ch4: 0.082, n2o: 0.012 },
+  "SERC Virginia/Carolina": { co2: 823.0, ch4: 0.047, n2o: 0.007 },
+  "US Average": { co2: 856.1, ch4: 0.066, n2o: 0.009 }
+};
+
 const VEHICLE_TYPES = [
   { name: "Passenger Cars", mpg: 24.8 },
   { name: "Other 2-Axle, 4-Tire Vehicles", mpg: 18.1 },
@@ -327,7 +358,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     fire_transfer_amount: "",
     fire_capacity_change: "",
     purchased_gas_type: "",
-    purchased_gas_amount: ""
+    purchased_gas_amount: "",
+    egrid_subregion: "",
+    electricity_kwh: "",
+    custom_emission_factor: ""
   });
 
   // Populate form when editing
@@ -369,7 +403,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         fire_transfer_amount: "",
         fire_capacity_change: "",
         purchased_gas_type: "",
-        purchased_gas_amount: ""
+        purchased_gas_amount: "",
+        egrid_subregion: "",
+        electricity_kwh: "",
+        custom_emission_factor: ""
       });
     } else if (!open) {
       setFormData({
@@ -400,7 +437,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         fire_transfer_amount: "",
         fire_capacity_change: "",
         purchased_gas_type: "",
-        purchased_gas_amount: ""
+        purchased_gas_amount: "",
+        egrid_subregion: "",
+        electricity_kwh: "",
+        custom_emission_factor: ""
       });
     }
   }, [editingRecord, open]);
@@ -416,6 +456,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isRefrigeration = formData.category === "refrigeration_ac";
   const isFireSuppression = formData.category === "fire_suppression";
   const isPurchasedGases = formData.category === "purchased_gases";
+  const isPurchasedElectricity = formData.category === "purchased_electricity";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
@@ -493,6 +534,40 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return co2eTonnes.toFixed(4);
   };
 
+  // Calculate emissions for purchased electricity
+  const calculateElectricityEmissions = () => {
+    if (!formData.electricity_kwh) {
+      return null;
+    }
+
+    const kWh = parseFloat(formData.electricity_kwh) || 0;
+    const mWh = kWh / 1000; // Convert kWh to MWh
+
+    if (formData.scope_2_method === "market_based" && formData.custom_emission_factor) {
+      // Market-based: use custom emission factor (in lb CO2e/MWh)
+      const customFactor = parseFloat(formData.custom_emission_factor) || 0;
+      const lbsCO2e = mWh * customFactor;
+      const metricTonnes = lbsCO2e / 2204.62;
+      return metricTonnes.toFixed(4);
+    } else if (formData.scope_2_method === "location_based" && formData.egrid_subregion) {
+      // Location-based: use eGRID factors
+      const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+      if (!subregion) return null;
+
+      // Calculate total emissions in lbs CO2e/MWh
+      const co2Factor = subregion.co2;
+      const ch4Factor = subregion.ch4 * 28; // CH4 GWP = 28
+      const n2oFactor = subregion.n2o * 265; // N2O GWP = 265
+      const totalFactor = co2Factor + ch4Factor + n2oFactor;
+
+      const lbsCO2e = mWh * totalFactor;
+      const metricTonnes = lbsCO2e / 2204.62;
+      return metricTonnes.toFixed(4);
+    }
+
+    return null;
+  };
+
   // Calculate emissions for stationary combustion
   const calculateStationaryCombustionEmissions = () => {
     if (!formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units) {
@@ -560,6 +635,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     ? calculateFireSuppressionEmissions()
     : isPurchasedGases
     ? calculatePurchasedGasesEmissions()
+    : isPurchasedElectricity
+    ? calculateElectricityEmissions()
     : formData.amount && emissionFactor 
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
@@ -622,6 +699,22 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       record.unit = "kg";
       record.emission_factor = PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type] || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    } else if (isPurchasedElectricity) {
+      record.source = formData.scope_2_method === "location_based" 
+        ? formData.egrid_subregion 
+        : "Custom Supplier";
+      record.amount = parseFloat(formData.electricity_kwh);
+      record.unit = "kWh";
+      
+      if (formData.scope_2_method === "location_based" && formData.egrid_subregion) {
+        const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
+        const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+        record.emission_factor = totalFactor / 1000; // Convert to per kWh
+      } else if (formData.scope_2_method === "market_based") {
+        record.emission_factor = parseFloat(formData.custom_emission_factor) / 1000 || 0;
+      }
+      
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
@@ -657,7 +750,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       fire_transfer_amount: "",
       fire_capacity_change: "",
       purchased_gas_type: "",
-      purchased_gas_amount: ""
+      purchased_gas_amount: "",
+      egrid_subregion: "",
+      electricity_kwh: "",
+      custom_emission_factor: ""
     });
   };
 
@@ -768,7 +864,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && !isPurchasedElectricity && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -789,6 +885,75 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                     ))}
                   </SelectContent>
                 </Select>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Purchased Electricity Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isPurchasedElectricity && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Electricity Consumed (kWh)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.electricity_kwh}
+                    onChange={(e) => setFormData({ ...formData, electricity_kwh: e.target.value })}
+                    placeholder="Enter kWh"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                {formData.scope_2_method === "location_based" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">eGRID Subregion</Label>
+                    <Select 
+                      value={formData.egrid_subregion} 
+                      onValueChange={(value) => setFormData({ ...formData, egrid_subregion: value })}
+                    >
+                      <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                        <SelectValue placeholder="Select eGRID subregion" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {Object.keys(EGRID_SUBREGIONS).map(region => (
+                          <SelectItem key={region} value={region}>{region}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {formData.scope_2_method === "market_based" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">Emission Factor (lb CO₂e/MWh)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.custom_emission_factor}
+                      onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })}
+                      placeholder="Enter supplier emission factor or 0 for renewable"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                    <p className="text-xs text-slate-500">Enter 0 for 100% renewable energy purchases</p>
+                  </div>
+                )}
+
+                {calculatedEmissions && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -1429,6 +1594,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                         (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change)))
                   : isPurchasedGases
                   ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
+                  : isPurchasedElectricity
+                  ? (!formData.electricity_kwh || 
+                      (formData.scope_2_method === "location_based" && !formData.egrid_subregion) ||
+                      (formData.scope_2_method === "market_based" && !formData.custom_emission_factor))
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
