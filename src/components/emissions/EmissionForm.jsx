@@ -361,9 +361,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     egrid_subregion: "",
     electricity_kwh: "",
     custom_emission_factor: "",
-    steam_mmbtu: "",
-    steam_subregion: "",
-    steam_supplier_factor: ""
+    steam_source_area: "",
+    steam_fuel_type: "",
+    steam_boiler_efficiency: "",
+    steam_purchased: "",
+    steam_co2_factor: "",
+    steam_ch4_factor: "",
+    steam_n2o_factor: ""
   });
 
   // Populate form when editing
@@ -408,7 +412,14 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         purchased_gas_amount: "",
         egrid_subregion: "",
         electricity_kwh: "",
-        custom_emission_factor: ""
+        custom_emission_factor: "",
+        steam_source_area: "",
+        steam_fuel_type: "",
+        steam_boiler_efficiency: "",
+        steam_purchased: "",
+        steam_co2_factor: "",
+        steam_ch4_factor: "",
+        steam_n2o_factor: ""
       });
     } else if (!open) {
       setFormData({
@@ -443,9 +454,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         egrid_subregion: "",
         electricity_kwh: "",
         custom_emission_factor: "",
-        steam_mmbtu: "",
-        steam_subregion: "",
-        steam_supplier_factor: ""
+        steam_source_area: "",
+        steam_fuel_type: "",
+        steam_boiler_efficiency: "",
+        steam_purchased: "",
+        steam_co2_factor: "",
+        steam_ch4_factor: "",
+        steam_n2o_factor: ""
       });
     }
   }, [editingRecord, open]);
@@ -652,56 +667,64 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     
     // For purchased steam, create both market-based and location-based records
     if (isPurchasedSteam) {
-      const mmBtu = parseFloat(formData.steam_mmbtu);
-      const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
-      const locationTotalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
+      const steamPurchased = parseFloat(formData.steam_purchased);
+      const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
       
-      // Market-based record
-      let marketBasedTonnes, marketBasedFactor, marketBasedSource;
+      // Calculate mmBtu consumed
+      const mmBtuConsumed = steamPurchased * boilerEfficiency;
       
-      if (formData.steam_supplier_factor !== "") {
-        // Use custom supplier factor (in lb CO2e/mmBtu)
-        const customFactor = parseFloat(formData.steam_supplier_factor) || 0;
-        const marketBasedLbs = mmBtu * customFactor;
+      // Market-based calculation (using custom factors if provided)
+      let marketBasedTonnes;
+      const hasCO2Factor = formData.steam_co2_factor !== "";
+      const hasCH4Factor = formData.steam_ch4_factor !== "";
+      const hasN2OFactor = formData.steam_n2o_factor !== "";
+      
+      if (hasCO2Factor || hasCH4Factor || hasN2OFactor) {
+        // Use custom factors (in lb/mmBtu)
+        const co2Factor = parseFloat(formData.steam_co2_factor) || 0;
+        const ch4Factor = parseFloat(formData.steam_ch4_factor) || 0;
+        const n2oFactor = parseFloat(formData.steam_n2o_factor) || 0;
+        
+        // Convert to CO2e using GWP (CH4=28, N2O=265)
+        const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+        const marketBasedLbs = mmBtuConsumed * totalFactor;
         marketBasedTonnes = marketBasedLbs / 2204.62;
-        marketBasedFactor = customFactor / 1000; // per mmBtu
-        marketBasedSource = "Custom Supplier";
       } else {
-        // No supplier data: market-based equals location-based
-        const locationBasedLbs = mmBtu * locationTotalFactor;
-        marketBasedTonnes = locationBasedLbs / 2204.62;
-        marketBasedFactor = locationTotalFactor / 1000;
-        marketBasedSource = formData.steam_subregion;
+        // Use fuel-based default factors
+        const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
+        if (fuelFactor) {
+          const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
+          marketBasedTonnes = co2Kg / 1000;
+        } else {
+          marketBasedTonnes = 0;
+        }
       }
       
       const marketBasedRecord = {
         company_name: formData.company_name,
         scope: "scope_2",
         scope_2_method: "market_based",
-        category: "Purchased Heating",
-        source: marketBasedSource,
-        amount: mmBtu,
+        category: "Purchased Steam",
+        source: formData.steam_source_area,
+        amount: steamPurchased,
         unit: "mmBtu",
-        emission_factor: marketBasedFactor,
+        emission_factor: marketBasedTonnes / steamPurchased,
         co2e_tonnes: marketBasedTonnes,
         reporting_period: formData.reporting_period,
         notes: formData.notes
       };
       
-      // Location-based record
-      const locationBasedLbs = mmBtu * locationTotalFactor;
-      const locationBasedTonnes = locationBasedLbs / 2204.62;
-      
+      // Location-based calculation (same as market-based for steam)
       const locationBasedRecord = {
         company_name: formData.company_name,
         scope: "scope_2",
         scope_2_method: "location_based",
-        category: "Purchased Heating",
-        source: formData.steam_subregion,
-        amount: mmBtu,
+        category: "Purchased Steam",
+        source: formData.steam_source_area,
+        amount: steamPurchased,
         unit: "mmBtu",
-        emission_factor: locationTotalFactor / 1000,
-        co2e_tonnes: locationBasedTonnes,
+        emission_factor: marketBasedTonnes / steamPurchased,
+        co2e_tonnes: marketBasedTonnes,
         reporting_period: formData.reporting_period,
         notes: formData.notes
       };
@@ -741,9 +764,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         egrid_subregion: "",
         electricity_kwh: "",
         custom_emission_factor: "",
-        steam_mmbtu: "",
-        steam_subregion: "",
-        steam_supplier_factor: ""
+        steam_source_area: "",
+        steam_fuel_type: "",
+        steam_boiler_efficiency: "",
+        steam_purchased: "",
+        steam_co2_factor: "",
+        steam_ch4_factor: "",
+        steam_n2o_factor: ""
       });
       return;
     }
@@ -957,9 +984,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       egrid_subregion: "",
       electricity_kwh: "",
       custom_emission_factor: "",
-      steam_mmbtu: "",
-      steam_subregion: "",
-      steam_supplier_factor: ""
+      steam_source_area: "",
+      steam_fuel_type: "",
+      steam_boiler_efficiency: "",
+      steam_purchased: "",
+      steam_co2_factor: "",
+      steam_ch4_factor: "",
+      steam_n2o_factor: ""
     });
   };
 
@@ -1082,103 +1113,124 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-4 pt-2"
               >
-                <div className="p-4 bg-blue-50 rounded-xl mb-2">
-                  <p className="text-sm text-blue-800">
-                    Both methods will be calculated. If no supplier factor is provided, market-based will equal location-based.
-                  </p>
-                </div>
-
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Steam Consumed (mmBtu)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Source Area</Label>
                   <Input
-                    type="number"
-                    step="0.01"
-                    value={formData.steam_mmbtu}
-                    onChange={(e) => setFormData({ ...formData, steam_mmbtu: e.target.value })}
-                    placeholder="Enter mmBtu"
+                    value={formData.steam_source_area}
+                    onChange={(e) => setFormData({ ...formData, steam_source_area: e.target.value })}
+                    placeholder="Enter source area"
                     className="h-11 rounded-xl border-slate-200"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">eGRID Subregion (for Location-Based)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Fuel Type</Label>
                   <Select 
-                    value={formData.steam_subregion} 
-                    onValueChange={(value) => setFormData({ ...formData, steam_subregion: value })}
+                    value={formData.steam_fuel_type} 
+                    onValueChange={(value) => setFormData({ ...formData, steam_fuel_type: value })}
                   >
                     <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                      <SelectValue placeholder="Select eGRID subregion" />
+                      <SelectValue placeholder="Select fuel type" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {Object.keys(EGRID_SUBREGIONS).map(region => (
-                        <SelectItem key={region} value={region}>{region}</SelectItem>
+                    <SelectContent>
+                      {Object.keys(STATIONARY_COMBUSTION_FACTORS).map(fuel => (
+                        <SelectItem key={fuel} value={fuel}>{fuel}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/mmBtu) (Optional - for Market-Based)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Boiler Efficiency (%)</Label>
                   <Input
                     type="number"
                     step="0.01"
-                    value={formData.steam_supplier_factor}
-                    onChange={(e) => setFormData({ ...formData, steam_supplier_factor: e.target.value })}
-                    placeholder="Optional: Enter supplier factor or 0 for renewable"
+                    value={formData.steam_boiler_efficiency}
+                    onChange={(e) => setFormData({ ...formData, steam_boiler_efficiency: e.target.value })}
+                    placeholder="Enter efficiency (e.g., 80)"
                     className="h-11 rounded-xl border-slate-200"
                   />
-                  <p className="text-xs text-slate-500">Leave blank to use location-based factor for both methods</p>
                 </div>
 
-                {formData.steam_mmbtu && formData.steam_subregion && (
-                  <div className="space-y-2">
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
-                    >
-                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
-                      <span className="text-lg font-semibold text-emerald-800">
-                        {(() => {
-                          const mmBtu = parseFloat(formData.steam_mmbtu) || 0;
-                          
-                          if (formData.steam_supplier_factor !== "") {
-                            // Use custom factor
-                            const customFactor = parseFloat(formData.steam_supplier_factor) || 0;
-                            const lbsCO2e = mmBtu * customFactor;
-                            const metricTonnes = lbsCO2e / 2204.62;
-                            return metricTonnes.toFixed(4);
-                          } else {
-                            // Use location-based
-                            const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
-                            if (!subregion) return "0.0000";
-                            const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
-                            const lbsCO2e = mmBtu * totalFactor;
-                            const metricTonnes = lbsCO2e / 2204.62;
-                            return metricTonnes.toFixed(4);
-                          }
-                        })()} tCO₂e
-                      </span>
-                    </motion.div>
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center justify-between p-4 bg-blue-50 rounded-xl"
-                    >
-                      <span className="text-sm text-blue-700 font-medium">Location-Based Emissions</span>
-                      <span className="text-lg font-semibold text-blue-800">
-                        {(() => {
-                          const mmBtu = parseFloat(formData.steam_mmbtu) || 0;
-                          const subregion = EGRID_SUBREGIONS[formData.steam_subregion];
-                          if (!subregion) return "0.0000";
-                          const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
-                          const lbsCO2e = mmBtu * totalFactor;
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Steam Purchased (mmBtu)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.steam_purchased}
+                    onChange={(e) => setFormData({ ...formData, steam_purchased: e.target.value })}
+                    placeholder="Enter mmBtu"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Emission Factors (Optional - lb/mmBtu)</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_co2_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_co2_factor: e.target.value })}
+                      placeholder="CO₂"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_ch4_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_ch4_factor: e.target.value })}
+                      placeholder="CH₄"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.steam_n2o_factor}
+                      onChange={(e) => setFormData({ ...formData, steam_n2o_factor: e.target.value })}
+                      placeholder="N₂O"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500">Leave blank to use default fuel-based factors</p>
+                </div>
+
+                {formData.steam_purchased && formData.steam_fuel_type && formData.steam_boiler_efficiency && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">
+                      {(() => {
+                        const steamPurchased = parseFloat(formData.steam_purchased) || 0;
+                        const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
+                        const mmBtuConsumed = steamPurchased * boilerEfficiency;
+                        
+                        const hasCO2Factor = formData.steam_co2_factor !== "";
+                        const hasCH4Factor = formData.steam_ch4_factor !== "";
+                        const hasN2OFactor = formData.steam_n2o_factor !== "";
+                        
+                        if (hasCO2Factor || hasCH4Factor || hasN2OFactor) {
+                          const co2Factor = parseFloat(formData.steam_co2_factor) || 0;
+                          const ch4Factor = parseFloat(formData.steam_ch4_factor) || 0;
+                          const n2oFactor = parseFloat(formData.steam_n2o_factor) || 0;
+                          const totalFactor = co2Factor + (ch4Factor * 28) + (n2oFactor * 265);
+                          const lbsCO2e = mmBtuConsumed * totalFactor;
                           const metricTonnes = lbsCO2e / 2204.62;
                           return metricTonnes.toFixed(4);
-                        })()} tCO₂e
-                      </span>
-                    </motion.div>
-                  </div>
+                        } else {
+                          const fuelFactor = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
+                          if (fuelFactor) {
+                            const co2Kg = mmBtuConsumed * fuelFactor.co2PerMmBtu;
+                            return (co2Kg / 1000).toFixed(4);
+                          }
+                          return "0.0000";
+                        }
+                      })()} tCO₂e
+                    </span>
+                  </motion.div>
                 )}
               </motion.div>
             )}
@@ -1935,7 +1987,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   : isPurchasedElectricity
                   ? (!formData.electricity_kwh || !formData.egrid_subregion)
                   : isPurchasedSteam
-                  ? (!formData.steam_mmbtu || !formData.steam_subregion)
+                  ? (!formData.steam_source_area || !formData.steam_fuel_type || !formData.steam_boiler_efficiency || !formData.steam_purchased)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
