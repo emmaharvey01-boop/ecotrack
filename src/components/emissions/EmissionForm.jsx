@@ -644,37 +644,40 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // For purchased electricity, create two records (market-based and location-based)
+    // For purchased electricity, create records based on available data
     if (isPurchasedElectricity) {
       const kWh = parseFloat(formData.electricity_kwh);
       const mWh = kWh / 1000;
+      const records = [];
       
-      // Market-based record
-      const customFactor = parseFloat(formData.custom_emission_factor) || 0;
-      const marketBasedLbs = mWh * customFactor;
-      const marketBasedTonnes = marketBasedLbs / 2204.62;
+      // Market-based record (only if supplier factor is provided)
+      if (formData.custom_emission_factor !== "") {
+        const customFactor = parseFloat(formData.custom_emission_factor) || 0;
+        const marketBasedLbs = mWh * customFactor;
+        const marketBasedTonnes = marketBasedLbs / 2204.62;
+        
+        records.push({
+          company_name: formData.company_name,
+          scope: "scope_2",
+          scope_2_method: "market_based",
+          category: "Purchased Electricity",
+          source: "Custom Supplier",
+          amount: kWh,
+          unit: "kWh",
+          emission_factor: customFactor / 1000,
+          co2e_tonnes: marketBasedTonnes,
+          reporting_period: formData.reporting_period,
+          notes: formData.notes
+        });
+      }
       
-      const marketBasedRecord = {
-        company_name: formData.company_name,
-        scope: "scope_2",
-        scope_2_method: "market_based",
-        category: "Purchased Electricity",
-        source: "Custom Supplier",
-        amount: kWh,
-        unit: "kWh",
-        emission_factor: customFactor / 1000,
-        co2e_tonnes: marketBasedTonnes,
-        reporting_period: formData.reporting_period,
-        notes: formData.notes
-      };
-      
-      // Location-based record
+      // Location-based record (always create)
       const subregion = EGRID_SUBREGIONS[formData.egrid_subregion];
       const totalFactor = subregion.co2 + (subregion.ch4 * 28) + (subregion.n2o * 265);
       const locationBasedLbs = mWh * totalFactor;
       const locationBasedTonnes = locationBasedLbs / 2204.62;
       
-      const locationBasedRecord = {
+      records.push({
         company_name: formData.company_name,
         scope: "scope_2",
         scope_2_method: "location_based",
@@ -686,10 +689,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         co2e_tonnes: locationBasedTonnes,
         reporting_period: formData.reporting_period,
         notes: formData.notes
-      };
+      });
       
-      // Submit both records
-      onSubmit([marketBasedRecord, locationBasedRecord]);
+      // Submit record(s)
+      onSubmit(records.length > 1 ? records : records[0]);
       
       setFormData({
         company_name: "",
@@ -961,7 +964,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
               >
                 <div className="p-4 bg-blue-50 rounded-xl mb-2">
                   <p className="text-sm text-blue-800">
-                    Both market-based and location-based emissions will be calculated automatically
+                    Location-based method is always calculated. Market-based is optional if you have supplier data.
                   </p>
                 </div>
 
@@ -995,37 +998,39 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (for Market-Based)</Label>
+                  <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (Optional - for Market-Based)</Label>
                   <Input
                     type="number"
                     step="0.01"
                     value={formData.custom_emission_factor}
                     onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })}
-                    placeholder="Enter supplier emission factor or 0 for renewable"
+                    placeholder="Optional: Enter supplier factor or 0 for renewable"
                     className="h-11 rounded-xl border-slate-200"
                   />
-                  <p className="text-xs text-slate-500">Enter 0 for 100% renewable energy purchases</p>
+                  <p className="text-xs text-slate-500">Leave blank to calculate location-based only, or enter 0 for 100% renewable</p>
                 </div>
 
-                {formData.electricity_kwh && formData.egrid_subregion && formData.custom_emission_factor && (
+                {formData.electricity_kwh && formData.egrid_subregion && (
                   <div className="space-y-2">
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
-                    >
-                      <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
-                      <span className="text-lg font-semibold text-emerald-800">
-                        {(() => {
-                          const kWh = parseFloat(formData.electricity_kwh) || 0;
-                          const mWh = kWh / 1000;
-                          const customFactor = parseFloat(formData.custom_emission_factor) || 0;
-                          const lbsCO2e = mWh * customFactor;
-                          const metricTonnes = lbsCO2e / 2204.62;
-                          return metricTonnes.toFixed(4);
-                        })()} tCO₂e
-                      </span>
-                    </motion.div>
+                    {formData.custom_emission_factor && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                      >
+                        <span className="text-sm text-emerald-700 font-medium">Market-Based Emissions</span>
+                        <span className="text-lg font-semibold text-emerald-800">
+                          {(() => {
+                            const kWh = parseFloat(formData.electricity_kwh) || 0;
+                            const mWh = kWh / 1000;
+                            const customFactor = parseFloat(formData.custom_emission_factor) || 0;
+                            const lbsCO2e = mWh * customFactor;
+                            const metricTonnes = lbsCO2e / 2204.62;
+                            return metricTonnes.toFixed(4);
+                          })()} tCO₂e
+                        </span>
+                      </motion.div>
+                    )}
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -1687,7 +1692,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   : isPurchasedGases
                   ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
                   : isPurchasedElectricity
-                  ? (!formData.electricity_kwh || !formData.egrid_subregion || !formData.custom_emission_factor)
+                  ? (!formData.electricity_kwh || !formData.egrid_subregion)
                   : (!formData.source || !formData.amount)
                 ) ||
                 isSubmitting
