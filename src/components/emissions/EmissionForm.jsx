@@ -673,8 +673,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const steamPurchased = parseFloat(formData.steam_purchased);
       const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
       
-      // Calculate mmBtu consumed
-      const mmBtuConsumed = steamPurchased * boilerEfficiency;
+      // Calculate mmBtu of fuel consumed (divide by efficiency since efficiency < 1 means more fuel needed)
+      const mmBtuConsumed = steamPurchased / boilerEfficiency;
       
       // Market-based calculation
       let marketBasedTonnes;
@@ -1316,7 +1316,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                         {(() => {
                           const steamPurchased = parseFloat(formData.steam_purchased) || 0;
                           const boilerEfficiency = parseFloat(formData.steam_boiler_efficiency) / 100;
-                          const mmBtuConsumed = steamPurchased * boilerEfficiency;
+                          const mmBtuConsumed = steamPurchased / boilerEfficiency;
                           
                           const hasLocationCO2 = formData.steam_location_co2_factor !== "";
                           const hasLocationCH4 = formData.steam_location_ch4_factor !== "";
