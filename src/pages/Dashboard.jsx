@@ -152,22 +152,22 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0 }}
-            className="bg-[#1e293b] rounded-2xl p-6 shadow-sm border border-slate-700"
+            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-slate-400">Total Emissions</h3>
+              <h3 className="text-sm font-medium text-slate-600">Total Emissions</h3>
               <Activity className="w-5 h-5 text-slate-400" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-slate-500 mb-1">Market-Based</div>
-                <div className="text-2xl font-bold text-white">{(scope1Total + scope2MarketBased).toFixed(2)}</div>
-                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+                <div className="text-2xl font-bold text-slate-900">{(scope1Total + scope2MarketBased).toFixed(2)}</div>
+                <div className="text-xs text-slate-500 mt-1">tCO₂e</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500 mb-1">Location-Based</div>
-                <div className="text-2xl font-bold text-white">{(scope1Total + scope2LocationBased).toFixed(2)}</div>
-                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+                <div className="text-2xl font-bold text-slate-900">{(scope1Total + scope2LocationBased).toFixed(2)}</div>
+                <div className="text-xs text-slate-500 mt-1">tCO₂e</div>
               </div>
             </div>
           </motion.div>
@@ -183,22 +183,22 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1e293b] rounded-2xl p-6 shadow-sm border border-slate-700 border-l-4 border-l-[#52796F]"
+            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 border-l-4 border-l-[#52796F]"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-slate-400">Scope 2</h3>
+              <h3 className="text-sm font-medium text-slate-600">Scope 2</h3>
               <Zap className="w-5 h-5 text-slate-400" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-slate-500 mb-1">Market-Based</div>
-                <div className="text-2xl font-bold text-white">{scope2MarketBased.toFixed(2)}</div>
-                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+                <div className="text-2xl font-bold text-slate-900">{scope2MarketBased.toFixed(2)}</div>
+                <div className="text-xs text-slate-500 mt-1">tCO₂e</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500 mb-1">Location-Based</div>
-                <div className="text-2xl font-bold text-white">{scope2LocationBased.toFixed(2)}</div>
-                <div className="text-xs text-slate-400 mt-1">tCO₂e</div>
+                <div className="text-2xl font-bold text-slate-900">{scope2LocationBased.toFixed(2)}</div>
+                <div className="text-xs text-slate-500 mt-1">tCO₂e</div>
               </div>
             </div>
           </motion.div>
