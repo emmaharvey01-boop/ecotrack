@@ -547,6 +547,18 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       record.unit = formData.combustion_units;
       record.emission_factor = fuelData?.co2PerMmBtu || 0;
       record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    } else if (isRefrigeration && formData.refrigeration_method === "material_balance") {
+      record.source = formData.gas_type;
+      record.amount = parseFloat(formData.inventory_change) + parseFloat(formData.transfer_amount) + parseFloat(formData.capacity_change);
+      record.unit = "kg";
+      record.emission_factor = REFRIGERANT_GWP_FACTORS[formData.gas_type] || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
+    } else if (isFireSuppression && formData.fire_suppression_method === "material_balance") {
+      record.source = formData.fire_suppression_gas;
+      record.amount = parseFloat(formData.fire_inventory_change) + parseFloat(formData.fire_transfer_amount) + parseFloat(formData.fire_capacity_change);
+      record.unit = "lbs";
+      record.emission_factor = FIRE_SUPPRESSION_GWP_FACTORS[formData.fire_suppression_gas] || 0;
+      record.co2e_tonnes = parseFloat(calculatedEmissions) || 0;
     } else {
       record.amount = parseFloat(formData.amount);
       record.unit = emissionFactor?.unit || "";
