@@ -128,10 +128,7 @@ export default function Dashboard() {
               transition={{ delay: 0.2 }}
             >
               <Button 
-                onClick={() => {
-                  setEditingRecord(null);
-                  setShowForm(true);
-                }}
+                onClick={() => { setEditingRecord(null); setShowForm(true); }}
                 className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-5 shadow-sm"
               >
                 <Plus className="w-4 h-4 mr-2" />
