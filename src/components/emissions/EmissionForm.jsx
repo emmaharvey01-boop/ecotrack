@@ -1248,19 +1248,54 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">
-                    Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
-                  </Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={formData.travel_miles}
-                    onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
-                    placeholder="Enter miles"
-                    className="h-11 rounded-xl border-slate-200"
-                  />
-                </div>
+                {isCommuting ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Avg. Commute Distance {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.commute_distance}
+                        onChange={(e) => {
+                          const dist = e.target.value;
+                          const emp = formData.num_employees || "";
+                          setFormData({ ...formData, commute_distance: dist, travel_miles: dist && emp ? (parseFloat(dist) * parseFloat(emp)).toString() : "" });
+                        }}
+                        placeholder="Miles per employee"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Number of Employees</Label>
+                      <Input
+                        type="number"
+                        step="1"
+                        value={formData.num_employees}
+                        onChange={(e) => {
+                          const emp = e.target.value;
+                          const dist = formData.commute_distance || "";
+                          setFormData({ ...formData, num_employees: emp, travel_miles: dist && emp ? (parseFloat(dist) * parseFloat(emp)).toString() : "" });
+                        }}
+                        placeholder="# of employees"
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">
+                      Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
+                    </Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={formData.travel_miles}
+                      onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
+                      placeholder="Enter miles"
+                      className="h-11 rounded-xl border-slate-200"
+                    />
+                  </div>
+                )}
 
                 {calculatedEmissions && (
                   <motion.div
