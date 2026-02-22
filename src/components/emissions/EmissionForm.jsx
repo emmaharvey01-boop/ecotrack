@@ -2631,6 +2631,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   ? (!formData.upstream_mode || !formData.travel_mode || !formData.travel_miles)
                   : (isBusinessTravel || isCommuting)
                   ? (!formData.travel_mode || !formData.travel_miles)
+                  : isWaste
+                  ? (!formData.waste_material || !formData.waste_disposal || !formData.waste_weight || !formData.waste_unit)
                   : isOffsets
                   ? !formData.offsets_tonnes
                   : (!formData.source || !formData.amount)
