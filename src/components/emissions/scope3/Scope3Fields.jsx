@@ -60,14 +60,22 @@ export function BusinessTravelFields({ formData, setFormData, calculatedEmission
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 pt-2">
       <TravelModeSelect formData={formData} setFormData={setFormData} modes={Object.keys(BUSINESS_TRAVEL_FACTORS)} />
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">
-          Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
-        </Label>
-        <Input type="number" step="0.01" value={formData.travel_miles}
-          onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
-          placeholder="Enter miles" className="h-11 rounded-xl border-slate-200" />
-      </div>
+      <TravelMilesInput formData={formData} setFormData={setFormData} />
+      {calculatedEmissions && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl">
+          <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+          <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
+export function CommutingFields({ formData, setFormData, calculatedEmissions }) {
+  return (
+    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 pt-2">
+      <TravelModeSelect formData={formData} setFormData={setFormData} modes={COMMUTING_MODES} />
+      <TravelMilesInput formData={formData} setFormData={setFormData} />
       {calculatedEmissions && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl">
           <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
