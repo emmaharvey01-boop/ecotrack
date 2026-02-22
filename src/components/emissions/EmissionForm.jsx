@@ -1106,6 +1106,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 <SelectContent>
                   <SelectItem value="scope_1">Scope 1 (Direct)</SelectItem>
                   <SelectItem value="scope_2">Scope 2 (Indirect)</SelectItem>
+                  <SelectItem value="scope_3">Scope 3 (Value Chain)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
