@@ -23,20 +23,43 @@ const BUSINESS_TRAVEL_FACTORS = {
 
 export { BUSINESS_TRAVEL_FACTORS };
 
+const COMMUTING_MODES = Object.keys(BUSINESS_TRAVEL_FACTORS).filter(
+  mode => !mode.startsWith("Air")
+);
+
+function TravelModeSelect({ formData, setFormData, modes }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium text-slate-700">Transport Mode</Label>
+      <Select value={formData.travel_mode} onValueChange={(v) => setFormData({ ...formData, travel_mode: v })}>
+        <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select transport mode" /></SelectTrigger>
+        <SelectContent className="max-h-[300px]">
+          {modes.map(mode => (
+            <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function TravelMilesInput({ formData, setFormData }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium text-slate-700">
+        Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
+      </Label>
+      <Input type="number" step="0.01" value={formData.travel_miles}
+        onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
+        placeholder="Enter miles" className="h-11 rounded-xl border-slate-200" />
+    </div>
+  );
+}
+
 export function BusinessTravelFields({ formData, setFormData, calculatedEmissions }) {
   return (
     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4 pt-2">
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Transport Mode</Label>
-        <Select value={formData.travel_mode} onValueChange={(v) => setFormData({ ...formData, travel_mode: v })}>
-          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select transport mode" /></SelectTrigger>
-          <SelectContent className="max-h-[300px]">
-            {Object.keys(BUSINESS_TRAVEL_FACTORS).map(mode => (
-              <SelectItem key={mode} value={mode}>{mode}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <TravelModeSelect formData={formData} setFormData={setFormData} modes={Object.keys(BUSINESS_TRAVEL_FACTORS)} />
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">
           Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
