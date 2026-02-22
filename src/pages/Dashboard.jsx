@@ -85,6 +85,8 @@ export default function Dashboard() {
 
   const { scope1: scope1Total, scope2Market: scope2MarketBased, scope2Location: scope2LocationBased, scope3: scope3Total } = totals;
 
+  const closeForm = () => { setShowForm(false); setEditingRecord(null); };
+
   return (
     <div className="min-h-screen bg-[#0f172a] font-['Inter',system-ui,sans-serif]">
       {/* Header */}
