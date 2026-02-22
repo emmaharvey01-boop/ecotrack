@@ -603,6 +603,19 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return co2eTonnes.toFixed(4);
   };
 
+  // Calculate emissions for upstream transport
+  const calculateUpstreamTransportEmissions = () => {
+    if (!formData.travel_mode || !formData.travel_miles) return null;
+    const miles = parseFloat(formData.travel_miles) || 0;
+    const factors = UPSTREAM_TRANSPORT_FACTORS[formData.travel_mode];
+    if (!factors) return null;
+    const co2KgPerUnit = factors.co2;
+    const ch4KgPerUnit = factors.ch4 / 1000;
+    const n2oKgPerUnit = factors.n2o / 1000;
+    const totalKgCO2e = miles * (co2KgPerUnit + ch4KgPerUnit * 28 + n2oKgPerUnit * 265);
+    return (totalKgCO2e / 1000).toFixed(4);
+  };
+
   // Calculate emissions for business travel / commuting
   const calculateBusinessTravelEmissions = () => {
     if (!formData.travel_mode || !formData.travel_miles) return null;
