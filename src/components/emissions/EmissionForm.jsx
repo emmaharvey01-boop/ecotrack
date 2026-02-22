@@ -813,6 +813,29 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Handle waste
+    if (isWaste) {
+      const factors = WASTE_EMISSION_FACTORS[formData.waste_material];
+      const factor = factors?.[formData.waste_disposal] ?? 0;
+      let weightShortTons = parseFloat(formData.waste_weight) || 0;
+      if (formData.waste_unit === "lbs") weightShortTons = weightShortTons / 2000;
+      else if (formData.waste_unit === "kg") weightShortTons = weightShortTons / 907.185;
+      else if (formData.waste_unit === "metric_tons") weightShortTons = weightShortTons * 1.10231;
+      onSubmit({
+        company_name: formData.company_name,
+        scope: "scope_3",
+        category: "Waste",
+        source: `${formData.waste_material} - ${WASTE_DISPOSAL_LABELS[formData.waste_disposal]}`,
+        amount: parseFloat(formData.waste_weight),
+        unit: formData.waste_unit,
+        emission_factor: factor,
+        co2e_tonnes: weightShortTons * factor,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      });
+      return;
+    }
+
     // Handle offsets
     if (isOffsets) {
       const tonnes = parseFloat(formData.offsets_tonnes) || 0;
