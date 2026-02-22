@@ -49,27 +49,17 @@ export default function Dashboard() {
       }
       return base44.entities.EmissionRecord.create(data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["emissions"] });
-      setShowForm(false);
-      setEditingRecord(null);
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["emissions"] }); setShowForm(false); setEditingRecord(null); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.EmissionRecord.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["emissions"] });
-      setShowForm(false);
-      setEditingRecord(null);
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["emissions"] }); setShowForm(false); setEditingRecord(null); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.EmissionRecord.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["emissions"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["emissions"] }),
   });
 
   // Calculate totals in a single pass
