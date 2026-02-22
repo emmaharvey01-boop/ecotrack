@@ -1241,7 +1241,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                       <SelectValue placeholder="Select transport mode" />
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px]">
-                      {Object.keys(BUSINESS_TRAVEL_FACTORS).map(mode => (
+                      {(isCommuting ? COMMUTING_MODES : Object.keys(BUSINESS_TRAVEL_FACTORS)).map(mode => (
                         <SelectItem key={mode} value={mode}>{mode}</SelectItem>
                       ))}
                     </SelectContent>
