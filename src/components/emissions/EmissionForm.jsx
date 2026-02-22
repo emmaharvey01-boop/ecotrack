@@ -762,6 +762,30 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       return;
     }
 
+    // Handle upstream transport
+    if (isUpstreamTransport) {
+      const miles = parseFloat(formData.travel_miles) || 0;
+      const factors = UPSTREAM_TRANSPORT_FACTORS[formData.travel_mode];
+      const co2KgPerUnit = factors.co2;
+      const ch4KgPerUnit = factors.ch4 / 1000;
+      const n2oKgPerUnit = factors.n2o / 1000;
+      const totalKgCO2e = miles * (co2KgPerUnit + ch4KgPerUnit * 28 + n2oKgPerUnit * 265);
+      const co2eTonnes = totalKgCO2e / 1000;
+      onSubmit({
+        company_name: formData.company_name,
+        scope: "scope_3",
+        category: "Upstream Transport and Distribution",
+        source: formData.travel_mode,
+        amount: miles,
+        unit: factors.unit,
+        emission_factor: factors.co2,
+        co2e_tonnes: co2eTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      });
+      return;
+    }
+
     // Handle business travel / commuting
     if (isBusinessTravel || isCommuting) {
       const miles = parseFloat(formData.travel_miles) || 0;
