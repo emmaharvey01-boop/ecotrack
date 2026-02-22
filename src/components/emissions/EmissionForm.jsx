@@ -809,6 +809,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     ? (parseFloat(formData.amount) * emissionFactor.factor).toFixed(4)
     : null;
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
