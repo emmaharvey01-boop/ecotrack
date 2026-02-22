@@ -239,17 +239,11 @@ export default function Dashboard() {
       {/* Form Modal */}
       <EmissionForm
         open={showForm}
-        onClose={() => {
-          setShowForm(false);
-          setEditingRecord(null);
-        }}
-        onSubmit={(data) => {
-          if (editingRecord) {
-            updateMutation.mutate({ id: editingRecord.id, data });
-          } else {
-            createMutation.mutate(data);
-          }
-        }}
+        onClose={closeForm}
+        onSubmit={(data) => editingRecord
+          ? updateMutation.mutate({ id: editingRecord.id, data })
+          : createMutation.mutate(data)
+        }
         editingRecord={editingRecord}
         isSubmitting={createMutation.isPending || updateMutation.isPending}
       />
