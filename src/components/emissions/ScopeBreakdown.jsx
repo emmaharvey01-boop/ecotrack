@@ -59,10 +59,12 @@ export default function ScopeBreakdown({ records, scope }) {
   const total = scope === "scope_2" 
     ? chartData.reduce((sum, item) => sum + item.marketBased + item.locationBased, 0)
     : chartData.reduce((sum, item) => sum + item.value, 0);
-  const scopeLabel = scope === "scope_1" ? "Scope 1" : "Scope 2";
+  const scopeLabel = scope === "scope_1" ? "Scope 1" : scope === "scope_2" ? "Scope 2" : "Scope 3";
   const scopeDescription = scope === "scope_1" 
     ? "Direct emissions from owned or controlled sources" 
-    : "Indirect emissions from purchased energy";
+    : scope === "scope_2"
+    ? "Indirect emissions from purchased energy"
+    : "Value chain emissions (business travel, commuting, etc.)";
 
   if (chartData.length === 0) {
     return (
