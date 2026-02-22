@@ -524,6 +524,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isPurchasedSteam = formData.category === "purchased_steam";
   const isBusinessTravel = formData.category === "business_travel";
   const isCommuting = formData.category === "commuting";
+  const isUpstreamTransport = formData.category === "upstream_transport";
   const isOffsets = formData.category === "offsets";
 
   // Calculate emissions for mobile sources
