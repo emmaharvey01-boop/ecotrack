@@ -224,10 +224,7 @@ export default function Dashboard() {
           <EmissionTable 
             records={records} 
             onDelete={deleteMutation.mutate}
-            onEdit={(record) => {
-              setEditingRecord(record);
-              setShowForm(true);
-            }}
+            onEdit={(record) => { setEditingRecord(record); setShowForm(true); }}
             isDeleting={deleteMutation.isPending}
           />
         </div>
