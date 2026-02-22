@@ -361,6 +361,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     category: "",
     travel_mode: "",
     travel_miles: "",
+    commute_distance: "",
+    num_employees: "",
     offsets_tonnes: "",
     source: "",
     amount: "",
