@@ -79,6 +79,29 @@ const SCOPE_2_CATEGORIES = [
   { value: "purchased_steam", label: "Purchased Steam", sources: [] }
 ];
 
+const SCOPE_3_CATEGORIES = [
+  { value: "business_travel", label: "Business Travel", sources: [] },
+  { value: "commuting", label: "Employee Commuting", sources: [] },
+  { value: "upstream_transport", label: "Upstream Transport and Distribution", sources: [] },
+  { value: "waste", label: "Waste", sources: [] },
+  { value: "offsets", label: "Offsets", sources: [] }
+];
+
+const BUSINESS_TRAVEL_FACTORS = {
+  "Passenger Car":                                  { co2: 0.306, ch4: 0.009,   n2o: 0.006,  unit: "vehicle-mile" },
+  "Light-Duty Truck":                               { co2: 0.405, ch4: 0.011,   n2o: 0.010,  unit: "vehicle-mile" },
+  "Motorcycle":                                     { co2: 0.376, ch4: 0.091,   n2o: 0.019,  unit: "vehicle-mile" },
+  "Intercity Rail - Northeast Corridor":            { co2: 0.058, ch4: 0.0055,  n2o: 0.0007, unit: "passenger-mile" },
+  "Intercity Rail - Other Routes":                  { co2: 0.150, ch4: 0.0117,  n2o: 0.0038, unit: "passenger-mile" },
+  "Intercity Rail - National Average":              { co2: 0.113, ch4: 0.0092,  n2o: 0.0026, unit: "passenger-mile" },
+  "Commuter Rail":                                  { co2: 0.133, ch4: 0.0105,  n2o: 0.0026, unit: "passenger-mile" },
+  "Transit Rail (i.e. Subway, Tram)":              { co2: 0.093, ch4: 0.0075,  n2o: 0.0010, unit: "passenger-mile" },
+  "Bus":                                            { co2: 0.071, ch4: 0.0050,  n2o: 0.0021, unit: "passenger-mile" },
+  "Air Short Haul (< 300 miles)":                  { co2: 0.207, ch4: 0.0064,  n2o: 0.0066, unit: "passenger-mile" },
+  "Air Medium Haul (>= 300 miles, < 2300 miles)":  { co2: 0.129, ch4: 0.0006,  n2o: 0.0041, unit: "passenger-mile" },
+  "Air Long Haul (>= 2300 miles)":                 { co2: 0.163, ch4: 0.0006,  n2o: 0.0052, unit: "passenger-mile" }
+};
+
 const EGRID_SUBREGIONS = {
   "ASCC Alaska Grid": { co2: 1052.1, ch4: 0.088, n2o: 0.012 },
   "ASCC Miscellaneous": { co2: 495.8, ch4: 0.023, n2o: 0.004 },
