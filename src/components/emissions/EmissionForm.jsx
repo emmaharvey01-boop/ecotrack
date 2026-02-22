@@ -492,7 +492,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   }, [editingRecord, open]);
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
-                     formData.scope === "scope_2" ? SCOPE_2_CATEGORIES : [];
+                     formData.scope === "scope_2" ? SCOPE_2_CATEGORIES :
+                     formData.scope === "scope_3" ? SCOPE_3_CATEGORIES : [];
   
   const selectedCategory = categories.find(c => c.value === formData.category);
   const sources = selectedCategory?.sources || [];
@@ -504,6 +505,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isPurchasedGases = formData.category === "purchased_gases";
   const isPurchasedElectricity = formData.category === "purchased_electricity";
   const isPurchasedSteam = formData.category === "purchased_steam";
+  const isBusinessTravel = formData.category === "business_travel";
+  const isCommuting = formData.category === "commuting";
+  const isOffsets = formData.category === "offsets";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
