@@ -8,7 +8,12 @@ const CATEGORY_COLORS = {
   "Process Emissions": "#52B788",
   "Purchased Electricity": "#52796F",
   "Purchased Heating": "#74A892",
-  "Purchased Cooling": "#95C4B1"
+  "Purchased Cooling": "#95C4B1",
+  "Business Travel": "#7C3AED",
+  "Employee Commuting": "#9D5CF5",
+  "Upstream Transport and Distribution": "#B47FFC",
+  "Waste": "#C9A2FD",
+  "Offsets": "#34D399"
 };
 
 export default function ScopeBreakdown({ records, scope }) {
