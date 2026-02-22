@@ -204,9 +204,9 @@ export default function Dashboard() {
             </div>
           </motion.div>
           <StatsCard
-            title="Records"
-            value={records.length}
-            unit="entries"
+            title="Scope 3"
+            value={scope3Total.toFixed(2)}
+            unit="tCO₂e"
             icon={TrendingDown}
             delay={0.3}
           />
