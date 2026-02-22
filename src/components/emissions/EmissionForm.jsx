@@ -1274,6 +1274,60 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
             )}
           </AnimatePresence>
 
+          {/* Upstream Transport Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isUpstreamTransport && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Vehicle / Transport Type</Label>
+                  <Select
+                    value={formData.travel_mode}
+                    onValueChange={(value) => setFormData({ ...formData, travel_mode: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select transport type" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {Object.keys(UPSTREAM_TRANSPORT_FACTORS).map(mode => (
+                        <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">
+                    Distance {formData.travel_mode && `(${UPSTREAM_TRANSPORT_FACTORS[formData.travel_mode]?.unit})`}
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.travel_miles}
+                    onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
+                    placeholder="Enter distance"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                {calculatedEmissions && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Business Travel / Commuting Detailed Fields */}
           <AnimatePresence mode="wait">
             {(isBusinessTravel || isCommuting) && (
