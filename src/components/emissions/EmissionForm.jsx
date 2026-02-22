@@ -608,14 +608,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
 
   // Calculate emissions for upstream transport
   const calculateUpstreamTransportEmissions = () => {
-    if (!formData.travel_mode || !formData.travel_miles) return null;
-    const miles = parseFloat(formData.travel_miles) || 0;
-    const factors = UPSTREAM_TRANSPORT_FACTORS[formData.travel_mode];
+    if (!formData.upstream_mode || !formData.travel_mode || !formData.travel_miles) return null;
+    const distance = parseFloat(formData.travel_miles) || 0;
+    const factorTable = formData.upstream_mode === "vehicle_mile" ? UPSTREAM_TRANSPORT_VEHICLE_MILE : UPSTREAM_TRANSPORT_TON_MILE;
+    const factors = factorTable[formData.travel_mode];
     if (!factors) return null;
-    const co2KgPerUnit = factors.co2;
-    const ch4KgPerUnit = factors.ch4 / 1000;
-    const n2oKgPerUnit = factors.n2o / 1000;
-    const totalKgCO2e = miles * (co2KgPerUnit + ch4KgPerUnit * 28 + n2oKgPerUnit * 265);
+    const totalKgCO2e = distance * (factors.co2 + (factors.ch4 / 1000) * 28 + (factors.n2o / 1000) * 265);
     return (totalKgCO2e / 1000).toFixed(4);
   };
 
