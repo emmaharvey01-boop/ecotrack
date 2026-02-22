@@ -372,6 +372,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     scope: "",
     scope_2_method: "",
     category: "",
+    upstream_mode: "",
     travel_mode: "",
     travel_miles: "",
     commute_distance: "",
