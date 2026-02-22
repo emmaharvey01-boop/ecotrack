@@ -98,13 +98,17 @@ export default function EmissionTable({ records, onDelete, onEdit, isDeleting })
                         className={`font-medium ${
                           record.scope === "scope_1" 
                             ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" 
-                            : "bg-amber-100 text-amber-700 hover:bg-amber-100"
+                            : record.scope === "scope_2"
+                            ? "bg-amber-100 text-amber-700 hover:bg-amber-100"
+                            : "bg-purple-100 text-purple-700 hover:bg-purple-100"
                         }`}
                       >
                         {record.scope === "scope_1" ? (
                           <><Leaf className="w-3 h-3 mr-1" /> Scope 1</>
-                        ) : (
+                        ) : record.scope === "scope_2" ? (
                           <><Zap className="w-3 h-3 mr-1" /> Scope 2</>
+                        ) : (
+                          <><Globe className="w-3 h-3 mr-1" /> Scope 3</>
                         )}
                       </Badge>
                     </TableCell>
