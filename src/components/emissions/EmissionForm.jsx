@@ -1178,6 +1178,96 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
             )}
           </AnimatePresence>
 
+          {/* Business Travel / Commuting Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {(isBusinessTravel || isCommuting) && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Transport Mode</Label>
+                  <Select
+                    value={formData.travel_mode}
+                    onValueChange={(value) => setFormData({ ...formData, travel_mode: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                      <SelectValue placeholder="Select transport mode" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {Object.keys(BUSINESS_TRAVEL_FACTORS).map(mode => (
+                        <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">
+                    Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={formData.travel_miles}
+                    onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
+                    placeholder="Enter miles"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                </div>
+
+                {calculatedEmissions && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Calculated Emissions</span>
+                    <span className="text-lg font-semibold text-emerald-800">{calculatedEmissions} tCO₂e</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Offsets Detailed Fields */}
+          <AnimatePresence mode="wait">
+            {isOffsets && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700">Offset Amount (tCO₂e)</Label>
+                  <Input
+                    type="number"
+                    step="0.0001"
+                    value={formData.offsets_tonnes}
+                    onChange={(e) => setFormData({ ...formData, offsets_tonnes: e.target.value })}
+                    placeholder="Enter offset amount in metric tons"
+                    className="h-11 rounded-xl border-slate-200"
+                  />
+                  <p className="text-xs text-slate-500">Enter as a positive number — offsets will be recorded as negative emissions.</p>
+                </div>
+
+                {formData.offsets_tonnes && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl"
+                  >
+                    <span className="text-sm text-emerald-700 font-medium">Offset Credit</span>
+                    <span className="text-lg font-semibold text-emerald-800">-{parseFloat(formData.offsets_tonnes).toFixed(4)} tCO₂e</span>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Purchased Steam Detailed Fields */}
           <AnimatePresence mode="wait">
             {isPurchasedSteam && (
