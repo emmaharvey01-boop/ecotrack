@@ -714,6 +714,48 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Handle offsets
+    if (isOffsets) {
+      const tonnes = parseFloat(formData.offsets_tonnes) || 0;
+      onSubmit({
+        company_name: formData.company_name,
+        scope: "scope_3",
+        category: "Offsets",
+        source: "Carbon Offsets",
+        amount: tonnes,
+        unit: "tCO₂e",
+        emission_factor: -1,
+        co2e_tonnes: -tonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      });
+      return;
+    }
+
+    // Handle business travel / commuting
+    if (isBusinessTravel || isCommuting) {
+      const miles = parseFloat(formData.travel_miles) || 0;
+      const factors = BUSINESS_TRAVEL_FACTORS[formData.travel_mode];
+      const co2KgPerMile = factors.co2;
+      const ch4KgPerMile = factors.ch4 / 1000;
+      const n2oKgPerMile = factors.n2o / 1000;
+      const totalKgCO2e = miles * (co2KgPerMile + ch4KgPerMile * 28 + n2oKgPerMile * 265);
+      const co2eTonnes = totalKgCO2e / 1000;
+      onSubmit({
+        company_name: formData.company_name,
+        scope: "scope_3",
+        category: isBusinessTravel ? "Business Travel" : "Employee Commuting",
+        source: formData.travel_mode,
+        amount: miles,
+        unit: factors.unit,
+        emission_factor: factors.co2,
+        co2e_tonnes: co2eTonnes,
+        reporting_period: formData.reporting_period,
+        notes: formData.notes
+      });
+      return;
+    }
+
     // For purchased steam, create both market-based and location-based records
     if (isPurchasedSteam) {
       const steamPurchased = parseFloat(formData.steam_purchased);
