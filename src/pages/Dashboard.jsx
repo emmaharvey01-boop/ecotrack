@@ -24,7 +24,7 @@ export default function Dashboard() {
   const [selectedCompany, setSelectedCompany] = useState("all");
   const queryClient = useQueryClient();
 
-  const { data: allRecords = [], isLoading } = useQuery({
+  const { data: allRecords = [] } = useQuery({
     queryKey: ["emissions"],
     queryFn: () => base44.entities.EmissionRecord.list("-created_date"),
   });
