@@ -218,6 +218,9 @@ export default function Dashboard() {
           <ScopeBreakdown records={records} scope="scope_1" />
           <ScopeBreakdown records={records} scope="scope_2" />
         </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <ScopeBreakdown records={records} scope="scope_3" />
+        </div>
 
         {/* Table Section */}
         <div className="mb-8">
