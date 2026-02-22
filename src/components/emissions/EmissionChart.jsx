@@ -3,12 +3,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 
 const COLORS = {
   scope_1: "#1B4332",
-  scope_2: "#52796F"
+  scope_2: "#52796F",
+  scope_3: "#7C3AED"
 };
 
 const SCOPE_LABELS = {
   scope_1: "Scope 1 (Direct)",
-  scope_2: "Scope 2 (Indirect)"
+  scope_2: "Scope 2 (Indirect)",
+  scope_3: "Scope 3 (Value Chain)"
 };
 
 export default function EmissionChart({ records }) {
