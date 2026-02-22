@@ -690,7 +690,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return co2Tonnes.toFixed(4);
   };
 
-  const calculatedEmissions = isMobileCombustion 
+  const calculatedEmissions = (isBusinessTravel || isCommuting)
+    ? calculateBusinessTravelEmissions()
+    : isMobileCombustion 
     ? calculateMobileCombustionEmissions()
     : isStationaryCombustion
     ? calculateStationaryCombustionEmissions()
