@@ -579,6 +579,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isCommuting = formData.category === "commuting";
   const isUpstreamTransport = formData.category === "upstream_transport";
   const isOffsets = formData.category === "offsets";
+  const isWaste = formData.category === "waste";
 
   // Calculate emissions for mobile sources
   const calculateMobileCombustionEmissions = () => {
