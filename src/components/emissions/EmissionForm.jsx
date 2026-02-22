@@ -367,8 +367,8 @@ const EMISSION_FACTORS = {
 const WASTE_EMISSION_FACTORS = {
   "Grains":                               { recycled: null,  landfilled: 2.06,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
   "Bread":                                { recycled: null,  landfilled: 1.49,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
-  "Fruits and Vegetables":                { recycled: null,  landfilled: 0.29,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
-  "Dairy Products":                       { recycled: null,  landfilled: 0.72,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Fruits and Vegetables":                { recycled: null,  landfilled: 1.05,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Dairy Products":                       { recycled: null,  landfilled: 0.72,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.11 },
   "Yard Trimmings":                       { recycled: null,  landfilled: 0.36,  combusted: 0.05, composted: 0.14, anaerobically_digested: null  },
   "Grass":                                { recycled: null,  landfilled: 0.28,  combusted: 0.05, composted: 0.14, anaerobically_digested: 0.09  },
   "Leaves":                               { recycled: null,  landfilled: 0.28,  combusted: 0.05, composted: 0.14, anaerobically_digested: 0.12  },
@@ -381,7 +381,7 @@ const WASTE_EMISSION_FACTORS = {
   "Mixed Recyclables":                    { recycled: 0.09,  landfilled: 0.75,  combusted: 0.05, composted: null, anaerobically_digested: null  },
   "Food Waste":                           { recycled: null,  landfilled: 0.68,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.13  },
   "Mixed Organics":                       { recycled: null,  landfilled: 0.50,  combusted: 0.05, composted: 0.13, anaerobically_digested: null  },
-  "Mixed MSW municipal solid waste":      { recycled: null,  landfilled: 0.58,  combusted: 0.43, composted: null, anaerobically_digested: null  },
+  "Mixed MSW (municipal solid waste)":    { recycled: null,  landfilled: 0.58,  combusted: 0.43, composted: null, anaerobically_digested: null  },
   "Carpet":                               { recycled: null,  landfilled: 0.02,  combusted: 1.68, composted: null, anaerobically_digested: null  },
   "Desktop CPUs":                         { recycled: 0.01,  landfilled: 0.02,  combusted: 0.40, composted: null, anaerobically_digested: null  },
   "Portable Electronic Devices":          { recycled: 0.01,  landfilled: 0.02,  combusted: 0.89, composted: null, anaerobically_digested: null  },
@@ -400,7 +400,7 @@ const WASTE_EMISSION_FACTORS = {
   "Fiberglass Insulation":                { recycled: 0.05,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
   "Structural Steel":                     { recycled: 0.04,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
   "Vinyl Flooring":                       { recycled: null,  landfilled: 0.02,  combusted: 0.29, composted: null, anaerobically_digested: null  },
-  "Wood Flooring":                        { recycled: null,  landfilled: 0.02,  combusted: 0.18, composted: null, anaerobically_digested: 0.08  },
+  "Wood Flooring":                        { recycled: null,  landfilled: 0.18,  combusted: null, composted: null, anaerobically_digested: 0.08  },
 };
 
 const WASTE_DISPOSAL_LABELS = {
