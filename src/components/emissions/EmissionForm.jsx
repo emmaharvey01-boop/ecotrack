@@ -585,6 +585,20 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return co2eTonnes.toFixed(4);
   };
 
+  // Calculate emissions for business travel / commuting
+  const calculateBusinessTravelEmissions = () => {
+    if (!formData.travel_mode || !formData.travel_miles) return null;
+    const miles = parseFloat(formData.travel_miles) || 0;
+    const factors = BUSINESS_TRAVEL_FACTORS[formData.travel_mode];
+    if (!factors) return null;
+    // co2 in kg/unit, ch4 in g/unit, n2o in g/unit
+    const co2KgPerMile = factors.co2;
+    const ch4KgPerMile = factors.ch4 / 1000;
+    const n2oKgPerMile = factors.n2o / 1000;
+    const totalKgCO2e = miles * (co2KgPerMile + ch4KgPerMile * 28 + n2oKgPerMile * 265);
+    return (totalKgCO2e / 1000).toFixed(4);
+  };
+
   // Calculate emissions for purchased electricity
   const calculateElectricityEmissions = () => {
     if (!formData.electricity_kwh) {
