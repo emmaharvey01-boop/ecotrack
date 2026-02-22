@@ -773,7 +773,23 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return co2Tonnes.toFixed(4);
   };
 
-  const calculatedEmissions = isUpstreamTransport
+  // Calculate waste emissions
+  const calculateWasteEmissions = () => {
+    if (!formData.waste_material || !formData.waste_disposal || !formData.waste_weight) return null;
+    const factors = WASTE_EMISSION_FACTORS[formData.waste_material];
+    if (!factors) return null;
+    const factor = factors[formData.waste_disposal];
+    if (factor === null || factor === undefined) return null;
+    let weightShortTons = parseFloat(formData.waste_weight) || 0;
+    if (formData.waste_unit === "lbs") weightShortTons = weightShortTons / 2000;
+    else if (formData.waste_unit === "kg") weightShortTons = weightShortTons / 907.185;
+    else if (formData.waste_unit === "metric_tons") weightShortTons = weightShortTons * 1.10231;
+    return (weightShortTons * factor).toFixed(4);
+  };
+
+  const calculatedEmissions = isWaste
+    ? calculateWasteEmissions()
+    : isUpstreamTransport
     ? calculateUpstreamTransportEmissions()
     : (isBusinessTravel || isCommuting)
     ? calculateBusinessTravelEmissions()
