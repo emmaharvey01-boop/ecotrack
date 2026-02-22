@@ -1283,35 +1283,55 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 className="space-y-4 pt-2"
               >
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Vehicle / Transport Type</Label>
+                  <Label className="text-sm font-medium text-slate-700">Transport Method</Label>
                   <Select
-                    value={formData.travel_mode}
-                    onValueChange={(value) => setFormData({ ...formData, travel_mode: value })}
+                    value={formData.upstream_mode}
+                    onValueChange={(value) => setFormData({ ...formData, upstream_mode: value, travel_mode: "", travel_miles: "" })}
                   >
                     <SelectTrigger className="h-11 rounded-xl border-slate-200">
-                      <SelectValue placeholder="Select transport type" />
+                      <SelectValue placeholder="Select transport method" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {Object.keys(UPSTREAM_TRANSPORT_FACTORS).map(mode => (
-                        <SelectItem key={mode} value={mode}>{mode}</SelectItem>
-                      ))}
+                    <SelectContent>
+                      <SelectItem value="vehicle_mile">On-Road Transport (Vehicle Miles)</SelectItem>
+                      <SelectItem value="ton_mile">Product Transport (Short Ton Miles)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">
-                    Distance {formData.travel_mode && `(${UPSTREAM_TRANSPORT_FACTORS[formData.travel_mode]?.unit})`}
-                  </Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={formData.travel_miles}
-                    onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
-                    placeholder="Enter distance"
-                    className="h-11 rounded-xl border-slate-200"
-                  />
-                </div>
+                {formData.upstream_mode && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Vehicle Type</Label>
+                      <Select
+                        value={formData.travel_mode}
+                        onValueChange={(value) => setFormData({ ...formData, travel_mode: value })}
+                      >
+                        <SelectTrigger className="h-11 rounded-xl border-slate-200">
+                          <SelectValue placeholder="Select vehicle type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(formData.upstream_mode === "vehicle_mile" ? UPSTREAM_TRANSPORT_VEHICLE_MILE : UPSTREAM_TRANSPORT_TON_MILE).map(mode => (
+                            <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">
+                        {formData.upstream_mode === "vehicle_mile" ? "Vehicle Miles" : "Short Ton Miles"}
+                      </Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={formData.travel_miles}
+                        onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })}
+                        placeholder={`Enter ${formData.upstream_mode === "vehicle_mile" ? "vehicle miles" : "short ton miles"}`}
+                        className="h-11 rounded-xl border-slate-200"
+                      />
+                    </div>
+                  </>
+                )}
 
                 {calculatedEmissions && (
                   <motion.div
