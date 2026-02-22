@@ -1249,7 +1249,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && !isPurchasedElectricity && !isPurchasedSteam && !isBusinessTravel && !isCommuting && !isOffsets && (
+            {formData.category && !isMobileCombustion && !isStationaryCombustion && !isRefrigeration && !isFireSuppression && !isPurchasedGases && !isPurchasedElectricity && !isPurchasedSteam && !isBusinessTravel && !isCommuting && !isUpstreamTransport && !isOffsets && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
