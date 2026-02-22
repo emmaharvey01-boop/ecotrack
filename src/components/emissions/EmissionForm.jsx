@@ -1146,9 +1146,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   <SelectValue placeholder="Select scope" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="scope_1">Scope 1 (Direct)</SelectItem>
-                  <SelectItem value="scope_2">Scope 2 (Indirect)</SelectItem>
-                  <SelectItem value="scope_3">Scope 3 (Value Chain)</SelectItem>
+                  <SelectItem value="scope_1">Scope 1</SelectItem>
+                  <SelectItem value="scope_2">Scope 2</SelectItem>
+                  <SelectItem value="scope_3">Scope 3</SelectItem>
                 </SelectContent>
               </Select>
             </div>
