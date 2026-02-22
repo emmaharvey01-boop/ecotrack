@@ -2441,7 +2441,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   : isPurchasedSteam
                   ? (!formData.steam_source_area || !formData.steam_fuel_type || !formData.steam_boiler_efficiency || !formData.steam_purchased)
                   : isUpstreamTransport
-                  ? (!formData.travel_mode || !formData.travel_miles)
+                  ? (!formData.upstream_mode || !formData.travel_mode || !formData.travel_miles)
                   : (isBusinessTravel || isCommuting)
                   ? (!formData.travel_mode || !formData.travel_miles)
                   : isOffsets
