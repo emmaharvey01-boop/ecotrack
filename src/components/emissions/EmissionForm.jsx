@@ -362,6 +362,55 @@ const EMISSION_FACTORS = {
   "Chilled Water": { factor: 0.00012, unit: "kWh" }
 };
 
+// WARM Emission Factors (MT CO2e per short ton)
+// Columns: recycled, landfilled, combusted, composted, anaerobically_digested
+const WASTE_EMISSION_FACTORS = {
+  "Grains":                               { recycled: null,  landfilled: 2.06,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Bread":                                { recycled: null,  landfilled: 1.49,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Fruits and Vegetables":                { recycled: null,  landfilled: 0.29,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Dairy Products":                       { recycled: null,  landfilled: 0.72,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.14 },
+  "Yard Trimmings":                       { recycled: null,  landfilled: 0.36,  combusted: 0.05, composted: 0.14, anaerobically_digested: null  },
+  "Grass":                                { recycled: null,  landfilled: 0.28,  combusted: 0.05, composted: 0.14, anaerobically_digested: 0.09  },
+  "Leaves":                               { recycled: null,  landfilled: 0.28,  combusted: 0.05, composted: 0.14, anaerobically_digested: 0.12  },
+  "Branches":                             { recycled: null,  landfilled: 0.58,  combusted: 0.05, composted: 0.14, anaerobically_digested: 0.15  },
+  "Mixed Paper (general)":                { recycled: 0.07,  landfilled: 0.89,  combusted: 0.05, composted: null, anaerobically_digested: null  },
+  "Mixed Paper (primarily residential)":  { recycled: 0.07,  landfilled: 0.86,  combusted: 0.05, composted: null, anaerobically_digested: null  },
+  "Mixed Paper (primarily from offices)": { recycled: 0.03,  landfilled: 0.84,  combusted: 0.05, composted: null, anaerobically_digested: null  },
+  "Mixed Metals":                         { recycled: 0.23,  landfilled: 0.02,  combusted: 0.01, composted: null, anaerobically_digested: null  },
+  "Mixed Plastics":                       { recycled: 0.22,  landfilled: 0.02,  combusted: 2.34, composted: null, anaerobically_digested: null  },
+  "Mixed Recyclables":                    { recycled: 0.09,  landfilled: 0.75,  combusted: 0.05, composted: null, anaerobically_digested: null  },
+  "Food Waste":                           { recycled: null,  landfilled: 0.68,  combusted: 0.05, composted: 0.11, anaerobically_digested: 0.13  },
+  "Mixed Organics":                       { recycled: null,  landfilled: 0.50,  combusted: 0.05, composted: 0.13, anaerobically_digested: null  },
+  "Mixed MSW municipal solid waste":      { recycled: null,  landfilled: 0.58,  combusted: 0.43, composted: null, anaerobically_digested: null  },
+  "Carpet":                               { recycled: null,  landfilled: 0.02,  combusted: 1.68, composted: null, anaerobically_digested: null  },
+  "Desktop CPUs":                         { recycled: 0.01,  landfilled: 0.02,  combusted: 0.40, composted: null, anaerobically_digested: null  },
+  "Portable Electronic Devices":          { recycled: 0.01,  landfilled: 0.02,  combusted: 0.89, composted: null, anaerobically_digested: null  },
+  "Flat-panel Displays":                  { recycled: 0.02,  landfilled: 0.02,  combusted: 0.74, composted: null, anaerobically_digested: null  },
+  "CRT Displays":                         { recycled: 0.02,  landfilled: 0.02,  combusted: 0.64, composted: null, anaerobically_digested: null  },
+  "Electronic Peripherals":               { recycled: 0.05,  landfilled: 0.02,  combusted: 1.23, composted: null, anaerobically_digested: null  },
+  "Hard-copy Devices":                    { recycled: 0.01,  landfilled: 0.02,  combusted: 1.92, composted: null, anaerobically_digested: null  },
+  "Mixed Electronics":                    { recycled: 0.02,  landfilled: 0.02,  combusted: 0.96, composted: null, anaerobically_digested: null  },
+  "Clay Bricks":                          { recycled: 0.02,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Concrete":                             { recycled: 0.01,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Fly Ash":                              { recycled: null,  landfilled: null,   combusted: null, composted: null, anaerobically_digested: null  },
+  "Tires":                                { recycled: 0.10,  landfilled: 0.02,  combusted: 2.21, composted: null, anaerobically_digested: null  },
+  "Asphalt Concrete":                     { recycled: 0.004, landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Asphalt Shingles":                     { recycled: 0.03,  landfilled: 0.02,  combusted: 0.70, composted: null, anaerobically_digested: null  },
+  "Drywall":                              { recycled: 0.05,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Fiberglass Insulation":                { recycled: 0.05,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Structural Steel":                     { recycled: 0.04,  landfilled: 0.02,  combusted: null, composted: null, anaerobically_digested: null  },
+  "Vinyl Flooring":                       { recycled: null,  landfilled: 0.02,  combusted: 0.29, composted: null, anaerobically_digested: null  },
+  "Wood Flooring":                        { recycled: null,  landfilled: 0.02,  combusted: 0.18, composted: null, anaerobically_digested: 0.08  },
+};
+
+const WASTE_DISPOSAL_LABELS = {
+  recycled:               "Recycled",
+  landfilled:             "Landfilled",
+  combusted:              "Combusted (Waste-to-Energy)",
+  composted:              "Composted",
+  anaerobically_digested: "Anaerobically Digested",
+};
+
 const REPORTING_PERIODS = [
   "2024", "2025", "2026", "2027", "2028"
 ];
