@@ -2420,6 +2420,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   ? (!formData.electricity_kwh || !formData.egrid_subregion)
                   : isPurchasedSteam
                   ? (!formData.steam_source_area || !formData.steam_fuel_type || !formData.steam_boiler_efficiency || !formData.steam_purchased)
+                  : isUpstreamTransport
+                  ? (!formData.travel_mode || !formData.travel_miles)
                   : (isBusinessTravel || isCommuting)
                   ? (!formData.travel_mode || !formData.travel_miles)
                   : isOffsets
