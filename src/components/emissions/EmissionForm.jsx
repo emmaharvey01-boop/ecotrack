@@ -104,14 +104,17 @@ const BUSINESS_TRAVEL_FACTORS = {
 
 const COMMUTING_MODES = Object.keys(BUSINESS_TRAVEL_FACTORS).filter(m => !m.startsWith("Air"));
 
-const UPSTREAM_TRANSPORT_FACTORS = {
-  "Medium- and Heavy-Duty Truck (vehicle-mile)": { co2: 1.360, ch4: 0.012,   n2o: 0.038,  unit: "vehicle-mile" },
-  "Passenger Car":                                { co2: 0.306, ch4: 0.009,   n2o: 0.006,  unit: "vehicle-mile" },
-  "Light-Duty Truck":                             { co2: 0.405, ch4: 0.011,   n2o: 0.010,  unit: "vehicle-mile" },
-  "Medium- and Heavy-Duty Truck (ton-mile)":      { co2: 0.168, ch4: 0.0015,  n2o: 0.0047, unit: "ton-mile" },
-  "Rail":                                         { co2: 0.022, ch4: 0.0017,  n2o: 0.0005, unit: "ton-mile" },
-  "Waterborne Craft":                             { co2: 0.082, ch4: 0.0326,  n2o: 0.0021, unit: "ton-mile" },
-  "Aircraft":                                     { co2: 0.905, ch4: 0,       n2o: 0.0279, unit: "ton-mile" }
+const UPSTREAM_TRANSPORT_VEHICLE_MILE = {
+  "Passenger Car":                { co2: 0.306, ch4: 0.009,  n2o: 0.006,  unit: "vehicle-mile" },
+  "Light-Duty Truck":             { co2: 0.405, ch4: 0.011,  n2o: 0.010,  unit: "vehicle-mile" },
+  "Medium- and Heavy-Duty Truck": { co2: 1.360, ch4: 0.012,  n2o: 0.038,  unit: "vehicle-mile" },
+};
+
+const UPSTREAM_TRANSPORT_TON_MILE = {
+  "Medium- and Heavy-Duty Truck": { co2: 0.168, ch4: 0.0015, n2o: 0.0047, unit: "short ton-mile" },
+  "Rail":                         { co2: 0.022, ch4: 0.0017, n2o: 0.0005, unit: "short ton-mile" },
+  "Waterborne Craft":             { co2: 0.082, ch4: 0.0326, n2o: 0.0021, unit: "short ton-mile" },
+  "Aircraft":                     { co2: 0.905, ch4: 0,      n2o: 0.0279, unit: "short ton-mile" },
 };
 
 const EGRID_SUBREGIONS = {
