@@ -72,13 +72,18 @@ export default function Dashboard() {
     },
   });
 
-  // Calculate totals
-  const totalEmissions = records.reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
-  const scope1Total = records.filter(r => r.scope === "scope_1").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
-  const scope2Total = records.filter(r => r.scope === "scope_2").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
-  const scope2MarketBased = records.filter(r => r.scope === "scope_2" && r.scope_2_method === "market_based").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
-  const scope2LocationBased = records.filter(r => r.scope === "scope_2" && r.scope_2_method === "location_based").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
-  const scope3Total = records.filter(r => r.scope === "scope_3").reduce((sum, r) => sum + (r.co2e_tonnes || 0), 0);
+  // Calculate totals in a single pass
+  const totals = useMemo(() => records.reduce((acc, r) => {
+    const val = r.co2e_tonnes || 0;
+    if (r.scope === "scope_1") acc.scope1 += val;
+    else if (r.scope === "scope_2") {
+      if (r.scope_2_method === "market_based") acc.scope2Market += val;
+      else if (r.scope_2_method === "location_based") acc.scope2Location += val;
+    } else if (r.scope === "scope_3") acc.scope3 += val;
+    return acc;
+  }, { scope1: 0, scope2Market: 0, scope2Location: 0, scope3: 0 }), [records]);
+
+  const { scope1: scope1Total, scope2Market: scope2MarketBased, scope2Location: scope2LocationBased, scope3: scope3Total } = totals;
 
   return (
     <div className="min-h-screen bg-[#0f172a] font-['Inter',system-ui,sans-serif]">
