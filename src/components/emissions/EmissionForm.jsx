@@ -102,6 +102,8 @@ const BUSINESS_TRAVEL_FACTORS = {
   "Air Long Haul (>= 2300 miles)":                 { co2: 0.163, ch4: 0.0006,  n2o: 0.0052, unit: "passenger-mile" }
 };
 
+const COMMUTING_MODES = Object.keys(BUSINESS_TRAVEL_FACTORS).filter(m => !m.startsWith("Air"));
+
 const EGRID_SUBREGIONS = {
   "ASCC Alaska Grid": { co2: 1052.1, ch4: 0.088, n2o: 0.012 },
   "ASCC Miscellaneous": { co2: 495.8, ch4: 0.023, n2o: 0.004 },
