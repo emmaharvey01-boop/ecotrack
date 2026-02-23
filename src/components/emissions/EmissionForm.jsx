@@ -27,8 +27,7 @@ import {
   FIRE_SUPPRESSION_GWP_FACTORS,
 } from "./CombustionFields";
 
-// Re-export for local use
-const STATIONARY_COMBUSTION_FUELS_LOCAL = STATIONARY_COMBUSTION_FUELS;
+
 
 const SCOPE_1_CATEGORIES = [
   { 
