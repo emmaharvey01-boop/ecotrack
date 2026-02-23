@@ -77,6 +77,7 @@ export default function OrgInfoForm({ company, orgInfo, onSaved, onNext }) {
           </Select>
         </Field>
         <Field label="Website"><Input value={form.website || ""} onChange={inp("website")} placeholder="https://..." className={cls} /></Field>
+        <Field label="Annual Revenue (USD)"><Input type="number" value={form.annual_revenue || ""} onChange={inp("annual_revenue")} placeholder="e.g. 5000000" className={cls} /></Field>
         <Field label="Street Address" full><Input value={form.street_address || ""} onChange={inp("street_address")} className={cls} /></Field>
         <Field label="City"><Input value={form.city || ""} onChange={inp("city")} className={cls} /></Field>
         <Field label="State/Province"><Input value={form.state || ""} onChange={inp("state")} className={cls} /></Field>
