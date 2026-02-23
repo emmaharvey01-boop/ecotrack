@@ -17,44 +17,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { X, Leaf, Zap } from "lucide-react";
+import {
+  StationaryCombustionFields,
+  MobileCombustionFields,
+  RefrigerationFields,
+  FireSuppressionFields,
+  STATIONARY_COMBUSTION_FUELS,
+  REFRIGERANT_GWP_FACTORS,
+  FIRE_SUPPRESSION_GWP_FACTORS,
+} from "./CombustionFields";
 
-const STATIONARY_COMBUSTION_FUELS = [
-  // Coal and Coke - Solid
-  { name: "Anthracite Coal", state: "solid" },
-  { name: "Bituminous Coal", state: "solid" },
-  { name: "Sub-bituminous Coal", state: "solid" },
-  { name: "Lignite Coal", state: "solid" },
-  { name: "Mixed (Commercial Sector)", state: "solid" },
-  { name: "Mixed (Electric Power Sector)", state: "solid" },
-  { name: "Mixed (Industrial Coking)", state: "solid" },
-  { name: "Mixed (Industrial Sector)", state: "solid" },
-  { name: "Coal Coke", state: "solid" },
-  // Other Fuels - Solid
-  { name: "Municipal Solid Waste", state: "solid" },
-  { name: "Petroleum Coke (Solid)", state: "solid" },
-  { name: "Plastics", state: "solid" },
-  { name: "Tires", state: "solid" },
-  // Biomass Fuels - Solid
-  { name: "Agricultural Byproducts", state: "solid" },
-  { name: "Peat", state: "solid" },
-  { name: "Solid Byproducts", state: "solid" },
-  { name: "Wood and Wood Residuals", state: "solid" },
-  // Gaseous Fuels
-  { name: "Natural Gas", state: "gas" },
-  { name: "Propane Gas", state: "gas" },
-  { name: "Landfill Gas", state: "gas" },
-  // Petroleum Products
-  { name: "Distillate Fuel Oil No. 2", state: "liquid" },
-  { name: "Residual Fuel Oil No. 6", state: "liquid" },
-  { name: "Kerosene", state: "liquid" },
-  { name: "Liquefied Petroleum Gases (LPG)", state: "liquid" },
-  // Biomass Fuels - Liquid
-  { name: "Biodiesel (100%)", state: "liquid" },
-  { name: "Ethanol (100%)", state: "liquid" },
-  { name: "Rendered Animal Fat", state: "liquid" },
-  { name: "Vegetable Oil", state: "liquid" }
-];
+// Re-export for local use
+const STATIONARY_COMBUSTION_FUELS_LOCAL = STATIONARY_COMBUSTION_FUELS;
 
 const SCOPE_1_CATEGORIES = [
   { 
