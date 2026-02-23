@@ -61,7 +61,8 @@ export default function CompanySurvey() {
           <p className="text-gray-500 text-sm">
             Please complete the following questions about your organization. This information will be used to generate your GHG emissions report.
           </p>
-          <p className="text-red-500 text-xs mt-3">* Required</p>
+          <p className="text-gray-500 text-xs mt-2">Only the company name is required — you can skip the rest and fill them in later.</p>
+          <p className="text-red-500 text-xs mt-1">* Required</p>
         </div>
 
         {/* Questions */}
