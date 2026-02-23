@@ -1,13 +1,14 @@
+// Source: EPA Emission Factors for GHG Inventories, January 15, 2025 (Table 10)
 export const BUSINESS_TRAVEL_FACTORS = {
-  "Passenger Car":                                  { co2: 0.306, ch4: 0.009,   n2o: 0.006,  unit: "vehicle-mile" },
-  "Light-Duty Truck":                               { co2: 0.405, ch4: 0.011,   n2o: 0.010,  unit: "vehicle-mile" },
-  "Motorcycle":                                     { co2: 0.376, ch4: 0.091,   n2o: 0.019,  unit: "vehicle-mile" },
-  "Intercity Rail - Northeast Corridor":            { co2: 0.058, ch4: 0.0055,  n2o: 0.0007, unit: "passenger-mile" },
-  "Intercity Rail - Other Routes":                  { co2: 0.150, ch4: 0.0117,  n2o: 0.0038, unit: "passenger-mile" },
-  "Intercity Rail - National Average":              { co2: 0.113, ch4: 0.0092,  n2o: 0.0026, unit: "passenger-mile" },
+  "Passenger Car":                                  { co2: 0.297, ch4: 0.0059,  n2o: 0.0053, unit: "vehicle-mile" },
+  "Light-Duty Truck":                               { co2: 0.394, ch4: 0.0109,  n2o: 0.0088, unit: "vehicle-mile" },
+  "Motorcycle":                                     { co2: 0.368, ch4: 0.0888,  n2o: 0.0188, unit: "vehicle-mile" },
+  "Intercity Rail - Northeast Corridor":            { co2: 0.023, ch4: 0.0010,  n2o: 0.0001, unit: "passenger-mile" },
+  "Intercity Rail - Other Routes":                  { co2: 0.149, ch4: 0.0120,  n2o: 0.0040, unit: "passenger-mile" },
+  "Intercity Rail - National Average":              { co2: 0.096, ch4: 0.0080,  n2o: 0.0020, unit: "passenger-mile" },
   "Commuter Rail":                                  { co2: 0.133, ch4: 0.0105,  n2o: 0.0026, unit: "passenger-mile" },
   "Transit Rail (i.e. Subway, Tram)":              { co2: 0.093, ch4: 0.0075,  n2o: 0.0010, unit: "passenger-mile" },
-  "Bus":                                            { co2: 0.071, ch4: 0.0050,  n2o: 0.0021, unit: "passenger-mile" },
+  "Bus":                                            { co2: 0.066, ch4: 0.0046,  n2o: 0.0019, unit: "passenger-mile" },
   "Air Short Haul (< 300 miles)":                  { co2: 0.207, ch4: 0.0064,  n2o: 0.0066, unit: "passenger-mile" },
   "Air Medium Haul (>= 300 miles, < 2300 miles)":  { co2: 0.129, ch4: 0.0006,  n2o: 0.0041, unit: "passenger-mile" },
   "Air Long Haul (>= 2300 miles)":                 { co2: 0.163, ch4: 0.0006,  n2o: 0.0052, unit: "passenger-mile" }
