@@ -129,6 +129,12 @@ export default function Dashboard() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
             >
+              <Link to={createPageUrl("OrganizationInfo")}>
+                <Button variant="outline" className="rounded-xl h-11 px-5 border-slate-600 text-slate-300 bg-transparent hover:bg-slate-700">
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export Report
+                </Button>
+              </Link>
               <Button 
                 onClick={() => { setEditingRecord(null); setShowForm(true); }}
                 className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-5 shadow-sm"
