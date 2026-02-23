@@ -1090,6 +1090,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                   <SelectItem value="scope_1">Scope 1</SelectItem>
                   <SelectItem value="scope_2">Scope 2</SelectItem>
                   <SelectItem value="scope_3">Scope 3</SelectItem>
+                  <SelectItem value="offsets">Offsets</SelectItem>
                 </SelectContent>
               </Select>
             </div>
