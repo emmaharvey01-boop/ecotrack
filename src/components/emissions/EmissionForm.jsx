@@ -217,6 +217,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     commute_distance: "",
     num_employees: "",
     offsets_tonnes: "",
+    offsets_ghg_scope: "",
     waste_material: "",
     waste_disposal: "",
     waste_weight: "",
