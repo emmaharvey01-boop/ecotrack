@@ -121,14 +121,7 @@ const EGRID_SUBREGIONS = {
   "US Average": { co2: 856.1, ch4: 0.066, n2o: 0.009 }
 };
 
-const VEHICLE_TYPES = [
-  { name: "Passenger Cars", mpg: 24.8 },
-  { name: "Other 2-Axle, 4-Tire Vehicles", mpg: 18.1 },
-  { name: "Motorcycles", mpg: 44.0 },
-  { name: "Single unit 2-Axle 6-Tire or More Trucks", mpg: 7.9 },
-  { name: "Combination Trucks", mpg: 6.9 },
-  { name: "Diesel Buses (Diesel Heavy-Duty Vehicles)", mpg: 7.4 }
-];
+
 
 
 
