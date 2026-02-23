@@ -68,34 +68,50 @@ export default function CompanySurvey() {
         {/* Questions */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {questions.map((q, i) => (
-            <>
-            <div key={q.key} className="bg-white rounded-xl shadow-sm p-6">
-              <Label className="text-gray-800 font-medium text-sm leading-relaxed block mb-3">
-                {i + 1}. {q.label}
-                {q.required && <span className="text-red-500 ml-1">*</span>}
-              </Label>
+            <div key={q.key}>
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <Label className="text-gray-800 font-medium text-sm leading-relaxed block mb-3">
+                  {i + 1}. {q.label}
+                  {q.required && <span className="text-red-500 ml-1">*</span>}
+                </Label>
 
-              {q.type === "text" && (
-                <Input
-                  value={form[q.key] || ""}
-                  onChange={e => set(q.key, e.target.value)}
-                  placeholder={q.placeholder || "Your answer"}
-                  required={q.required}
-                  className="border-0 border-b border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-[#1B4332] px-0 text-sm"
-                />
-              )}
+                {q.type === "text" && (
+                  <Input
+                    value={form[q.key] || ""}
+                    onChange={e => set(q.key, e.target.value)}
+                    placeholder={q.placeholder || "Your answer"}
+                    required={q.required}
+                    className="border-0 border-b border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-[#1B4332] px-0 text-sm"
+                  />
+                )}
 
-              {q.type === "dropdown" && (
-                <Select value={form[q.key] || ""} onValueChange={v => set(q.key, v)}>
-                  <SelectTrigger className="w-full border border-gray-200 rounded-lg text-sm">
-                    <SelectValue placeholder="Choose..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {q.options.map(o => (
-                      <SelectItem key={o} value={o}>{o}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {q.type === "dropdown" && (
+                  <Select value={form[q.key] || ""} onValueChange={v => set(q.key, v)}>
+                    <SelectTrigger className="w-full border border-gray-200 rounded-lg text-sm">
+                      <SelectValue placeholder="Choose..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {q.options.map(o => (
+                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {/* Skip button after question 1 */}
+              {i === 0 && (
+                <div className="flex justify-end pt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={!form.company_name || saveMutation.isPending}
+                    onClick={() => saveMutation.mutate({ company_name: form.company_name })}
+                    className="rounded-lg h-9 px-5 border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-sm"
+                  >
+                    Skip & come back later
+                  </Button>
+                </div>
               )}
             </div>
           ))}
