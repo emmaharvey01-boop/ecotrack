@@ -16,17 +16,18 @@ export const BUSINESS_TRAVEL_FACTORS = {
 
 export const COMMUTING_MODES = Object.keys(BUSINESS_TRAVEL_FACTORS).filter(m => !m.startsWith("Air"));
 
+// Source: EPA Emission Factors for GHG Inventories, January 15, 2025 (Table 8)
 export const UPSTREAM_TRANSPORT_VEHICLE_MILE = {
-  "Passenger Car": { co2: 0.306, ch4: 0.009, n2o: 0.006, unit: "vehicle-mile" },
-  "Light-Duty Truck": { co2: 0.405, ch4: 0.011, n2o: 0.010, unit: "vehicle-mile" },
-  "Medium- and Heavy-Duty Truck": { co2: 1.360, ch4: 0.012, n2o: 0.038, unit: "vehicle-mile" },
+  "Passenger Car": { co2: 0.297, ch4: 0.0059, n2o: 0.0053, unit: "vehicle-mile" },
+  "Light-Duty Truck": { co2: 0.394, ch4: 0.0109, n2o: 0.0088, unit: "vehicle-mile" },
+  "Medium- and Heavy-Duty Truck": { co2: 1.298, ch4: 0.0115, n2o: 0.0376, unit: "vehicle-mile" },
 };
 
 export const UPSTREAM_TRANSPORT_TON_MILE = {
-  "Medium- and Heavy-Duty Truck": { co2: 0.168, ch4: 0.0015, n2o: 0.0047, unit: "short ton-mile" },
-  "Rail": { co2: 0.022, ch4: 0.0017, n2o: 0.0005, unit: "short ton-mile" },
-  "Waterborne Craft": { co2: 0.082, ch4: 0.0326, n2o: 0.0021, unit: "short ton-mile" },
-  "Aircraft": { co2: 0.905, ch4: 0, n2o: 0.0279, unit: "short ton-mile" },
+  "Medium- and Heavy-Duty Truck": { co2: 0.186, ch4: 0.0016, n2o: 0.0054, unit: "short ton-mile" },
+  "Rail": { co2: 0.021, ch4: 0.0016, n2o: 0.0005, unit: "short ton-mile" },
+  "Waterborne Craft": { co2: 0.077, ch4: 0.0310, n2o: 0.0020, unit: "short ton-mile" },
+  "Aircraft": { co2: 1.086, ch4: 0, n2o: 0.0334, unit: "short ton-mile" },
 };
 
 export const EGRID_SUBREGIONS = {
