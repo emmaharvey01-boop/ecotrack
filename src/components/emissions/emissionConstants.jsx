@@ -72,21 +72,55 @@ export const PURCHASED_GASES_GWP_FACTORS = {
   "HFC-245fa": 858, "HFC-365mfc": 804, "HFC-43-10mee": 1650,
 };
 
+// Source: EPA Emission Factors for GHG Inventories, January 15, 2025 (Table 1)
 export const STATIONARY_COMBUSTION_FACTORS = {
-  "Natural Gas": { co2PerMmBtu: 53.06 }, "Distillate Fuel Oil No. 2": { co2PerMmBtu: 73.96 },
-  "Residual Fuel Oil No. 6": { co2PerMmBtu: 75.10 }, "Kerosene": { co2PerMmBtu: 75.20 },
-  "Liquefied Petroleum Gases (LPG)": { co2PerMmBtu: 61.71 }, "Anthracite Coal": { co2PerMmBtu: 103.69 },
-  "Bituminous Coal": { co2PerMmBtu: 93.28 }, "Sub-bituminous Coal": { co2PerMmBtu: 97.17 },
-  "Lignite Coal": { co2PerMmBtu: 97.72 }, "Mixed (Commercial Sector)": { co2PerMmBtu: 94.27 },
-  "Mixed (Electric Power Sector)": { co2PerMmBtu: 95.52 }, "Mixed (Industrial Coking)": { co2PerMmBtu: 93.9 },
-  "Mixed (Industrial Sector)": { co2PerMmBtu: 94.67 }, "Coal Coke": { co2PerMmBtu: 113.67 },
-  "Municipal Solid Waste": { co2PerMmBtu: 90.7 }, "Petroleum Coke (Solid)": { co2PerMmBtu: 102.41 },
-  "Plastics": { co2PerMmBtu: 75 }, "Tires": { co2PerMmBtu: 85.97 },
-  "Agricultural Byproducts": { co2PerMmBtu: 118.17 }, "Peat": { co2PerMmBtu: 111.84 },
-  "Solid Byproducts": { co2PerMmBtu: 105.51 }, "Wood and Wood Residuals": { co2PerMmBtu: 0 },
-  "Propane Gas": { co2PerMmBtu: 61.46 }, "Landfill Gas": { co2PerMmBtu: 0 },
-  "Biodiesel (100%)": { co2PerMmBtu: 73.84 }, "Ethanol (100%)": { co2PerMmBtu: 68.44 },
-  "Rendered Animal Fat": { co2PerMmBtu: 71.06 }, "Vegetable Oil": { co2PerMmBtu: 81.55 },
+  // Coal and Coke (kg CO2 per mmBtu, HHV)
+  "Natural Gas":                    { co2PerMmBtu: 53.06,  ch4PerMmBtu: 1.0,  n2oPerMmBtu: 0.10  },
+  "Anthracite Coal":                { co2PerMmBtu: 103.69, ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Bituminous Coal":                { co2PerMmBtu: 93.28,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Sub-bituminous Coal":            { co2PerMmBtu: 97.17,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Lignite Coal":                   { co2PerMmBtu: 97.72,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Mixed (Commercial Sector)":      { co2PerMmBtu: 94.27,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Mixed (Electric Power Sector)":  { co2PerMmBtu: 95.52,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Mixed (Industrial Coking)":      { co2PerMmBtu: 93.90,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Mixed (Industrial Sector)":      { co2PerMmBtu: 94.67,  ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  "Coal Coke":                      { co2PerMmBtu: 113.67, ch4PerMmBtu: 11,   n2oPerMmBtu: 1.6   },
+  // Other Fuels - Solid
+  "Municipal Solid Waste":          { co2PerMmBtu: 90.70,  ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Petroleum Coke (Solid)":         { co2PerMmBtu: 102.41, ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Plastics":                       { co2PerMmBtu: 75.00,  ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Tires":                          { co2PerMmBtu: 85.97,  ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  // Biomass - Solid
+  "Agricultural Byproducts":        { co2PerMmBtu: 118.17, ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Peat":                           { co2PerMmBtu: 111.84, ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Solid Byproducts":               { co2PerMmBtu: 105.51, ch4PerMmBtu: 32,   n2oPerMmBtu: 4.2   },
+  "Wood and Wood Residuals":        { co2PerMmBtu: 93.80,  ch4PerMmBtu: 7.2,  n2oPerMmBtu: 3.6   },
+  // Gaseous
+  "Blast Furnace Gas":              { co2PerMmBtu: 274.32, ch4PerMmBtu: 0.022,n2oPerMmBtu: 0.10  },
+  "Coke Oven Gas":                  { co2PerMmBtu: 46.85,  ch4PerMmBtu: 0.48, n2oPerMmBtu: 0.10  },
+  "Fuel Gas":                       { co2PerMmBtu: 59.00,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Propane Gas":                    { co2PerMmBtu: 61.46,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Landfill Gas":                   { co2PerMmBtu: 52.07,  ch4PerMmBtu: 3.2,  n2oPerMmBtu: 0.63  },
+  "Other Biomass Gases":            { co2PerMmBtu: 52.07,  ch4PerMmBtu: 3.2,  n2oPerMmBtu: 0.63  },
+  // Petroleum Products (kg CO2 per mmBtu)
+  "Distillate Fuel Oil No. 1":      { co2PerMmBtu: 73.25,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Distillate Fuel Oil No. 2":      { co2PerMmBtu: 73.96,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Distillate Fuel Oil No. 4":      { co2PerMmBtu: 75.04,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Residual Fuel Oil No. 5":        { co2PerMmBtu: 72.93,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Residual Fuel Oil No. 6":        { co2PerMmBtu: 75.10,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Kerosene":                       { co2PerMmBtu: 75.20,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Kerosene-Type Jet Fuel":         { co2PerMmBtu: 72.22,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Liquefied Petroleum Gases (LPG)":{ co2PerMmBtu: 61.71,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Motor Gasoline":                 { co2PerMmBtu: 70.22,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Aviation Gasoline":              { co2PerMmBtu: 69.25,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Propane":                        { co2PerMmBtu: 62.87,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Crude Oil":                      { co2PerMmBtu: 74.54,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  "Lubricants":                     { co2PerMmBtu: 74.27,  ch4PerMmBtu: 3.0,  n2oPerMmBtu: 0.60  },
+  // Biomass - Liquid
+  "Biodiesel (100%)":               { co2PerMmBtu: 73.84,  ch4PerMmBtu: 1.1,  n2oPerMmBtu: 0.11  },
+  "Ethanol (100%)":                 { co2PerMmBtu: 68.44,  ch4PerMmBtu: 1.1,  n2oPerMmBtu: 0.11  },
+  "Rendered Animal Fat":            { co2PerMmBtu: 71.06,  ch4PerMmBtu: 1.1,  n2oPerMmBtu: 0.11  },
+  "Vegetable Oil":                  { co2PerMmBtu: 81.55,  ch4PerMmBtu: 1.1,  n2oPerMmBtu: 0.11  },
 };
 
 export const EMISSION_FACTORS = {
