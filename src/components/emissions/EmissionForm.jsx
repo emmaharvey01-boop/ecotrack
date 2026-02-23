@@ -639,7 +639,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const tonnes = parseFloat(formData.offsets_tonnes) || 0;
       onSubmit({
         company_name: formData.company_name,
-        scope: "scope_3",
+        scope: "offsets",
         category: "Offsets",
         source: "Carbon Offsets",
         amount: tonnes,
