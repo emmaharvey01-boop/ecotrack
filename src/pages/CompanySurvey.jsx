@@ -34,8 +34,8 @@ export default function CompanySurvey() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => base44.entities.OrganizationInfo.create(data),
-    onSuccess: () => {
-      navigate(createPageUrl("OrganizationInfo"));
+    onSuccess: (_, variables) => {
+      navigate(createPageUrl("CompanyDashboard") + `?company=${encodeURIComponent(variables.company_name)}`);
     },
   });
 
