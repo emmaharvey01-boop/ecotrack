@@ -34,7 +34,7 @@ export default function CompanySurvey() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => base44.entities.OrganizationInfo.create(data),
-    onSuccess: (created) => {
+    onSuccess: () => {
       navigate(createPageUrl("OrganizationInfo"));
     },
   });
@@ -48,7 +48,6 @@ export default function CompanySurvey() {
 
   return (
     <div className="min-h-screen bg-[#f0f4f8]">
-      {/* Header banner */}
       <div className="bg-[#1B4332] h-2 w-full" />
       <div className="max-w-2xl mx-auto px-4 py-10">
 
@@ -99,7 +98,6 @@ export default function CompanySurvey() {
                 )}
               </div>
 
-              {/* Skip button after question 1 */}
               {i === 0 && (
                 <div className="flex justify-end pt-1">
                   <Button
@@ -109,7 +107,7 @@ export default function CompanySurvey() {
                     onClick={() => saveMutation.mutate({ company_name: form.company_name })}
                     className="rounded-lg h-9 px-5 border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-sm"
                   >
-                    Skip & come back later
+                    Skip &amp; come back later
                   </Button>
                 </div>
               )}
@@ -117,18 +115,15 @@ export default function CompanySurvey() {
           ))}
 
           {/* Submit */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center pt-2">
-            <div className="flex gap-3 w-full sm:w-auto">
-              <Button
-                type="submit"
-                disabled={!form.company_name || saveMutation.isPending}
-                className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-lg h-11 px-8 flex items-center gap-2"
-              >
-                {saveMutation.isPending ? "Saving..." : "Submit"}
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-
-            </div>
+          <div className="flex justify-between items-center pt-2">
+            <Button
+              type="submit"
+              disabled={!form.company_name || saveMutation.isPending}
+              className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-lg h-11 px-8 flex items-center gap-2"
+            >
+              {saveMutation.isPending ? "Saving..." : "Submit"}
+              <ChevronRight className="w-4 h-4" />
+            </Button>
             <button
               type="button"
               onClick={() => setForm({})}
