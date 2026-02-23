@@ -26,6 +26,7 @@ import {
   REFRIGERANT_GWP_FACTORS,
   FIRE_SUPPRESSION_GWP_FACTORS,
 } from "./CombustionFields";
+import OffsetsFields from "./OffsetsFields";
 
 const SCOPE_1_CATEGORIES = [
   { 
