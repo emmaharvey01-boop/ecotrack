@@ -49,11 +49,13 @@
  */
 import OrganizationInfo from './pages/OrganizationInfo';
 import CompanyDashboard from './pages/CompanyDashboard';
+import CompanySurvey from './pages/CompanySurvey';
 
 
 export const PAGES = {
     "OrganizationInfo": OrganizationInfo,
     "CompanyDashboard": CompanyDashboard,
+    "CompanySurvey": CompanySurvey,
 }
 
 export const pagesConfig = {
