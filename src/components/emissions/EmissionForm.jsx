@@ -122,7 +122,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     }
     if (isMobileCombustion) {
       if (!formData.fuel_usage || !formData.fuel_units) return null;
-      const ef = { gallons: 8.887, scf: 0.0551 };
+      // Table 2: Motor Gasoline = 8.78 kg CO2/gal, CNG = 0.05444 kg CO2/scf (EPA Jan 2025)
+      const ef = { gallons: 8.78, scf: 0.05444 };
       return ((parseFloat(formData.fuel_usage) * (ef[formData.fuel_units] || 0)) / 1000).toFixed(4);
     }
     if (isStationaryCombustion) {
