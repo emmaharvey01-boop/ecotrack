@@ -59,7 +59,7 @@ const SCOPE_3_CATEGORIES = [
   { value: "waste", label: "Waste", sources: [] },
 ];
 const OFFSETS_CATEGORIES = [{ value: "offsets", label: "Carbon Offsets", sources: [] }];
-// Offsets is its own top-level scope value
+
 
 const BUSINESS_TRAVEL_FACTORS = {
   "Passenger Car":                                  { co2: 0.306, ch4: 0.009,   n2o: 0.006,  unit: "vehicle-mile" },
