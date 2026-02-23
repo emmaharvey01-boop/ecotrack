@@ -233,9 +233,7 @@ const WASTE_DISPOSAL_LABELS = {
   anaerobically_digested: "Anaerobically Digested",
 };
 
-const REPORTING_PERIODS = [
-  "2024", "2025", "2026", "2027", "2028"
-];
+const REPORTING_PERIODS = ["2024", "2025", "2026", "2027", "2028"];
 
 export default function EmissionForm({ open, onClose, onSubmit, editingRecord, isSubmitting }) {
   const [formData, setFormData] = useState({
