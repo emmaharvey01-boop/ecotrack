@@ -57,8 +57,8 @@ const SCOPE_3_CATEGORIES = [
   { value: "commuting", label: "Employee Commuting", sources: [] },
   { value: "upstream_transport", label: "Upstream Transport and Distribution", sources: [] },
   { value: "waste", label: "Waste", sources: [] },
-  { value: "offsets", label: "Offsets", sources: [] }
 ];
+const OFFSETS_CATEGORIES = [{ value: "offsets", label: "Carbon Offsets", sources: [] }];
 
 const BUSINESS_TRAVEL_FACTORS = {
   "Passenger Car":                                  { co2: 0.306, ch4: 0.009,   n2o: 0.006,  unit: "vehicle-mile" },
