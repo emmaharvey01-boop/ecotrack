@@ -27,8 +27,6 @@ import {
   FIRE_SUPPRESSION_GWP_FACTORS,
 } from "./CombustionFields";
 
-
-
 const SCOPE_1_CATEGORIES = [
   { 
     value: "stationary_combustion", 
