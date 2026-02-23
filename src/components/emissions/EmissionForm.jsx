@@ -230,7 +230,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
 
     const record = { ...makeBase(), scope: formData.scope, scope_2_method: formData.scope === "scope_2" ? formData.scope_2_method : undefined, category: selectedCategory?.label || formData.category, source: formData.source };
     if (isMobileCombustion) {
-      const ef = { gallons: 8.887, scf: 0.0551 };
+      const ef = { gallons: 8.78, scf: 0.05444 };
       Object.assign(record, { source: formData.vehicle_type, source_area: formData.vehicle_type, fuel_combusted: formData.fuel_units === "gallons" ? "Gasoline" : "Natural Gas", fuel_state: formData.fuel_units === "gallons" ? "liquid" : "gas", quantity_combusted: parseFloat(formData.fuel_usage), combustion_units: formData.fuel_units, amount: parseFloat(formData.fuel_usage), unit: formData.fuel_units, emission_factor: ef[formData.fuel_units]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
     } else if (isStationaryCombustion) {
       const fd = STATIONARY_COMBUSTION_FACTORS[formData.fuel_combusted];
