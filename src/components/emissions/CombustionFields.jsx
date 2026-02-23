@@ -5,7 +5,9 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
+// Source: EPA Emission Factors for GHG Inventories, January 15, 2025 (Table 1)
 const STATIONARY_COMBUSTION_FUELS = [
+  // Coal and Coke
   { name: "Anthracite Coal", state: "solid" },
   { name: "Bituminous Coal", state: "solid" },
   { name: "Sub-bituminous Coal", state: "solid" },
@@ -15,21 +17,39 @@ const STATIONARY_COMBUSTION_FUELS = [
   { name: "Mixed (Industrial Coking)", state: "solid" },
   { name: "Mixed (Industrial Sector)", state: "solid" },
   { name: "Coal Coke", state: "solid" },
+  // Other Fuels - Solid
   { name: "Municipal Solid Waste", state: "solid" },
   { name: "Petroleum Coke (Solid)", state: "solid" },
   { name: "Plastics", state: "solid" },
   { name: "Tires", state: "solid" },
+  // Biomass - Solid
   { name: "Agricultural Byproducts", state: "solid" },
   { name: "Peat", state: "solid" },
   { name: "Solid Byproducts", state: "solid" },
   { name: "Wood and Wood Residuals", state: "solid" },
+  // Gaseous
   { name: "Natural Gas", state: "gas" },
   { name: "Propane Gas", state: "gas" },
   { name: "Landfill Gas", state: "gas" },
+  { name: "Blast Furnace Gas", state: "gas" },
+  { name: "Coke Oven Gas", state: "gas" },
+  { name: "Fuel Gas", state: "gas" },
+  { name: "Other Biomass Gases", state: "gas" },
+  // Petroleum Products - Liquid
+  { name: "Distillate Fuel Oil No. 1", state: "liquid" },
   { name: "Distillate Fuel Oil No. 2", state: "liquid" },
+  { name: "Distillate Fuel Oil No. 4", state: "liquid" },
+  { name: "Residual Fuel Oil No. 5", state: "liquid" },
   { name: "Residual Fuel Oil No. 6", state: "liquid" },
   { name: "Kerosene", state: "liquid" },
+  { name: "Kerosene-Type Jet Fuel", state: "liquid" },
   { name: "Liquefied Petroleum Gases (LPG)", state: "liquid" },
+  { name: "Motor Gasoline", state: "liquid" },
+  { name: "Aviation Gasoline", state: "liquid" },
+  { name: "Propane", state: "liquid" },
+  { name: "Crude Oil", state: "liquid" },
+  { name: "Lubricants", state: "liquid" },
+  // Biomass - Liquid
   { name: "Biodiesel (100%)", state: "liquid" },
   { name: "Ethanol (100%)", state: "liquid" },
   { name: "Rendered Animal Fat", state: "liquid" },
