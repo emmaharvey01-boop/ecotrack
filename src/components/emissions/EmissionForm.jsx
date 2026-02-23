@@ -639,7 +639,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         company_name: formData.company_name,
         scope: "offsets",
         category: "Offsets",
-        source: "Carbon Offsets",
+        source: formData.offsets_ghg_scope ? `Carbon Offsets - ${formData.offsets_ghg_scope}` : "Carbon Offsets",
         amount: tonnes,
         unit: "tCO₂e",
         emission_factor: -1,
