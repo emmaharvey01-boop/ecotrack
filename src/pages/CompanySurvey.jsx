@@ -105,6 +105,7 @@ export default function CompanySurvey() {
                     variant="outline"
                     disabled={!form.company_name || saveMutation.isPending}
                     onClick={() => saveMutation.mutate({ company_name: form.company_name })}
+
                     className="rounded-lg h-9 px-5 border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5 text-sm"
                   >
                     Skip &amp; come back later
