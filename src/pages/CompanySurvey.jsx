@@ -68,6 +68,7 @@ export default function CompanySurvey() {
         {/* Questions */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {questions.map((q, i) => (
+            <>
             <div key={q.key} className="bg-white rounded-xl shadow-sm p-6">
               <Label className="text-gray-800 font-medium text-sm leading-relaxed block mb-3">
                 {i + 1}. {q.label}
