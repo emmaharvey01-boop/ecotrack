@@ -127,15 +127,7 @@ export default function CompanySurvey() {
                 {saveMutation.isPending ? "Saving..." : "Submit"}
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!form.company_name || saveMutation.isPending}
-                onClick={() => saveMutation.mutate({ company_name: form.company_name })}
-                className="rounded-lg h-11 px-6 border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332]/5"
-              >
-                Skip & come back later
-              </Button>
+
             </div>
             <button
               type="button"
