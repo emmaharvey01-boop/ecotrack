@@ -179,15 +179,9 @@ const EMISSION_FACTORS = {
   "Refrigerants": { factor: 1.43, unit: "kg" },
   "Air Conditioning Units": { factor: 1.81, unit: "kg" },
   "Fire Suppressants": { factor: 7.14, unit: "kg" },
-  "Chemical Processes": { factor: 0.5, unit: "tonnes" },
-  "Manufacturing": { factor: 0.3, unit: "tonnes" },
-  "Waste Treatment": { factor: 0.2, unit: "tonnes" },
   "Grid Electricity": { factor: 0.000417, unit: "kWh" },
   "Renewable Electricity": { factor: 0.00002, unit: "kWh" },
-  "District Heating": { factor: 0.00019, unit: "kWh" },
   "Steam": { factor: 0.00022, unit: "kg" },
-  "District Cooling": { factor: 0.00015, unit: "kWh" },
-  "Chilled Water": { factor: 0.00012, unit: "kWh" }
 };
 
 // WARM Emission Factors (MT CO2e per short ton)
