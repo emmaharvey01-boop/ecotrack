@@ -109,9 +109,11 @@ export default function OrganizationInfoPage() {
         <div className="max-w-5xl mx-auto px-4 py-20 text-center text-slate-400">
           <Building2 className="w-12 h-12 mx-auto mb-4 opacity-30" />
           <p className="text-lg mb-6">Start a new company log to fill in organization information.</p>
-          <Button onClick={() => {/* trigger new company */}} className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-6">
-            <Building2 className="w-4 h-4 mr-2" />Start a New Company Log
-          </Button>
+          <Link to={createPageUrl("Dashboard")}>
+            <Button className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-6">
+              <Building2 className="w-4 h-4 mr-2" />Start a New Company Log
+            </Button>
+          </Link>
         </div>
       ) : (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
