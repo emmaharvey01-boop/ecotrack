@@ -360,7 +360,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES : 
                      formData.scope === "scope_2" ? SCOPE_2_CATEGORIES :
-                     formData.scope === "scope_3" ? SCOPE_3_CATEGORIES : [];
+                     formData.scope === "scope_3" ? SCOPE_3_CATEGORIES :
+                     formData.scope === "offsets" ? OFFSETS_CATEGORIES : [];
   
   const selectedCategory = categories.find(c => c.value === formData.category);
   const sources = selectedCategory?.sources || [];
