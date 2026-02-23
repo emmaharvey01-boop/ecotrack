@@ -49,11 +49,13 @@
  */
 import Dashboard from './pages/Dashboard';
 import OrganizationInfo from './pages/OrganizationInfo';
+import CompanyDashboard from './pages/CompanyDashboard';
 
 
 export const PAGES = {
     "Dashboard": Dashboard,
     "OrganizationInfo": OrganizationInfo,
+    "CompanyDashboard": CompanyDashboard,
 }
 
 export const pagesConfig = {
