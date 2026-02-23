@@ -170,6 +170,10 @@ export default function CompanyDashboard() {
               <ScopeBreakdown records={records} scope="scope_1" />
               <ScopeBreakdown records={records} scope="scope_2" />
             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <ScopeBreakdown records={records} scope="scope_3" />
+              <ScopeBreakdown records={records} scope="offsets" />
+            </div>
 
             <EmissionTable records={records} onDelete={deleteMutation.mutate} onEdit={(r) => { setEditingRecord(r); setShowForm(true); }} isDeleting={deleteMutation.isPending} />
 
