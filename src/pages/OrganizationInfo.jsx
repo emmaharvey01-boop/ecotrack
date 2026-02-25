@@ -113,6 +113,27 @@ export default function OrganizationInfoPage() {
                 <Button onClick={() => exportToExcel(form, companyRecords)} className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11 px-5">
                   <Download className="w-4 h-4 mr-2" />Export Report
                 </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="rounded-xl h-11 px-5">
+                      <Trash2 className="w-4 h-4 mr-2" />Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete "{selectedCompany}"?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the organization info and all {companyRecords.length} emission record(s) for this company. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => deleteMutation.mutate()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        {deleteMutation.isPending ? "Deleting…" : "Delete Everything"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
           </div>
