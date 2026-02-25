@@ -47,15 +47,15 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import OrganizationInfo from './pages/OrganizationInfo';
 import CompanyDashboard from './pages/CompanyDashboard';
 import CompanySurvey from './pages/CompanySurvey';
+import OrganizationInfo from './pages/OrganizationInfo';
 
 
 export const PAGES = {
-    "OrganizationInfo": OrganizationInfo,
     "CompanyDashboard": CompanyDashboard,
     "CompanySurvey": CompanySurvey,
+    "OrganizationInfo": OrganizationInfo,
 }
 
 export const pagesConfig = {
