@@ -69,6 +69,19 @@ export default function OrganizationInfoPage() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["orgInfo"] }); setSaved(true); setTimeout(() => setSaved(false), 2500); },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const toDelete = allRecords.filter(r => r.company_name === selectedCompany);
+      await Promise.all(toDelete.map(r => base44.entities.EmissionRecord.delete(r.id)));
+      if (existingOrg) await base44.entities.OrganizationInfo.delete(existingOrg.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+      queryClient.invalidateQueries({ queryKey: ["orgInfo"] });
+      setSelectedCompany("all");
+    },
+  });
+
   const set = (key) => (val) => setForm(f => ({ ...f, [key]: val }));
   const setInput = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
 
