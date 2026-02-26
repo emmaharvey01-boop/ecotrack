@@ -37,10 +37,56 @@ const YesNo = ({ value, onChange }) => (
   </Select>
 );
 
-export default function AdditionalInfoForm({ company, orgInfo, onSaved }) {
+// Compute disclosure totals from emission records
+function computeDisclosureTotals(records, annualRevenue) {
+  const scope1 = records.filter(r => r.scope === "scope_1");
+  const scope2 = records.filter(r => r.scope === "scope_2");
+
+  const sum = (arr) => arr.reduce((s, r) => s + (r.co2e_tonnes || 0), 0);
+
+  const scope1Total = sum(scope1);
+  const scope1Stationary = sum(scope1.filter(r => r.category?.toLowerCase().includes("stationary")));
+  const scope1Process = sum(scope1.filter(r => r.category?.toLowerCase().includes("process")));
+  const scope1Mobile = sum(scope1.filter(r => r.category?.toLowerCase().includes("mobile")));
+  const scope1Fugitive = sum(scope1.filter(r =>
+    r.category?.toLowerCase().includes("fugitive") ||
+    r.category?.toLowerCase().includes("refriger") ||
+    r.category?.toLowerCase().includes("fire")
+  ));
+
+  const scope2MarketTotal = sum(scope2.filter(r => r.scope_2_method === "market_based"));
+  const scope2LocationTotal = sum(scope2.filter(r => r.scope_2_method === "location_based"));
+  const scope2Electricity = sum(scope2.filter(r => r.category?.toLowerCase().includes("electric")));
+  const scope2Steam = sum(scope2.filter(r => r.category?.toLowerCase().includes("steam")));
+  const scope2Heating = sum(scope2.filter(r => r.category?.toLowerCase().includes("heat")));
+  const scope2Cooling = sum(scope2.filter(r => r.category?.toLowerCase().includes("cool")));
+
+  const revenueMillions = annualRevenue ? annualRevenue / 1_000_000 : null;
+
+  return {
+    scope1_total_direct: +scope1Total.toFixed(4),
+    scope1_stationary_total: +scope1Stationary.toFixed(4),
+    scope1_process_total: +scope1Process.toFixed(4),
+    scope1_mobile_total: +scope1Mobile.toFixed(4),
+    scope1_fugitive_total: +scope1Fugitive.toFixed(4),
+    scope1_intensity: revenueMillions ? +(scope1Total / revenueMillions).toFixed(4) : "",
+    scope2_total_indirect_market: +scope2MarketTotal.toFixed(4),
+    scope2_total_indirect_location: +scope2LocationTotal.toFixed(4),
+    scope2_electricity_total: +scope2Electricity.toFixed(4),
+    scope2_steam_total: +scope2Steam.toFixed(4),
+    scope2_heating_total: +scope2Heating.toFixed(4),
+    scope2_cooling_total: +scope2Cooling.toFixed(4),
+    scope2_intensity_market: revenueMillions ? +(scope2MarketTotal / revenueMillions).toFixed(4) : "",
+    scope2_intensity_location: revenueMillions ? +(scope2LocationTotal / revenueMillions).toFixed(4) : "",
+  };
+}
+
+export default function AdditionalInfoForm({ company, orgInfo, records = [], onSaved }) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState({});
   const [saved, setSaved] = useState(false);
+
+  const computed = computeDisclosureTotals(records, orgInfo?.annual_revenue);
 
   useEffect(() => {
     if (orgInfo) setForm(orgInfo);
