@@ -179,10 +179,13 @@ export default function AdditionalInfoForm({ company, orgInfo, records = [], onS
         <Field label="Scope 1 from Fugitive Sources (mtCO₂e)">
           <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_fugitive_total}</div>
         </Field>
+        <Field label="Scope 1 Direct Biogenic (CO₂) Emissions (mtCO₂)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_biogenic_total}</div>
+        </Field>
         <Field label="Scope 1 Emission Intensity (mtCO₂e / $millions revenue)">
           <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_intensity !== "" ? computed.scope1_intensity : <span className="text-slate-500 italic text-xs">requires annual revenue</span>}</div>
         </Field>
-        <Field label="All Scope 1 at limited assurance level?"><YesNo value={form.scope1_limited_assurance} onChange={set("scope1_limited_assurance")} /></Field>
+        <Field label="All Scope 1 emissions at limited assurance level?"><YesNo value={form.scope1_limited_assurance} onChange={set("scope1_limited_assurance")} /></Field>
         <Field label="If No, provide explanation" full><Textarea value={form.scope1_assurance_explanation || ""} onChange={setInput("scope1_assurance_explanation")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
       </Section>
 
@@ -191,6 +194,9 @@ export default function AdditionalInfoForm({ company, orgInfo, records = [], onS
           <Calculator className="w-3.5 h-3.5" />
           Values calculated automatically from your emissions records.
         </div>
+        <Field label="Scope 2 Total Direct Emissions (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_total}</div>
+        </Field>
         <Field label="Scope 2 Total — Market-Based (mtCO₂e)">
           <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_total_indirect_market}</div>
         </Field>
@@ -215,18 +221,21 @@ export default function AdditionalInfoForm({ company, orgInfo, records = [], onS
         <Field label="Scope 2 Intensity — Location (mtCO₂e / $millions revenue)">
           <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_intensity_location !== "" ? computed.scope2_intensity_location : <span className="text-slate-500 italic text-xs">requires annual revenue</span>}</div>
         </Field>
+        <Field label="All Scope 2 emissions at limited assurance level?"><YesNo value={form.scope2_limited_assurance} onChange={set("scope2_limited_assurance")} /></Field>
+        <Field label="If No, provide explanation" full><Textarea value={form.scope2_assurance_explanation || ""} onChange={setInput("scope2_assurance_explanation")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
       </Section>
 
       <Section title="Methods & Disclosure" defaultOpen={false}>
         <Field label="Reporting Year (yyyy)"><Input value={form.reporting_year || ""} onChange={setInput("reporting_year")} placeholder="yyyy" className={inputCls} /></Field>
-        <Field label="Scope 1 Emission Factors Source"><Input value={form.scope1_emission_factors_source || ""} onChange={setInput("scope1_emission_factors_source")} className={inputCls} /></Field>
+        <Field label="Scope 1 Emission Factors Source (e.g. International Energy Agency)"><Input value={form.scope1_emission_factors_source || ""} onChange={setInput("scope1_emission_factors_source")} className={inputCls} /></Field>
+        <Field label="If Other, specify (Scope 1)"><Input value={form.scope1_emission_factor_other || ""} onChange={setInput("scope1_emission_factor_other")} className={inputCls} /></Field>
         <Field label="Scope 2 Emission Factors Source"><Input value={form.scope2_emission_factors_source || ""} onChange={setInput("scope2_emission_factors_source")} className={inputCls} /></Field>
+        <Field label="If Other, specify (Scope 2)"><Input value={form.scope2_emission_factor_other || ""} onChange={setInput("scope2_emission_factor_other")} className={inputCls} /></Field>
         <Field label="GWP Factors Source"><Input value={form.gwp_factors_source || ""} onChange={setInput("gwp_factors_source")} className={inputCls} /></Field>
-        <Field label="Other Emission Factor Source"><Input value={form.other_emission_factor_source || ""} onChange={setInput("other_emission_factor_source")} className={inputCls} /></Field>
-        <Field label="Calculation Approach" full><Textarea value={form.calculation_approach || ""} onChange={setInput("calculation_approach")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-        <Field label="Calculation Tools / Models" full><Textarea value={form.calculation_tools || ""} onChange={setInput("calculation_tools")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-        <Field label="Sources Excluded (Materiality)" full><Textarea value={form.sources_excluded_materiality || ""} onChange={setInput("sources_excluded_materiality")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-        <Field label="Materiality Threshold"><Input type="number" value={form.materiality_threshold || ""} onChange={setNum("materiality_threshold")} className={inputCls} /></Field>
+        <Field label="Calculation Approach" full><Textarea value={form.calculation_approach || ""} onChange={setInput("calculation_approach")} placeholder="Describe the calculation approach you are using (e.g. source data × emission factor)" className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
+        <Field label="Calculation Tools / Models" full><Textarea value={form.calculation_tools || ""} onChange={setInput("calculation_tools")} placeholder="Specify any process-specific calculations, including the tools or models used. Provide weblink for additional information." className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
+        <Field label="Sources Excluded Based on Materiality" full><Textarea value={form.sources_excluded_materiality || ""} onChange={setInput("sources_excluded_materiality")} placeholder="List any sources excluded based on the de minimis / source data × emission factor threshold" className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
+        <Field label="Materiality Threshold"><Input type="number" value={form.materiality_threshold || ""} onChange={setNum("materiality_threshold")} placeholder="Quantity of emissions associated with excluded sources" className={inputCls} /></Field>
         <Field label="CA MRR Facility ID Numbers" full><Input value={form.mrr_field || ""} onChange={setInput("mrr_field")} placeholder="Separate each item with ;" className={inputCls} /></Field>
       </Section>
 
