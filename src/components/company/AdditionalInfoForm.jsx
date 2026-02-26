@@ -63,13 +63,18 @@ function computeDisclosureTotals(records, annualRevenue) {
 
   const revenueMillions = annualRevenue ? annualRevenue / 1_000_000 : null;
 
+  const scope1Biogenic = sum(scope1.filter(r => r.category?.toLowerCase().includes("biogenic")));
+  const scope2Total = sum(scope2);
+
   return {
     scope1_total_direct: +scope1Total.toFixed(4),
     scope1_stationary_total: +scope1Stationary.toFixed(4),
     scope1_process_total: +scope1Process.toFixed(4),
     scope1_mobile_total: +scope1Mobile.toFixed(4),
     scope1_fugitive_total: +scope1Fugitive.toFixed(4),
+    scope1_biogenic_total: +scope1Biogenic.toFixed(4),
     scope1_intensity: revenueMillions ? +(scope1Total / revenueMillions).toFixed(4) : "",
+    scope2_total: +scope2Total.toFixed(4),
     scope2_total_indirect_market: +scope2MarketTotal.toFixed(4),
     scope2_total_indirect_location: +scope2LocationTotal.toFixed(4),
     scope2_electricity_total: +scope2Electricity.toFixed(4),
