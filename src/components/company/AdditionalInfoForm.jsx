@@ -160,23 +160,61 @@ export default function AdditionalInfoForm({ company, orgInfo, records = [], onS
       </Section>
 
       <Section title="Disclosure — Scope 1">
-        <Field label="Scope 1 Total Direct Emissions (mtCO₂e)"><Input type="number" value={form.scope1_total_direct || ""} onChange={setNum("scope1_total_direct")} className={inputCls} /></Field>
-        <Field label="Scope 1 from Stationary Combustion (mtCO₂e)"><Input type="number" value={form.scope1_stationary_total || ""} onChange={setNum("scope1_stationary_total")} className={inputCls} /></Field>
-        <Field label="Scope 1 from Process Sources (mtCO₂e)"><Input type="number" value={form.scope1_process_total || ""} onChange={setNum("scope1_process_total")} className={inputCls} /></Field>
-        <Field label="Scope 1 from Mobile Combustion (mtCO₂e)"><Input type="number" value={form.scope1_mobile_total || ""} onChange={setNum("scope1_mobile_total")} className={inputCls} /></Field>
-        <Field label="Scope 1 from Fugitive Sources (mtCO₂e)"><Input type="number" value={form.scope1_fugitive_total || ""} onChange={setNum("scope1_fugitive_total")} className={inputCls} /></Field>
-        <Field label="Scope 1 Emission Intensity (mtCO₂e / $millions revenue)"><Input type="number" value={form.scope1_intensity || ""} onChange={setNum("scope1_intensity")} className={inputCls} /></Field>
+        <div className="md:col-span-2 flex items-center gap-2 text-xs text-emerald-400 bg-emerald-900/20 rounded-lg px-3 py-2">
+          <Calculator className="w-3.5 h-3.5" />
+          Values calculated automatically from your emissions records.
+        </div>
+        <Field label="Scope 1 Total Direct Emissions (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_total_direct}</div>
+        </Field>
+        <Field label="Scope 1 from Stationary Combustion (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_stationary_total}</div>
+        </Field>
+        <Field label="Scope 1 from Process Sources (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_process_total}</div>
+        </Field>
+        <Field label="Scope 1 from Mobile Combustion (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_mobile_total}</div>
+        </Field>
+        <Field label="Scope 1 from Fugitive Sources (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_fugitive_total}</div>
+        </Field>
+        <Field label="Scope 1 Emission Intensity (mtCO₂e / $millions revenue)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope1_intensity !== "" ? computed.scope1_intensity : <span className="text-slate-500 italic text-xs">requires annual revenue</span>}</div>
+        </Field>
         <Field label="All Scope 1 at limited assurance level?"><YesNo value={form.scope1_limited_assurance} onChange={set("scope1_limited_assurance")} /></Field>
         <Field label="If No, provide explanation" full><Textarea value={form.scope1_assurance_explanation || ""} onChange={setInput("scope1_assurance_explanation")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
       </Section>
 
       <Section title="Disclosure — Scope 2">
-        <Field label="Scope 2 Total Indirect Emissions (mtCO₂e)"><Input type="number" value={form.scope2_total_indirect || ""} onChange={setNum("scope2_total_indirect")} className={inputCls} /></Field>
-        <Field label="Scope 2 from Purchased/Acquired Electricity (mtCO₂e)"><Input type="number" value={form.scope2_electricity_total || ""} onChange={setNum("scope2_electricity_total")} className={inputCls} /></Field>
-        <Field label="Scope 2 from Purchased/Acquired Steam (mtCO₂e)"><Input type="number" value={form.scope2_steam_total || ""} onChange={setNum("scope2_steam_total")} className={inputCls} /></Field>
-        <Field label="Scope 2 from Purchased/Acquired Heating (mtCO₂e)"><Input type="number" value={form.scope2_heating_total || ""} onChange={setNum("scope2_heating_total")} className={inputCls} /></Field>
-        <Field label="Scope 2 from Purchased/Acquired Cooling (mtCO₂e)"><Input type="number" value={form.scope2_cooling_total || ""} onChange={setNum("scope2_cooling_total")} className={inputCls} /></Field>
-        <Field label="Scope 2 Emission Intensity (mtCO₂e / $millions revenue)"><Input type="number" value={form.scope2_intensity || ""} onChange={setNum("scope2_intensity")} className={inputCls} /></Field>
+        <div className="md:col-span-2 flex items-center gap-2 text-xs text-emerald-400 bg-emerald-900/20 rounded-lg px-3 py-2">
+          <Calculator className="w-3.5 h-3.5" />
+          Values calculated automatically from your emissions records.
+        </div>
+        <Field label="Scope 2 Total — Market-Based (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_total_indirect_market}</div>
+        </Field>
+        <Field label="Scope 2 Total — Location-Based (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_total_indirect_location}</div>
+        </Field>
+        <Field label="Scope 2 from Purchased/Acquired Electricity (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_electricity_total}</div>
+        </Field>
+        <Field label="Scope 2 from Purchased/Acquired Steam (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_steam_total}</div>
+        </Field>
+        <Field label="Scope 2 from Purchased/Acquired Heating (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_heating_total}</div>
+        </Field>
+        <Field label="Scope 2 from Purchased/Acquired Cooling (mtCO₂e)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_cooling_total}</div>
+        </Field>
+        <Field label="Scope 2 Intensity — Market (mtCO₂e / $millions revenue)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_intensity_market !== "" ? computed.scope2_intensity_market : <span className="text-slate-500 italic text-xs">requires annual revenue</span>}</div>
+        </Field>
+        <Field label="Scope 2 Intensity — Location (mtCO₂e / $millions revenue)">
+          <div className={`${inputCls} flex items-center px-3 text-emerald-300 font-mono`}>{computed.scope2_intensity_location !== "" ? computed.scope2_intensity_location : <span className="text-slate-500 italic text-xs">requires annual revenue</span>}</div>
+        </Field>
       </Section>
 
       <Section title="Methods & Disclosure" defaultOpen={false}>
