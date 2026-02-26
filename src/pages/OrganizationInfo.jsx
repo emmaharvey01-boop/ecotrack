@@ -175,64 +175,6 @@ export default function OrganizationInfoPage() {
             <Field label="Verification Date (yyyy-mm-dd)"><Input value={form.verification_date || ""} onChange={setInput("verification_date")} placeholder="yyyy-mm-dd" className={inputCls} /></Field>
           </Section>
 
-          <Section title="3rd Party Verification" defaultOpen={false}>
-            <Field label="Verifier Organization Name"><Input value={form.third_party_verifier_name || ""} onChange={setInput("third_party_verifier_name")} className={inputCls} /></Field>
-            <Field label="Verifier Contact Name"><Input value={form.third_party_verifier_contact || ""} onChange={setInput("third_party_verifier_contact")} className={inputCls} /></Field>
-            <Field label="Verifier Email"><Input value={form.third_party_verifier_email || ""} onChange={setInput("third_party_verifier_email")} className={inputCls} /></Field>
-            <Field label="Verifier Phone"><Input value={form.third_party_verifier_phone || ""} onChange={setInput("third_party_verifier_phone")} className={inputCls} /></Field>
-            <Field label="Verifier Address" full><Input value={form.third_party_verifier_address || ""} onChange={setInput("third_party_verifier_address")} className={inputCls} /></Field>
-            <Field label="Scope 1 — 3rd Party Verified?"><YesNo value={form.scope1_third_party_verified} onChange={set("scope1_third_party_verified")} /></Field>
-            <Field label="If No, explain"><Input value={form.scope1_verification_explanation || ""} onChange={setInput("scope1_verification_explanation")} className={inputCls} /></Field>
-            <Field label="Scope 2 — 3rd Party Verified?"><YesNo value={form.scope2_third_party_verified} onChange={set("scope2_third_party_verified")} /></Field>
-            <Field label="If No, explain"><Input value={form.scope2_verification_explanation || ""} onChange={setInput("scope2_verification_explanation")} className={inputCls} /></Field>
-          </Section>
-
-          <Section title="Inventory Boundary" defaultOpen={false}>
-            <Field label="Reporting Start Date"><Input value={form.inventory_start_date || ""} onChange={setInput("inventory_start_date")} placeholder="yyyy-mm-dd" className={inputCls} /></Field>
-            <Field label="Reporting End Date"><Input value={form.inventory_end_date || ""} onChange={setInput("inventory_end_date")} placeholder="yyyy-mm-dd" className={inputCls} /></Field>
-            <Field label="Consolidation Approach">
-              <Select value={form.consolidation_approach} onValueChange={set("consolidation_approach")}>
-                <SelectTrigger className={inputCls}><SelectValue placeholder="Select approach" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Equity Share">Equity Share</SelectItem>
-                  <SelectItem value="Financial Control">Financial Control</SelectItem>
-                  <SelectItem value="Organizational Control">Organizational Control</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Equity Share % (if applicable)"><Input type="number" value={form.equity_share_percentage || ""} onChange={setInput("equity_share_percentage")} className={inputCls} /></Field>
-            <Field label="Subsidiary reports separately?"><YesNo value={form.subsidiary_reports_separately} onChange={set("subsidiary_reports_separately")} /></Field>
-            <Field label="Regions/facilities excluded?"><YesNo value={form.regions_excluded} onChange={set("regions_excluded")} /></Field>
-            <Field label="Excluded regions details" full><Textarea value={form.regions_excluded_details || ""} onChange={setInput("regions_excluded_details")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-            <Field label="Scope 1 — Stationary Combustion included?"><YesNo value={form.scope1_stationary_combustion} onChange={set("scope1_stationary_combustion")} /></Field>
-            <Field label="Scope 1 — Process Emissions included?"><YesNo value={form.scope1_process_emissions} onChange={set("scope1_process_emissions")} /></Field>
-            <Field label="Scope 1 — Mobile Combustion included?"><YesNo value={form.scope1_mobile_combustion} onChange={set("scope1_mobile_combustion")} /></Field>
-            <Field label="Scope 1 — Fugitive Emissions included?"><YesNo value={form.scope1_fugitive_emissions} onChange={set("scope1_fugitive_emissions")} /></Field>
-            <Field label="Scope 2 — Location-Based Electricity included?"><YesNo value={form.scope2_location_electricity} onChange={set("scope2_location_electricity")} /></Field>
-            <Field label="Scope 2 — Location-Based Heating included?"><YesNo value={form.scope2_location_heating} onChange={set("scope2_location_heating")} /></Field>
-            <Field label="Scope 2 — Location-Based Cooling included?"><YesNo value={form.scope2_location_cooling} onChange={set("scope2_location_cooling")} /></Field>
-            <Field label="Scope 2 — Market-Based Electricity included?"><YesNo value={form.scope2_market_electricity} onChange={set("scope2_market_electricity")} /></Field>
-            <Field label="Scope 2 — Market-Based Heating included?"><YesNo value={form.scope2_market_heating} onChange={set("scope2_market_heating")} /></Field>
-            <Field label="Scope 2 — Market-Based Cooling included?"><YesNo value={form.scope2_market_cooling} onChange={set("scope2_market_cooling")} /></Field>
-            <Field label="Includes Direct Biogenic emissions?"><YesNo value={form.includes_direct_biogenic} onChange={set("includes_direct_biogenic")} /></Field>
-            <Field label="Includes Indirect Biogenic emissions?"><YesNo value={form.includes_indirect_biogenic} onChange={set("includes_indirect_biogenic")} /></Field>
-            <Field label="Facilities excluded from inventory?"><YesNo value={form.facilities_excluded_inventory} onChange={set("facilities_excluded_inventory")} /></Field>
-            <Field label="Facilities excluded details" full><Textarea value={form.facilities_excluded_details || ""} onChange={setInput("facilities_excluded_details")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-          </Section>
-
-          <Section title="Methods & Disclosure" defaultOpen={false}>
-            <Field label="Reporting Year (yyyy)"><Input value={form.reporting_year || ""} onChange={setInput("reporting_year")} placeholder="yyyy" className={inputCls} /></Field>
-            <Field label="Scope 1 Emission Factors Source"><Input value={form.scope1_emission_factors_source || ""} onChange={setInput("scope1_emission_factors_source")} className={inputCls} /></Field>
-            <Field label="Scope 2 Emission Factors Source"><Input value={form.scope2_emission_factors_source || ""} onChange={setInput("scope2_emission_factors_source")} className={inputCls} /></Field>
-            <Field label="GWP Factors Source"><Input value={form.gwp_factors_source || ""} onChange={setInput("gwp_factors_source")} className={inputCls} /></Field>
-            <Field label="Other Emission Factor Source"><Input value={form.other_emission_factor_source || ""} onChange={setInput("other_emission_factor_source")} className={inputCls} /></Field>
-            <Field label="Calculation Approach" full><Textarea value={form.calculation_approach || ""} onChange={setInput("calculation_approach")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-            <Field label="Calculation Tools / Models" full><Textarea value={form.calculation_tools || ""} onChange={setInput("calculation_tools")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-            <Field label="Sources Excluded (Materiality)" full><Textarea value={form.sources_excluded_materiality || ""} onChange={setInput("sources_excluded_materiality")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none" rows={2} /></Field>
-            <Field label="Materiality Threshold"><Input type="number" value={form.materiality_threshold || ""} onChange={setInput("materiality_threshold")} className={inputCls} /></Field>
-            <Field label="CA MRR Facility ID Numbers" full><Input value={form.mrr_field || ""} onChange={setInput("mrr_field")} placeholder="Separate each item with ;" className={inputCls} /></Field>
-          </Section>
-
           <div className="flex justify-end gap-3 pb-8">
             <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-6">
               <Save className="w-4 h-4 mr-2" />{saved ? "Saved!" : "Save Organization Info"}
