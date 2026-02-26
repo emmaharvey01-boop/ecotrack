@@ -25,6 +25,7 @@ const questions = [
   { key: "contact_title", label: "Provide the title/position of the entity contact person.", type: "text" },
   { key: "contact_phone", label: "Enter the phone number of the entity contact person.", type: "text" },
   { key: "contact_email", label: "Enter the email address of the entity contact person.", type: "text" },
+  { key: "annual_revenue", label: "Enter your entity's annual revenue (in USD).", type: "number", placeholder: "e.g. 5000000" },
   { key: "verification_date", label: "Enter the date of verification (yyyy-mm-dd).", type: "text", placeholder: "yyyy-mm-dd" },
 ];
 
