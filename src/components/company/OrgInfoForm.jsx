@@ -90,64 +90,6 @@ export default function OrgInfoForm({ company, orgInfo, onSaved, onNext }) {
         <Field label="Verification Date (yyyy-mm-dd)"><Input value={form.verification_date || ""} onChange={inp("verification_date")} placeholder="yyyy-mm-dd" className={cls} /></Field>
       </Section>
 
-      <Section title="3rd Party Verification" defaultOpen={false}>
-        <Field label="Verifier Organization"><Input value={form.third_party_verifier_name || ""} onChange={inp("third_party_verifier_name")} className={cls} /></Field>
-        <Field label="Verifier Contact Name"><Input value={form.third_party_verifier_contact || ""} onChange={inp("third_party_verifier_contact")} className={cls} /></Field>
-        <Field label="Verifier Email"><Input value={form.third_party_verifier_email || ""} onChange={inp("third_party_verifier_email")} className={cls} /></Field>
-        <Field label="Verifier Phone"><Input value={form.third_party_verifier_phone || ""} onChange={inp("third_party_verifier_phone")} className={cls} /></Field>
-        <Field label="Verifier Address" full><Input value={form.third_party_verifier_address || ""} onChange={inp("third_party_verifier_address")} className={cls} /></Field>
-        <Field label="Scope 1 — 3rd Party Verified?"><YesNo value={form.scope1_third_party_verified} onChange={set("scope1_third_party_verified")} /></Field>
-        <Field label="If No, explain"><Input value={form.scope1_verification_explanation || ""} onChange={inp("scope1_verification_explanation")} className={cls} /></Field>
-        <Field label="Scope 2 — 3rd Party Verified?"><YesNo value={form.scope2_third_party_verified} onChange={set("scope2_third_party_verified")} /></Field>
-        <Field label="If No, explain"><Input value={form.scope2_verification_explanation || ""} onChange={inp("scope2_verification_explanation")} className={cls} /></Field>
-      </Section>
-
-      <Section title="Inventory Boundary" defaultOpen={false}>
-        <Field label="Reporting Start Date"><Input value={form.inventory_start_date || ""} onChange={inp("inventory_start_date")} placeholder="yyyy-mm-dd" className={cls} /></Field>
-        <Field label="Reporting End Date"><Input value={form.inventory_end_date || ""} onChange={inp("inventory_end_date")} placeholder="yyyy-mm-dd" className={cls} /></Field>
-        <Field label="Consolidation Approach">
-          <Select value={form.consolidation_approach} onValueChange={set("consolidation_approach")}>
-            <SelectTrigger className={cls}><SelectValue placeholder="Select" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Equity Share">Equity Share</SelectItem>
-              <SelectItem value="Financial Control">Financial Control</SelectItem>
-              <SelectItem value="Organizational Control">Organizational Control</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field label="Equity Share %"><Input type="number" value={form.equity_share_percentage || ""} onChange={inp("equity_share_percentage")} className={cls} /></Field>
-        <Field label="Subsidiary reports separately?"><YesNo value={form.subsidiary_reports_separately} onChange={set("subsidiary_reports_separately")} /></Field>
-        <Field label="Regions/facilities excluded?"><YesNo value={form.regions_excluded} onChange={set("regions_excluded")} /></Field>
-        <Field label="Excluded details" full><Textarea value={form.regions_excluded_details || ""} onChange={inp("regions_excluded_details")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none text-sm" rows={2} /></Field>
-        <Field label="Scope 1 — Stationary Combustion?"><YesNo value={form.scope1_stationary_combustion} onChange={set("scope1_stationary_combustion")} /></Field>
-        <Field label="Scope 1 — Process Emissions?"><YesNo value={form.scope1_process_emissions} onChange={set("scope1_process_emissions")} /></Field>
-        <Field label="Scope 1 — Mobile Combustion?"><YesNo value={form.scope1_mobile_combustion} onChange={set("scope1_mobile_combustion")} /></Field>
-        <Field label="Scope 1 — Fugitive Emissions?"><YesNo value={form.scope1_fugitive_emissions} onChange={set("scope1_fugitive_emissions")} /></Field>
-        <Field label="Scope 2 — Location Electricity?"><YesNo value={form.scope2_location_electricity} onChange={set("scope2_location_electricity")} /></Field>
-        <Field label="Scope 2 — Location Heating?"><YesNo value={form.scope2_location_heating} onChange={set("scope2_location_heating")} /></Field>
-        <Field label="Scope 2 — Location Cooling?"><YesNo value={form.scope2_location_cooling} onChange={set("scope2_location_cooling")} /></Field>
-        <Field label="Scope 2 — Market Electricity?"><YesNo value={form.scope2_market_electricity} onChange={set("scope2_market_electricity")} /></Field>
-        <Field label="Scope 2 — Market Heating?"><YesNo value={form.scope2_market_heating} onChange={set("scope2_market_heating")} /></Field>
-        <Field label="Scope 2 — Market Cooling?"><YesNo value={form.scope2_market_cooling} onChange={set("scope2_market_cooling")} /></Field>
-        <Field label="Direct Biogenic included?"><YesNo value={form.includes_direct_biogenic} onChange={set("includes_direct_biogenic")} /></Field>
-        <Field label="Indirect Biogenic included?"><YesNo value={form.includes_indirect_biogenic} onChange={set("includes_indirect_biogenic")} /></Field>
-        <Field label="Facilities excluded from inventory?"><YesNo value={form.facilities_excluded_inventory} onChange={set("facilities_excluded_inventory")} /></Field>
-        <Field label="Facilities excluded details" full><Textarea value={form.facilities_excluded_details || ""} onChange={inp("facilities_excluded_details")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none text-sm" rows={2} /></Field>
-      </Section>
-
-      <Section title="Methods & Disclosure" defaultOpen={false}>
-        <Field label="Reporting Year"><Input value={form.reporting_year || ""} onChange={inp("reporting_year")} placeholder="yyyy" className={cls} /></Field>
-        <Field label="Scope 1 Emission Factors Source"><Input value={form.scope1_emission_factors_source || ""} onChange={inp("scope1_emission_factors_source")} className={cls} /></Field>
-        <Field label="Scope 2 Emission Factors Source"><Input value={form.scope2_emission_factors_source || ""} onChange={inp("scope2_emission_factors_source")} className={cls} /></Field>
-        <Field label="GWP Factors Source"><Input value={form.gwp_factors_source || ""} onChange={inp("gwp_factors_source")} className={cls} /></Field>
-        <Field label="Other Emission Factor Source"><Input value={form.other_emission_factor_source || ""} onChange={inp("other_emission_factor_source")} className={cls} /></Field>
-        <Field label="Calculation Approach" full><Textarea value={form.calculation_approach || ""} onChange={inp("calculation_approach")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none text-sm" rows={2} /></Field>
-        <Field label="Calculation Tools / Models" full><Textarea value={form.calculation_tools || ""} onChange={inp("calculation_tools")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none text-sm" rows={2} /></Field>
-        <Field label="Sources Excluded (Materiality)" full><Textarea value={form.sources_excluded_materiality || ""} onChange={inp("sources_excluded_materiality")} className="rounded-xl border-slate-600 bg-[#0f172a] text-white resize-none text-sm" rows={2} /></Field>
-        <Field label="Materiality Threshold"><Input type="number" value={form.materiality_threshold || ""} onChange={inp("materiality_threshold")} className={cls} /></Field>
-        <Field label="CA MRR Facility ID Numbers" full><Input value={form.mrr_field || ""} onChange={inp("mrr_field")} placeholder="Separate each item with ;" className={cls} /></Field>
-      </Section>
-
       <div className="flex justify-between items-center pt-2 pb-6">
         <Button type="button" onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} variant="outline" className="rounded-xl h-11 px-6 border-slate-600 text-slate-300">
           <Save className="w-4 h-4 mr-2" />{saved ? "Saved!" : saveMutation.isPending ? "Saving…" : "Save"}
