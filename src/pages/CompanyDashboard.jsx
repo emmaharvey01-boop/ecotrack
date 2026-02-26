@@ -13,6 +13,7 @@ import ScopeBreakdown from "@/components/emissions/ScopeBreakdown";
 import StatsCard from "@/components/emissions/StatsCard";
 import { Leaf, Zap, Activity, TrendingDown } from "lucide-react";
 import OrgInfoForm from "@/components/company/OrgInfoForm";
+import AdditionalInfoForm from "@/components/company/AdditionalInfoForm";
 import { exportToExcel } from "@/components/exports/ExcelExport";
 
 const STEPS = [
