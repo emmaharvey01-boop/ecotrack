@@ -75,6 +75,16 @@ export default function CompanySurvey() {
                   {q.required && <span className="text-red-500 ml-1">*</span>}
                 </Label>
 
+                {q.type === "number" && (
+                  <Input
+                    type="number"
+                    value={form[q.key] || ""}
+                    onChange={e => set(q.key, e.target.value ? Number(e.target.value) : "")}
+                    placeholder={q.placeholder || "Your answer"}
+                    className="border-0 border-b border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-[#1B4332] px-0 text-sm"
+                  />
+                )}
+
                 {q.type === "text" && (
                   <Input
                     value={form[q.key] || ""}
