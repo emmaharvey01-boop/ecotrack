@@ -187,6 +187,25 @@ export default function CompanyDashboard() {
           </div>
         )}
 
+        {activeStep === "additional" && (
+          <div>
+            <div className="mb-6">
+              <h2 className="text-white font-semibold text-lg">Additional Information</h2>
+              <p className="text-slate-400 text-sm mt-1">3rd party verification, inventory boundary, and disclosure details.</p>
+            </div>
+            <AdditionalInfoForm
+              company={company}
+              orgInfo={orgInfo}
+              onSaved={() => queryClient.invalidateQueries({ queryKey: ["orgInfo"] })}
+            />
+            <div className="flex justify-end mt-2 pb-8">
+              <Button onClick={() => setActiveStep("export")} className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11 px-6">
+                <Download className="w-4 h-4 mr-2" />Continue to Export
+              </Button>
+            </div>
+          </div>
+        )}
+
         {activeStep === "export" && (
           <div className="max-w-xl mx-auto text-center py-12">
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-10">
