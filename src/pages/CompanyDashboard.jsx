@@ -196,6 +196,7 @@ export default function CompanyDashboard() {
             <AdditionalInfoForm
               company={company}
               orgInfo={orgInfo}
+              records={records}
               onSaved={() => queryClient.invalidateQueries({ queryKey: ["orgInfo"] })}
             />
             <div className="flex justify-end mt-2 pb-8">
