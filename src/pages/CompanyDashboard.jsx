@@ -19,6 +19,7 @@ import { exportToExcel } from "@/components/exports/ExcelExport";
 const STEPS = [
   { id: "org", label: "Organization Info", icon: ClipboardList },
   { id: "emissions", label: "Emissions Data", icon: BarChart2 },
+  { id: "additional", label: "Additional Information", icon: ClipboardList },
   { id: "export", label: "Export", icon: Download },
 ];
 
