@@ -180,8 +180,8 @@ export default function CompanyDashboard() {
             <EmissionTable records={records} onDelete={deleteMutation.mutate} onEdit={(r) => { setEditingRecord(r); setShowForm(true); }} isDeleting={deleteMutation.isPending} />
 
             <div className="flex justify-end mt-6">
-              <Button onClick={() => setActiveStep("export")} className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11 px-6">
-                <Download className="w-4 h-4 mr-2" />Continue to Export
+              <Button onClick={() => setActiveStep("additional")} className="bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl h-11 px-6">
+                Continue to Additional Information
               </Button>
             </div>
           </div>
