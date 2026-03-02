@@ -31,6 +31,8 @@ const SCOPE_1_CATEGORIES = [
 const SCOPE_2_CATEGORIES = [
   { value: "purchased_electricity", label: "Purchased Electricity", sources: [] },
   { value: "purchased_steam", label: "Purchased Steam", sources: [] },
+  { value: "purchased_heating", label: "Purchased Heating", sources: [] },
+  { value: "purchased_cooling", label: "Purchased Cooling", sources: [] },
 ];
 const SCOPE_3_CATEGORIES = [
   { value: "business_travel", label: "Business Travel", sources: [] },
