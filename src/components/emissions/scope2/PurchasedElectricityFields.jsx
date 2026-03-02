@@ -41,7 +41,7 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
         </Select>
       </div>
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (Optional - for Market-Based)</Label>
+        <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (for Market-Based)</Label>
         <Input type="number" step="0.01" value={formData.custom_emission_factor} onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })} placeholder="Optional: Enter supplier factor or 0 for renewable" className="h-11 rounded-xl border-slate-200" />
         <p className="text-xs text-slate-500">Leave blank to calculate location-based only, or enter 0 for 100% renewable</p>
       </div>
