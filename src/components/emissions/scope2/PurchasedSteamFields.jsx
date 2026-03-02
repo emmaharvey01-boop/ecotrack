@@ -4,14 +4,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATIONARY_COMBUSTION_FACTORS } from "../emissionConstants";
 
-function calcSteamTonnes(formData, marketFactors) {
+function calcSteamTonnes(formData, co2Key, ch4Key, n2oKey) {
   const steamPurchased = parseFloat(formData.steam_purchased) || 0;
   const eff = parseFloat(formData.steam_boiler_efficiency) / 100;
   if (!eff) return "0.0000";
   const mmBtu = steamPurchased / eff;
-  const [co2k, ch4k, n2ok] = marketFactors;
-  if (co2k !== "" || ch4k !== "" || n2ok !== "") {
-    const f = ((parseFloat(co2k)||0)/1000) + ((parseFloat(ch4k)||0)/1e6*28) + ((parseFloat(n2ok)||0)/1e6*265);
+  const c2 = formData[co2Key], c4 = formData[ch4Key], n2 = formData[n2oKey];
+  if (c2 !== "" || c4 !== "" || n2 !== "") {
+    const f = ((parseFloat(c2)||0)/1000) + ((parseFloat(c4)||0)/1e6*28) + ((parseFloat(n2)||0)/1e6*265);
     return (mmBtu * f).toFixed(4);
   }
   const fuel = STATIONARY_COMBUSTION_FACTORS[formData.steam_fuel_type];
@@ -20,47 +20,60 @@ function calcSteamTonnes(formData, marketFactors) {
 
 export default function PurchasedSteamFields({ formData, setFormData }) {
   const showCalc = formData.steam_purchased && formData.steam_fuel_type && formData.steam_boiler_efficiency;
-  const marketTonnes = showCalc ? calcSteamTonnes(formData, [formData.steam_market_co2_factor, formData.steam_market_ch4_factor, formData.steam_market_n2o_factor]) : null;
-  const locationTonnes = showCalc ? calcSteamTonnes(formData, [formData.steam_location_co2_factor, formData.steam_location_ch4_factor, formData.steam_location_n2o_factor]) : null;
+  const marketTonnes = showCalc ? calcSteamTonnes(formData, "steam_market_co2_factor", "steam_market_ch4_factor", "steam_market_n2o_factor") : null;
+  const locationTonnes = showCalc ? calcSteamTonnes(formData, "steam_location_co2_factor", "steam_location_ch4_factor", "steam_location_n2o_factor") : null;
 
-  const factorInputs = (prefix, label) => (
-    <div className="space-y-3">
-      <Label className="text-sm font-medium text-slate-700">{label}</Label>
-      <div className="grid grid-cols-3 gap-2">
-        {[["co2", "CO₂", "kg/mmBtu"], ["ch4", "CH₄", "g/mmBtu"], ["n2o", "N₂O", "g/mmBtu"]].map(([key, placeholder, unit]) => (
-          <div key={key} className="space-y-1">
-            <Input type="number" step="0.01" value={formData[`${prefix}_${key}_factor`]} onChange={(e) => setFormData({ ...formData, [`${prefix}_${key}_factor`]: e.target.value })} placeholder={placeholder} className="h-11 rounded-xl border-slate-200" />
-            <p className="text-xs text-slate-400">{unit}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const set = (key) => (e) => setFormData({ ...formData, [key]: e.target.value });
 
   return (
     <div className="space-y-4 pt-2">
+      <div className="p-4 bg-blue-50 rounded-xl">
+        <p className="text-sm text-blue-800">Both methods will be calculated. If no supplier factors are provided, market-based will equal location-based.</p>
+      </div>
+
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Source Area</Label>
-        <Input value={formData.steam_source_area} onChange={(e) => setFormData({ ...formData, steam_source_area: e.target.value })} placeholder="Enter source area" className="h-11 rounded-xl border-slate-200" />
+        <Input value={formData.steam_source_area} onChange={set("steam_source_area")} placeholder="Enter source area" className="h-11 rounded-xl border-slate-200" />
       </div>
+
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Fuel Type</Label>
+        <Label className="text-sm font-medium text-slate-700">Fuel Type (for Location-Based)</Label>
         <Select value={formData.steam_fuel_type} onValueChange={(v) => setFormData({ ...formData, steam_fuel_type: v })}>
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select fuel type" /></SelectTrigger>
           <SelectContent>{Object.keys(STATIONARY_COMBUSTION_FACTORS).map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
         </Select>
       </div>
+
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Boiler Efficiency (%)</Label>
-        <Input type="number" step="0.01" value={formData.steam_boiler_efficiency} onChange={(e) => setFormData({ ...formData, steam_boiler_efficiency: e.target.value })} placeholder="Enter efficiency (e.g., 80)" className="h-11 rounded-xl border-slate-200" />
+        <Input type="number" step="0.01" value={formData.steam_boiler_efficiency} onChange={set("steam_boiler_efficiency")} placeholder="Enter efficiency (e.g., 80)" className="h-11 rounded-xl border-slate-200" />
       </div>
+
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Steam Purchased (mmBtu)</Label>
-        <Input type="number" step="0.01" value={formData.steam_purchased} onChange={(e) => setFormData({ ...formData, steam_purchased: e.target.value })} placeholder="Enter mmBtu" className="h-11 rounded-xl border-slate-200" />
+        <Input type="number" step="0.01" value={formData.steam_purchased} onChange={set("steam_purchased")} placeholder="Enter mmBtu" className="h-11 rounded-xl border-slate-200" />
       </div>
-      {factorInputs("steam_market", "Market-Based Emission Factors (Optional)")}
-      {factorInputs("steam_location", "Location-Based Emission Factors (Optional)")}
-      <p className="text-xs text-slate-500">Leave blank to use default fuel-based factors</p>
+
+      {/* Market-Based Supplier Factors */}
+      <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <Label className="text-sm font-semibold text-slate-700">Supplier Emission Factors (for Market-Based)</Label>
+        <p className="text-xs text-slate-500">Leave blank to use default fuel-based factors.</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">CO₂ (kg/mmBtu)</Label>
+            <Input type="number" step="0.01" value={formData.steam_market_co2_factor} onChange={set("steam_market_co2_factor")} placeholder="e.g. 53" className="h-10 rounded-xl border-slate-200" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">CH₄ (g/mmBtu)</Label>
+            <Input type="number" step="0.0001" value={formData.steam_market_ch4_factor} onChange={set("steam_market_ch4_factor")} placeholder="e.g. 1.0" className="h-10 rounded-xl border-slate-200" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">N₂O (g/mmBtu)</Label>
+            <Input type="number" step="0.0001" value={formData.steam_market_n2o_factor} onChange={set("steam_market_n2o_factor")} placeholder="e.g. 0.1" className="h-10 rounded-xl border-slate-200" />
+          </div>
+        </div>
+      </div>
+
       {showCalc && (
         <div className="space-y-2">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl">
