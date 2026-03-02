@@ -99,8 +99,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isOffsets = cat === "offsets";
   const isWaste = cat === "waste";
   const hasDetailedFields = isMobileCombustion || isStationaryCombustion || isRefrigeration || isFireSuppression
-    || isPurchasedGases || isPurchasedElectricity || isPurchasedSteam || isBusinessTravel || isCommuting
-    || isUpstreamTransport || isWaste || isOffsets;
+    || isPurchasedGases || isPurchasedElectricity || isPurchasedSteam || isPurchasedHeating || isPurchasedCooling
+    || isBusinessTravel || isCommuting || isUpstreamTransport || isWaste || isOffsets;
 
   const calcEmissions = () => {
     if (isWaste) {
