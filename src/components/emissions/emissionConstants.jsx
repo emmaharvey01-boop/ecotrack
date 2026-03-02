@@ -202,6 +202,7 @@ export const EMPTY_FORM = {
   fire_suppression_method: "", fire_suppression_gas: "", fire_inventory_change: "", fire_transfer_amount: "", fire_capacity_change: "",
   purchased_gas_type: "", purchased_gas_amount: "",
   egrid_subregion: "", electricity_kwh: "", custom_emission_factor: "",
+  market_co2_factor: "", market_ch4_factor: "", market_n2o_factor: "",
   steam_source_area: "", steam_fuel_type: "", steam_boiler_efficiency: "", steam_purchased: "",
   steam_market_co2_factor: "", steam_market_ch4_factor: "", steam_market_n2o_factor: "",
   steam_location_co2_factor: "", steam_location_ch4_factor: "", steam_location_n2o_factor: "",
