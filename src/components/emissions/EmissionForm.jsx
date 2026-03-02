@@ -281,6 +281,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     : isPurchasedGases ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
     : isPurchasedElectricity ? (!formData.electricity_kwh || !formData.egrid_subregion)
     : isPurchasedSteam ? (!formData.steam_source_area || !formData.steam_fuel_type || !formData.steam_boiler_efficiency || !formData.steam_purchased)
+    : (isPurchasedHeating || isPurchasedCooling) ? (!formData.hc_source_area || !formData.hc_fuel_type || !formData.hc_boiler_efficiency || !formData.hc_purchased)
     : isUpstreamTransport ? (!formData.upstream_mode || !formData.travel_mode || !formData.travel_miles)
     : (isBusinessTravel || isCommuting) ? (!formData.travel_mode || !formData.travel_miles)
     : isWaste ? (!formData.waste_material || !formData.waste_disposal || !formData.waste_weight || !formData.waste_unit)
