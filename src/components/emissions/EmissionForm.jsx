@@ -215,6 +215,26 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         { ...makeBase(), scope: "scope_2", scope_2_method: "location_based", category: "Purchased Steam", source: formData.steam_source_area, amount: sp, unit: "mmBtu", emission_factor: lT/sp, co2e_tonnes: lT },
       ]);
     }
+    if (isPurchasedHeating || isPurchasedCooling) {
+      const purchased = parseFloat(formData.hc_purchased), eff = parseFloat(formData.hc_boiler_efficiency)/100;
+      const mmBtu = purchased / eff;
+      const calcT = (co2Key, ch4Key, n2oKey) => {
+        const c2 = formData[co2Key], c4 = formData[ch4Key], n2 = formData[n2oKey];
+        if (c2 !== "" || c4 !== "" || n2 !== "") {
+          const f = ((parseFloat(c2)||0)/1000) + ((parseFloat(c4)||0)/1e6*28) + ((parseFloat(n2)||0)/1e6*265);
+          return mmBtu * f;
+        }
+        const fuel = STATIONARY_COMBUSTION_FACTORS[formData.hc_fuel_type];
+        return fuel ? mmBtu * fuel.co2PerMmBtu / 1000 : 0;
+      };
+      const mT = calcT("hc_market_co2_factor", "hc_market_ch4_factor", "hc_market_n2o_factor");
+      const lT = calcT("hc_location_co2_factor", "hc_location_ch4_factor", "hc_location_n2o_factor");
+      const catLabel = isPurchasedHeating ? "Purchased Heating" : "Purchased Cooling";
+      return onSubmit([
+        { ...makeBase(), scope: "scope_2", scope_2_method: "market_based", category: catLabel, source: formData.hc_source_area, amount: purchased, unit: "mmBtu", emission_factor: mT/purchased, co2e_tonnes: mT },
+        { ...makeBase(), scope: "scope_2", scope_2_method: "location_based", category: catLabel, source: formData.hc_source_area, amount: purchased, unit: "mmBtu", emission_factor: lT/purchased, co2e_tonnes: lT },
+      ]);
+    }
     if (isPurchasedElectricity) {
       const kWh = parseFloat(formData.electricity_kwh), mWh = kWh/1000;
       const s = EGRID_SUBREGIONS[formData.egrid_subregion];
