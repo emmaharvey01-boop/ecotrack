@@ -240,10 +240,14 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const s = EGRID_SUBREGIONS[formData.egrid_subregion];
       const locFactor = s.co2 + (s.ch4*28) + (s.n2o*265);
       const locT = mWh * locFactor / 2204.62;
+      const hasMarketFactors = formData.market_co2_factor !== "" || formData.market_ch4_factor !== "" || formData.market_n2o_factor !== "";
       let mktT, mktFactor, mktSrc;
-      if (formData.custom_emission_factor !== "") {
-        const cf = parseFloat(formData.custom_emission_factor) || 0;
-        mktT = mWh * cf / 2204.62; mktFactor = cf/1000; mktSrc = "Custom Supplier";
+      if (hasMarketFactors) {
+        const co2 = parseFloat(formData.market_co2_factor) || 0;
+        const ch4 = parseFloat(formData.market_ch4_factor) || 0;
+        const n2o = parseFloat(formData.market_n2o_factor) || 0;
+        const mktFactorLb = co2 + (ch4 * 28) + (n2o * 265);
+        mktT = mWh * mktFactorLb / 2204.62; mktFactor = mktFactorLb / 1000; mktSrc = "Supplier";
       } else {
         mktT = locT; mktFactor = locFactor/1000; mktSrc = formData.egrid_subregion;
       }
