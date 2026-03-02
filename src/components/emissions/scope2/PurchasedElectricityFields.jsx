@@ -14,25 +14,40 @@ function calcLocationTonnes(kwh, subregionKey) {
 
 export default function PurchasedElectricityFields({ formData, setFormData }) {
   const kwh = parseFloat(formData.electricity_kwh) || 0;
+  const mWh = kwh / 1000;
   const showCalc = formData.electricity_kwh && formData.egrid_subregion;
+
+  const hasMarketFactors =
+    formData.market_co2_factor !== "" ||
+    formData.market_ch4_factor !== "" ||
+    formData.market_n2o_factor !== "";
 
   const marketTonnes = (() => {
     if (!showCalc) return null;
-    if (formData.custom_emission_factor !== "") {
-      return ((kwh / 1000) * (parseFloat(formData.custom_emission_factor) || 0) / 2204.62).toFixed(4);
+    if (hasMarketFactors) {
+      const co2 = parseFloat(formData.market_co2_factor) || 0; // lb CO2/MWh
+      const ch4 = parseFloat(formData.market_ch4_factor) || 0; // lb CH4/MWh
+      const n2o = parseFloat(formData.market_n2o_factor) || 0; // lb N2O/MWh
+      // Convert lb/MWh to tonnes CO2e/MWh using GWP: CH4=28, N2O=265
+      const co2e_per_mwh = co2 + (ch4 * 28) + (n2o * 265); // lb CO2e/MWh
+      return (mWh * co2e_per_mwh / 2204.62).toFixed(4);
     }
     return calcLocationTonnes(kwh, formData.egrid_subregion);
   })();
 
+  const set = (key) => (e) => setFormData({ ...formData, [key]: e.target.value });
+
   return (
     <div className="space-y-4 pt-2">
       <div className="p-4 bg-blue-50 rounded-xl">
-        <p className="text-sm text-blue-800">Both methods will be calculated. If no supplier factor is provided, market-based will equal location-based.</p>
+        <p className="text-sm text-blue-800">Both methods will be calculated. If no supplier factors are provided, market-based will equal location-based.</p>
       </div>
+
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Electricity Consumed (kWh)</Label>
-        <Input type="number" step="0.01" value={formData.electricity_kwh} onChange={(e) => setFormData({ ...formData, electricity_kwh: e.target.value })} placeholder="Enter kWh" className="h-11 rounded-xl border-slate-200" />
+        <Input type="number" step="0.01" value={formData.electricity_kwh} onChange={set("electricity_kwh")} placeholder="Enter kWh" className="h-11 rounded-xl border-slate-200" />
       </div>
+
       <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">eGRID Subregion (for Location-Based)</Label>
         <Select value={formData.egrid_subregion} onValueChange={(v) => setFormData({ ...formData, egrid_subregion: v })}>
@@ -40,11 +55,27 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
           <SelectContent className="max-h-[300px]">{Object.keys(EGRID_SUBREGIONS).map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Supplier Emission Factor (lb CO₂e/MWh) (for Market-Based)</Label>
-        <Input type="number" step="0.01" value={formData.custom_emission_factor} onChange={(e) => setFormData({ ...formData, custom_emission_factor: e.target.value })} placeholder="Optional: Enter supplier factor or 0 for renewable" className="h-11 rounded-xl border-slate-200" />
-        <p className="text-xs text-slate-500">Leave blank to calculate location-based only, or enter 0 for 100% renewable</p>
+
+      {/* Market-Based Supplier Factors */}
+      <div className="space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <Label className="text-sm font-semibold text-slate-700">Supplier Emission Factors (for Market-Based)</Label>
+        <p className="text-xs text-slate-500">Leave blank to use location-based factors. Enter 0 for CO₂ if 100% renewable.</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">CO₂ (lb/MWh)</Label>
+            <Input type="number" step="0.01" value={formData.market_co2_factor} onChange={set("market_co2_factor")} placeholder="e.g. 850" className="h-10 rounded-xl border-slate-200" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">CH₄ (lb/MWh)</Label>
+            <Input type="number" step="0.0001" value={formData.market_ch4_factor} onChange={set("market_ch4_factor")} placeholder="e.g. 0.08" className="h-10 rounded-xl border-slate-200" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-slate-600">N₂O (lb/MWh)</Label>
+            <Input type="number" step="0.0001" value={formData.market_n2o_factor} onChange={set("market_n2o_factor")} placeholder="e.g. 0.01" className="h-10 rounded-xl border-slate-200" />
+          </div>
+        </div>
       </div>
+
       {showCalc && (
         <div className="space-y-2">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl">
