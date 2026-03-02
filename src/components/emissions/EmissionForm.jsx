@@ -13,6 +13,7 @@ import UpstreamTransportFields from "./scope3/UpstreamTransportFields";
 import BusinessTravelFields from "./scope3/BusinessTravelFields";
 import PurchasedElectricityFields from "./scope2/PurchasedElectricityFields";
 import PurchasedSteamFields from "./scope2/PurchasedSteamFields";
+import PurchasedHeatingCoolingFields from "./scope2/PurchasedHeatingCoolingFields";
 import PurchasedGasesFields from "./scope1/PurchasedGasesFields";
 import {
   BUSINESS_TRAVEL_FACTORS, UPSTREAM_TRANSPORT_VEHICLE_MILE, UPSTREAM_TRANSPORT_TON_MILE,
