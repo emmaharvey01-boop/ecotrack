@@ -91,6 +91,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isPurchasedGases = cat === "purchased_gases";
   const isPurchasedElectricity = cat === "purchased_electricity";
   const isPurchasedSteam = cat === "purchased_steam";
+  const isPurchasedHeating = cat === "purchased_heating";
+  const isPurchasedCooling = cat === "purchased_cooling";
   const isBusinessTravel = cat === "business_travel";
   const isCommuting = cat === "commuting";
   const isUpstreamTransport = cat === "upstream_transport";
