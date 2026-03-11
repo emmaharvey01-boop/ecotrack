@@ -26,7 +26,7 @@ const SCOPE_1_CATEGORIES = [
   { value: "stationary_combustion", label: "Stationary Combustion", sources: STATIONARY_COMBUSTION_FUELS.map(f => f.name), guidance: "Report emissions from fuel combustion in stationary equipment (boilers, furnaces, heaters). Enter the type and quantity of fuel consumed. Include all stationary sources owned or controlled by your organization." },
   { value: "mobile_sources", label: "Mobile Sources", sources: ["Mobile Sources"], guidance: "Report emissions from company-owned or controlled vehicles (cars, trucks, equipment). Enter fuel consumption or vehicle miles traveled. Include all mobile combustion sources like fleet vehicles and off-road equipment." },
   { value: "fugitive_emissions", label: "Fugitive Emissions", sources: [], guidance: "Report fugitive emissions from refrigeration, air conditioning, and fire suppression systems. Use the material balance approach: (net inventory change + transfers + capacity changes) × gas-specific GWP factor." },
-  { value: "purchased_gases", label: "Purchased Gases", sources: [], guidance: "Report emissions from purchased industrial gases (CO₂, N₂O, SF₆, etc.) that are released during use. Enter the quantity purchased/consumed and select the appropriate gas type with its GWP factor." },
+  { value: "purchased_gases", label: "Process Emissions", sources: [], guidance: "Report emissions from purchased industrial gases (CO₂, N₂O, SF₆, etc.) that are released during use. Enter the quantity purchased/consumed and select the appropriate gas type with its GWP factor." },
 ];
 const SCOPE_2_CATEGORIES = [
   { value: "purchased_electricity", label: "Purchased Electricity", sources: [], guidance: "Report emissions from purchased electricity consumption. Enter kWh consumed and select your eGRID subregion for location-based method. Optionally provide supplier-specific emission factors (CO₂, CH₄, N₂O in lb/MWh) for market-based method. Both methods will be calculated." },
@@ -51,7 +51,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         "Stationary Combustion": "stationary_combustion", "Mobile Sources": "mobile_sources",
         "Fugitive Emissions": "fugitive_emissions",
         "Refrigeration and A/C Equipment Use": "fugitive_emissions", "Fire Suppression": "fugitive_emissions",
-        "Purchased Gases": "purchased_gases", "Purchased Electricity": "purchased_electricity",
+        "Process Emissions": "purchased_gases", "Purchased Gases": "purchased_gases", "Purchased Electricity": "purchased_electricity",
       };
       setFormData({
         ...EMPTY_FORM,
