@@ -46,10 +46,20 @@ export default function CompanyDashboard() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
+      if (data.isDraft) {
+        return base44.entities.DraftEmissionRecord.create({
+          company_name: company,
+          scope: data.formData.scope,
+          scope_2_method: data.formData.scope_2_method,
+          category: data.formData.category,
+          draft_data: data.formData,
+          notes: data.formData.notes
+        });
+      }
       if (Array.isArray(data)) return Promise.all(data.map(r => base44.entities.EmissionRecord.create(r)));
       return base44.entities.EmissionRecord.create(data);
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["emissions"] }); setShowForm(false); setEditingRecord(null); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["emissions"] }); queryClient.invalidateQueries({ queryKey: ["drafts"] }); setShowForm(false); setEditingRecord(null); },
   });
 
   const updateMutation = useMutation({

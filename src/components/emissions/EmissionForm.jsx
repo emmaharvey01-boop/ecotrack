@@ -385,7 +385,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
             </div>
           </div>
           <div className="flex gap-3 p-6 pt-4 border-t border-slate-100 flex-shrink-0 bg-white">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1 h-11 rounded-xl">Cancel</Button>
+            <Button type="button" variant="outline" onClick={onClose} className="h-11 rounded-xl px-4">Cancel</Button>
+            <Button type="button" variant="outline" onClick={(e) => { e.preventDefault(); onSubmit({ isDraft: true, formData, company_name: formData.company_name }); }} disabled={isSubmitting} className="h-11 rounded-xl px-4 border-slate-300 text-slate-700 hover:bg-slate-50">
+              Save as Draft
+            </Button>
             <Button type="submit" disabled={isSubmitDisabled} className="flex-1 h-11 rounded-xl bg-[#1B4332] hover:bg-[#143728] text-white">
               {isSubmitting ? (editingRecord ? "Updating..." : "Adding...") : (editingRecord ? "Update Record" : "Add Record")}
             </Button>
