@@ -25,8 +25,7 @@ import {
 const SCOPE_1_CATEGORIES = [
   { value: "stationary_combustion", label: "Stationary Combustion", sources: STATIONARY_COMBUSTION_FUELS.map(f => f.name), guidance: "Report emissions from fuel combustion in stationary equipment (boilers, furnaces, heaters). Enter the type and quantity of fuel consumed. Include all stationary sources owned or controlled by your organization." },
   { value: "mobile_sources", label: "Mobile Sources", sources: ["Mobile Sources"], guidance: "Report emissions from company-owned or controlled vehicles (cars, trucks, equipment). Enter fuel consumption or vehicle miles traveled. Include all mobile combustion sources like fleet vehicles and off-road equipment." },
-  { value: "refrigeration_ac", label: "Refrigeration and A/C Equipment Use", sources: [], guidance: "Report fugitive emissions from refrigeration and air conditioning systems. Use the material balance approach: calculate net change in refrigerant inventory, amount transferred to/from equipment, and capacity changes. Then × by the refrigerant's GWP factor." },
-  { value: "fire_suppression", label: "Fire Suppression", sources: [], guidance: "Report fugitive emissions from fire suppression systems containing HFCs, PFCs, or other GHGs. Use material balance approach: (net inventory change + transfers + capacity changes) × gas-specific GWP factor." },
+  { value: "fugitive_emissions", label: "Fugitive Emissions", sources: [], guidance: "Report fugitive emissions from refrigeration, air conditioning, and fire suppression systems. Use the material balance approach: (net inventory change + transfers + capacity changes) × gas-specific GWP factor." },
   { value: "purchased_gases", label: "Purchased Gases", sources: [], guidance: "Report emissions from purchased industrial gases (CO₂, N₂O, SF₆, etc.) that are released during use. Enter the quantity purchased/consumed and select the appropriate gas type with its GWP factor." },
 ];
 const SCOPE_2_CATEGORIES = [
@@ -50,7 +49,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     if (editingRecord && open) {
       const catMap = {
         "Stationary Combustion": "stationary_combustion", "Mobile Sources": "mobile_sources",
-        "Refrigeration and A/C Equipment Use": "refrigeration_ac", "Fire Suppression": "fire_suppression",
+        "Fugitive Emissions": "fugitive_emissions",
+        "Refrigeration and A/C Equipment Use": "fugitive_emissions", "Fire Suppression": "fugitive_emissions",
         "Purchased Gases": "purchased_gases", "Purchased Electricity": "purchased_electricity",
       };
       setFormData({
@@ -87,8 +87,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const cat = formData.category;
   const isMobileCombustion = cat === "mobile_sources";
   const isStationaryCombustion = cat === "stationary_combustion";
-  const isRefrigeration = cat === "refrigeration_ac";
-  const isFireSuppression = cat === "fire_suppression";
+  const isFugitiveEmissions = cat === "fugitive_emissions";
+  const isRefrigeration = isFugitiveEmissions && (formData.fugitive_type === "refrigeration" || !formData.fugitive_type);
+  const isFireSuppression = isFugitiveEmissions && formData.fugitive_type === "fire_suppression";
   const isPurchasedGases = cat === "purchased_gases";
   const isPurchasedElectricity = cat === "purchased_electricity";
   const isPurchasedSteam = cat === "purchased_steam";
@@ -99,7 +100,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isUpstreamTransport = cat === "upstream_transport";
   const isOffsets = cat === "offsets";
   const isWaste = cat === "waste";
-  const hasDetailedFields = isMobileCombustion || isStationaryCombustion || isRefrigeration || isFireSuppression
+  const hasDetailedFields = isMobileCombustion || isStationaryCombustion || isFugitiveEmissions
     || isPurchasedGases || isPurchasedElectricity || isPurchasedSteam || isPurchasedHeating || isPurchasedCooling
     || isBusinessTravel || isCommuting || isUpstreamTransport || isWaste || isOffsets;
 
@@ -265,10 +266,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     } else if (isStationaryCombustion) {
       const fd = STATIONARY_COMBUSTION_FACTORS[formData.fuel_combusted];
       Object.assign(record, { source: formData.fuel_combusted, fuel_combusted: formData.fuel_combusted, fuel_state: formData.fuel_state, quantity_combusted: parseFloat(formData.quantity_combusted), combustion_units: formData.combustion_units, amount: parseFloat(formData.quantity_combusted), unit: formData.combustion_units, emission_factor: fd?.co2PerMmBtu||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
-    } else if (isRefrigeration && formData.refrigeration_method === "material_balance") {
-      Object.assign(record, { source: formData.gas_type, amount: (parseFloat(formData.inventory_change)||0)+(parseFloat(formData.transfer_amount)||0)+(parseFloat(formData.capacity_change)||0), unit: "kg", emission_factor: REFRIGERANT_GWP_FACTORS[formData.gas_type]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
-    } else if (isFireSuppression && formData.fire_suppression_method === "material_balance") {
-      Object.assign(record, { source: formData.fire_suppression_gas, amount: (parseFloat(formData.fire_inventory_change)||0)+(parseFloat(formData.fire_transfer_amount)||0)+(parseFloat(formData.fire_capacity_change)||0), unit: "lbs", emission_factor: FIRE_SUPPRESSION_GWP_FACTORS[formData.fire_suppression_gas]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
+    } else if (isFugitiveEmissions) {
+      if (formData.fugitive_type === "refrigeration" && formData.refrigeration_method === "material_balance") {
+        Object.assign(record, { source: formData.gas_type, amount: (parseFloat(formData.inventory_change)||0)+(parseFloat(formData.transfer_amount)||0)+(parseFloat(formData.capacity_change)||0), unit: "kg", emission_factor: REFRIGERANT_GWP_FACTORS[formData.gas_type]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
+      } else if (formData.fugitive_type === "fire_suppression" && formData.fire_suppression_method === "material_balance") {
+        Object.assign(record, { source: formData.fire_suppression_gas, amount: (parseFloat(formData.fire_inventory_change)||0)+(parseFloat(formData.fire_transfer_amount)||0)+(parseFloat(formData.fire_capacity_change)||0), unit: "lbs", emission_factor: FIRE_SUPPRESSION_GWP_FACTORS[formData.fire_suppression_gas]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
+      }
     } else if (isPurchasedGases) {
       Object.assign(record, { source: formData.purchased_gas_type, amount: parseFloat(formData.purchased_gas_amount), unit: "lbs", emission_factor: PURCHASED_GASES_GWP_FACTORS[formData.purchased_gas_type]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
     } else {
@@ -281,8 +284,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   const isSubmitDisabled = !formData.scope || !formData.category || !formData.reporting_period || (
     isMobileCombustion ? (!formData.vehicle_type || !formData.fuel_usage || !formData.fuel_units)
     : isStationaryCombustion ? (!formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
-    : isRefrigeration ? (!formData.refrigeration_method || (formData.refrigeration_method === "material_balance" && (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change)))
-    : isFireSuppression ? (!formData.fire_suppression_method || (formData.fire_suppression_method === "material_balance" && (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change)))
+    : isFugitiveEmissions ? (!formData.fugitive_type || (
+        formData.fugitive_type === "refrigeration" ? (!formData.refrigeration_method || (formData.refrigeration_method === "material_balance" && (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change)))
+        : (!formData.fire_suppression_method || (formData.fire_suppression_method === "material_balance" && (!formData.fire_suppression_gas || !formData.fire_inventory_change || !formData.fire_transfer_amount || !formData.fire_capacity_change)))
+      ))
     : isPurchasedGases ? (!formData.purchased_gas_type || !formData.purchased_gas_amount)
     : isPurchasedElectricity ? (!formData.electricity_kwh || !formData.egrid_subregion)
     : isPurchasedSteam ? (!formData.steam_source_area || !formData.steam_fuel_type || !formData.steam_boiler_efficiency || !formData.steam_purchased)
@@ -357,6 +362,22 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
             </AnimatePresence>
 
             <AnimatePresence mode="wait">
+              {isFugitiveEmissions && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700">Fugitive Emission Type</Label>
+                    <Select value={formData.fugitive_type || ""} onValueChange={(v) => setFormData({ ...formData, fugitive_type: v })}>
+                      <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select type" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="refrigeration">Refrigeration and A/C Equipment</SelectItem>
+                        <SelectItem value="fire_suppression">Fire Suppression Systems</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {isRefrigeration && <RefrigerationFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} />}
+                  {isFireSuppression && <FireSuppressionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} />}
+                </motion.div>
+              )}
               {isWaste && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><WasteFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {isUpstreamTransport && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><UpstreamTransportFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {(isBusinessTravel || isCommuting) && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><BusinessTravelFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} isCommuting={isCommuting} /></motion.div>}
@@ -365,8 +386,6 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
               {(isPurchasedHeating || isPurchasedCooling) && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedHeatingCoolingFields formData={formData} setFormData={setFormData} categoryLabel={isPurchasedHeating ? "Heating" : "Cooling"} /></motion.div>}
               {isPurchasedElectricity && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedElectricityFields formData={formData} setFormData={setFormData} /></motion.div>}
               {isPurchasedGases && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedGasesFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
-              {isFireSuppression && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><FireSuppressionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
-              {isRefrigeration && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><RefrigerationFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {isStationaryCombustion && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><StationaryCombustionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {isMobileCombustion && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><MobileCombustionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
             </AnimatePresence>
