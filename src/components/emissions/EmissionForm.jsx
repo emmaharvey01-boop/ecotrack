@@ -22,25 +22,25 @@ import {
 } from "./emissionConstants";
 
 const SCOPE_1_CATEGORIES = [
-  { value: "stationary_combustion", label: "Stationary Combustion", sources: STATIONARY_COMBUSTION_FUELS.map(f => f.name) },
-  { value: "mobile_sources", label: "Mobile Sources", sources: ["Mobile Sources"] },
-  { value: "refrigeration_ac", label: "Refrigeration and A/C Equipment Use", sources: [] },
-  { value: "fire_suppression", label: "Fire Suppression", sources: [] },
-  { value: "purchased_gases", label: "Purchased Gases", sources: [] },
+  { value: "stationary_combustion", label: "Stationary Combustion", sources: STATIONARY_COMBUSTION_FUELS.map(f => f.name), guidance: "Report emissions from fuel combustion in stationary equipment (boilers, furnaces, heaters). Enter the type and quantity of fuel consumed. Include all stationary sources owned or controlled by your organization." },
+  { value: "mobile_sources", label: "Mobile Sources", sources: ["Mobile Sources"], guidance: "Report emissions from company-owned or controlled vehicles (cars, trucks, equipment). Enter fuel consumption or vehicle miles traveled. Include all mobile combustion sources like fleet vehicles and off-road equipment." },
+  { value: "refrigeration_ac", label: "Refrigeration and A/C Equipment Use", sources: [], guidance: "Report fugitive emissions from refrigeration and air conditioning systems. Use the material balance approach: calculate net change in refrigerant inventory, amount transferred to/from equipment, and capacity changes. Multiply by the refrigerant's GWP factor." },
+  { value: "fire_suppression", label: "Fire Suppression", sources: [], guidance: "Report fugitive emissions from fire suppression systems containing HFCs, PFCs, or other GHGs. Use material balance approach: net inventory change + transfers + capacity changes, multiplied by the gas-specific GWP factor." },
+  { value: "purchased_gases", label: "Purchased Gases", sources: [], guidance: "Report emissions from purchased industrial gases (CO₂, N₂O, SF₆, etc.) that are released during use. Enter the quantity purchased/consumed and select the appropriate gas type with its GWP factor." },
 ];
 const SCOPE_2_CATEGORIES = [
-  { value: "purchased_electricity", label: "Purchased Electricity", sources: [] },
-  { value: "purchased_steam", label: "Purchased Steam", sources: [] },
-  { value: "purchased_heating", label: "Purchased Heating", sources: [] },
-  { value: "purchased_cooling", label: "Purchased Cooling", sources: [] },
+  { value: "purchased_electricity", label: "Purchased Electricity", sources: [], guidance: "Report emissions from purchased electricity consumption. Enter kWh consumed and select your eGRID subregion for location-based method. Optionally provide supplier-specific emission factors (CO₂, CH₄, N₂O in lb/MWh) for market-based method. Both methods will be calculated." },
+  { value: "purchased_steam", label: "Purchased Steam", sources: [], guidance: "Report emissions from purchased steam. Enter mmBtu of steam purchased, boiler efficiency %, and fuel type used by supplier. Optionally provide supplier-specific factors (CO₂ in kg/mmBtu, CH₄ and N₂O in g/mmBtu) for market-based calculation." },
+  { value: "purchased_heating", label: "Purchased Heating", sources: [], guidance: "Report emissions from purchased heating (district heat). Enter mmBtu purchased, boiler efficiency %, and fuel type. Optionally provide supplier-specific emission factors (CO₂, CH₄, N₂O) for market-based method." },
+  { value: "purchased_cooling", label: "Purchased Cooling", sources: [], guidance: "Report emissions from purchased cooling (district cooling/chilled water). Enter mmBtu purchased, chiller efficiency %, and fuel type used by supplier. Optionally provide supplier-specific factors for market-based calculation." },
 ];
 const SCOPE_3_CATEGORIES = [
-  { value: "business_travel", label: "Business Travel", sources: [] },
-  { value: "commuting", label: "Employee Commuting", sources: [] },
-  { value: "upstream_transport", label: "Upstream Transport and Distribution", sources: [] },
-  { value: "waste", label: "Waste", sources: [] },
+  { value: "business_travel", label: "Business Travel", sources: [], guidance: "Report emissions from employee business travel in vehicles not owned/controlled by your organization. Enter travel mode (air, rail, car) and distance traveled. Include air travel, rental cars, taxis, and employee-owned vehicles used for business." },
+  { value: "commuting", label: "Employee Commuting", sources: [], guidance: "Report emissions from employee commuting between home and work. Enter commute mode (car, bus, rail, etc.) and total miles traveled. Calculate based on number of employees, average commute distance, and frequency." },
+  { value: "upstream_transport", label: "Upstream Transport and Distribution", sources: [], guidance: "Report emissions from transportation and distribution of purchased goods. Select vehicle-mile or ton-mile method, choose transport mode, and enter distance. Include inbound logistics and third-party distribution services." },
+  { value: "waste", label: "Waste", sources: [], guidance: "Report emissions from disposal and treatment of waste generated in operations. Select waste material type (paper, food, plastics, etc.), disposal method (landfill, incineration, composting, recycling), and enter quantity in short tons, lbs, kg, or metric tons." },
 ];
-const OFFSETS_CATEGORIES = [{ value: "offsets", label: "Carbon Offsets", sources: [] }];
+const OFFSETS_CATEGORIES = [{ value: "offsets", label: "Carbon Offsets", sources: [], guidance: "Report carbon offsets purchased to compensate for emissions. Enter tonnes of CO₂e offset and optionally specify which GHG scope the offset applies to. Offsets will be shown as negative emissions in your inventory." }];
 
 export default function EmissionForm({ open, onClose, onSubmit, editingRecord, isSubmitting }) {
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
@@ -333,6 +333,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                     <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select category" /></SelectTrigger>
                     <SelectContent>{categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent>
                   </Select>
+                  {formData.category && selectedCategory?.guidance && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                      <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-blue-800 leading-relaxed">{selectedCategory.guidance}</p>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
