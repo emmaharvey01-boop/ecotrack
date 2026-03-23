@@ -50,7 +50,14 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
         <Label className="text-sm font-medium text-slate-700">Electricity Consumed</Label>
         <div className="flex gap-2">
           <Input type="number" step="0.01" value={formData.electricity_kwh} onChange={set("electricity_kwh")} placeholder={`Enter ${unit}`} className="h-11 rounded-xl border-slate-200 flex-1" />
-          <Select value={unit} onValueChange={(v) => setFormData({ ...formData, electricity_unit: v })}>
+          <Select value={unit} onValueChange={(v) => {
+            // Convert displayed value to keep the same physical quantity
+            const current = parseFloat(formData.electricity_kwh) || 0;
+            let converted = current;
+            if (v === "MWh" && unit === "kWh") converted = current / 1000;
+            if (v === "kWh" && unit === "MWh") converted = current * 1000;
+            setFormData({ ...formData, electricity_unit: v, electricity_kwh: converted ? String(converted) : "" });
+          }}>
             <SelectTrigger className="h-11 rounded-xl border-slate-200 w-24"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="kWh">kWh</SelectItem>
