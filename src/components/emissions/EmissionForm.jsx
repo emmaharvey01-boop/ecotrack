@@ -237,7 +237,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       ]);
     }
     if (isPurchasedElectricity) {
-      const kWh = parseFloat(formData.electricity_kwh), mWh = kWh/1000;
+      const rawAmount = parseFloat(formData.electricity_kwh);
+      const kWh = formData.electricity_unit === "MWh" ? rawAmount * 1000 : rawAmount;
+      const mWh = kWh / 1000;
       const s = EGRID_SUBREGIONS[formData.egrid_subregion];
       const locFactor = s.co2 + (s.ch4*28) + (s.n2o*265);
       const locT = mWh * locFactor / 2204.62;
