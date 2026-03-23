@@ -13,7 +13,10 @@ function calcLocationTonnes(kwh, subregionKey) {
 }
 
 export default function PurchasedElectricityFields({ formData, setFormData }) {
-  const kwh = parseFloat(formData.electricity_kwh) || 0;
+  const unit = formData.electricity_unit || "kWh";
+  const rawAmount = parseFloat(formData.electricity_kwh) || 0;
+  // Always work in kWh internally
+  const kwh = unit === "MWh" ? rawAmount * 1000 : rawAmount;
   const mWh = kwh / 1000;
   const showCalc = formData.electricity_kwh && formData.egrid_subregion;
 
@@ -44,8 +47,17 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Electricity Consumed (kWh)</Label>
-        <Input type="number" step="0.01" value={formData.electricity_kwh} onChange={set("electricity_kwh")} placeholder="Enter kWh" className="h-11 rounded-xl border-slate-200" />
+        <Label className="text-sm font-medium text-slate-700">Electricity Consumed</Label>
+        <div className="flex gap-2">
+          <Input type="number" step="0.01" value={formData.electricity_kwh} onChange={set("electricity_kwh")} placeholder={`Enter ${unit}`} className="h-11 rounded-xl border-slate-200 flex-1" />
+          <Select value={unit} onValueChange={(v) => setFormData({ ...formData, electricity_unit: v })}>
+            <SelectTrigger className="h-11 rounded-xl border-slate-200 w-24"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="kWh">kWh</SelectItem>
+              <SelectItem value="MWh">MWh</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">
