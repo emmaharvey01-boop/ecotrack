@@ -4,15 +4,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EGRID_SUBREGIONS } from "../emissionConstants";
 
-function calcLocationTonnes(kwh, subregionKey) {
-  const s = EGRID_SUBREGIONS[subregionKey];
+function calcLocationTonnes(kwh, subregionKey, subregionData) {
+  const s = subregionData[subregionKey];
   if (!s) return "0.0000";
   const mWh = kwh / 1000;
   const totalFactor = s.co2 + (s.ch4 * 28) + (s.n2o * 265);
   return (mWh * totalFactor / 2204.62).toFixed(4);
 }
 
-export default function PurchasedElectricityFields({ formData, setFormData }) {
+export default function PurchasedElectricityFields({ formData, setFormData, yearFactors }) {
+  const subregionData = (yearFactors && yearFactors.EGRID_SUBREGIONS) || EGRID_SUBREGIONS;
   const unit = formData.electricity_unit || "kWh";
   const rawAmount = parseFloat(formData.electricity_kwh) || 0;
   // Always work in kWh internally
@@ -20,22 +21,16 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
   const mWh = kwh / 1000;
   const showCalc = formData.electricity_kwh && formData.egrid_subregion;
 
-  const hasMarketFactors =
-    formData.market_co2_factor !== "" ||
-    formData.market_ch4_factor !== "" ||
-    formData.market_n2o_factor !== "";
-
   const marketTonnes = (() => {
     if (!showCalc) return null;
     if (hasMarketFactors) {
-      const co2 = parseFloat(formData.market_co2_factor) || 0; // lb CO2/MWh
-      const ch4 = parseFloat(formData.market_ch4_factor) || 0; // lb CH4/MWh
-      const n2o = parseFloat(formData.market_n2o_factor) || 0; // lb N2O/MWh
-      // Convert lb/MWh to tonnes CO2e/MWh using GWP: CH4=28, N2O=265
-      const co2e_per_mwh = co2 + (ch4 * 28) + (n2o * 265); // lb CO2e/MWh
+      const co2 = parseFloat(formData.market_co2_factor) || 0;
+      const ch4 = parseFloat(formData.market_ch4_factor) || 0;
+      const n2o = parseFloat(formData.market_n2o_factor) || 0;
+      const co2e_per_mwh = co2 + (ch4 * 28) + (n2o * 265);
       return (mWh * co2e_per_mwh / 2204.62).toFixed(4);
     }
-    return calcLocationTonnes(kwh, formData.egrid_subregion);
+    return calcLocationTonnes(kwh, formData.egrid_subregion, subregionData);
   })();
 
   const set = (key) => (e) => setFormData({ ...formData, [key]: e.target.value });
@@ -64,7 +59,7 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
         <Label className="text-sm font-medium text-slate-700">eGRID Subregion (for Location-Based)</Label>
         <Select value={formData.egrid_subregion} onValueChange={(v) => setFormData({ ...formData, egrid_subregion: v })}>
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select eGRID subregion" /></SelectTrigger>
-          <SelectContent className="max-h-[300px]">{Object.keys(EGRID_SUBREGIONS).map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+          <SelectContent className="max-h-[300px]">{Object.keys(subregionData).map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
         </Select>
       </div>
 
@@ -96,7 +91,7 @@ export default function PurchasedElectricityFields({ formData, setFormData }) {
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
             <span className="text-sm text-blue-700 font-medium">Location-Based Emissions</span>
-            <span className="text-lg font-semibold text-blue-800">{calcLocationTonnes(kwh, formData.egrid_subregion)} tCO₂e</span>
+            <span className="text-lg font-semibold text-blue-800">{calcLocationTonnes(kwh, formData.egrid_subregion, subregionData)} tCO₂e</span>
           </motion.div>
         </div>
       )}

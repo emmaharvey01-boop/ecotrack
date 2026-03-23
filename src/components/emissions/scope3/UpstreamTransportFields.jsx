@@ -4,8 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UPSTREAM_TRANSPORT_VEHICLE_MILE, UPSTREAM_TRANSPORT_TON_MILE } from "../emissionConstants";
 
-export default function UpstreamTransportFields({ formData, setFormData, calculatedEmissions }) {
-  const factorTable = formData.upstream_mode === "vehicle_mile" ? UPSTREAM_TRANSPORT_VEHICLE_MILE : UPSTREAM_TRANSPORT_TON_MILE;
+export default function UpstreamTransportFields({ formData, setFormData, calculatedEmissions, yearFactors }) {
+  const vmTable = (yearFactors && yearFactors.UPSTREAM_TRANSPORT_VEHICLE_MILE) || UPSTREAM_TRANSPORT_VEHICLE_MILE;
+  const tmTable = (yearFactors && yearFactors.UPSTREAM_TRANSPORT_TON_MILE) || UPSTREAM_TRANSPORT_TON_MILE;
+  const factorTable = formData.upstream_mode === "vehicle_mile" ? vmTable : tmTable;
   return (
     <div className="space-y-4 pt-2">
       <div className="space-y-2">

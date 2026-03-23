@@ -4,7 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BUSINESS_TRAVEL_FACTORS, COMMUTING_MODES } from "../emissionConstants";
 
-export default function BusinessTravelFields({ formData, setFormData, calculatedEmissions, isCommuting }) {
+export default function BusinessTravelFields({ formData, setFormData, calculatedEmissions, isCommuting, yearFactors }) {
+  const travelFactors = (yearFactors && yearFactors.BUSINESS_TRAVEL_FACTORS) || BUSINESS_TRAVEL_FACTORS;
+  const commuteModes = Object.keys(travelFactors).filter(m => !m.startsWith("Air"));
   return (
     <div className="space-y-4 pt-2">
       <div className="space-y-2">
@@ -12,14 +14,14 @@ export default function BusinessTravelFields({ formData, setFormData, calculated
         <Select value={formData.travel_mode} onValueChange={(v) => setFormData({ ...formData, travel_mode: v })}>
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select transport mode" /></SelectTrigger>
           <SelectContent className="max-h-[300px]">
-            {(isCommuting ? COMMUTING_MODES : Object.keys(BUSINESS_TRAVEL_FACTORS)).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {(isCommuting ? commuteModes : Object.keys(travelFactors)).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
       {isCommuting ? (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Avg. Commute Distance {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}</Label>
+            <Label className="text-sm font-medium text-slate-700">Avg. Commute Distance {formData.travel_mode && `(${travelFactors[formData.travel_mode]?.unit})`}</Label>
             <Input type="number" step="0.01" value={formData.commute_distance} onChange={(e) => {
               const dist = e.target.value, emp = formData.num_employees || "";
               setFormData({ ...formData, commute_distance: dist, travel_miles: dist && emp ? (parseFloat(dist) * parseFloat(emp)).toString() : "" });
@@ -35,7 +37,7 @@ export default function BusinessTravelFields({ formData, setFormData, calculated
         </div>
       ) : (
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">Miles Travelled {formData.travel_mode && `(${BUSINESS_TRAVEL_FACTORS[formData.travel_mode]?.unit})`}</Label>
+          <Label className="text-sm font-medium text-slate-700">Miles Travelled {formData.travel_mode && `(${travelFactors[formData.travel_mode]?.unit})`}</Label>
           <Input type="number" step="0.01" value={formData.travel_miles} onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })} placeholder="Enter miles" className="h-11 rounded-xl border-slate-200" />
         </div>
       )}

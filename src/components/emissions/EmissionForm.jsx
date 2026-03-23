@@ -20,6 +20,7 @@ import {
   BUSINESS_TRAVEL_FACTORS, UPSTREAM_TRANSPORT_VEHICLE_MILE, UPSTREAM_TRANSPORT_TON_MILE,
   EGRID_SUBREGIONS, PURCHASED_GASES_GWP_FACTORS, STATIONARY_COMBUSTION_FACTORS,
   EMISSION_FACTORS, WASTE_EMISSION_FACTORS, WASTE_DISPOSAL_LABELS, REPORTING_PERIODS, EMPTY_FORM,
+  getYearFactors,
 } from "./emissionConstants";
 
 const SCOPE_1_CATEGORIES = [
@@ -117,13 +118,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     }
     if (isUpstreamTransport) {
       if (!formData.upstream_mode || !formData.travel_mode || !formData.travel_miles) return null;
-      const t = formData.upstream_mode === "vehicle_mile" ? UPSTREAM_TRANSPORT_VEHICLE_MILE : UPSTREAM_TRANSPORT_TON_MILE;
+      const t = formData.upstream_mode === "vehicle_mile" ? yearFactors.UPSTREAM_TRANSPORT_VEHICLE_MILE : yearFactors.UPSTREAM_TRANSPORT_TON_MILE;
       const f = t[formData.travel_mode]; if (!f) return null;
       return ((parseFloat(formData.travel_miles) || 0) * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000).toFixed(4);
     }
     if (isBusinessTravel || isCommuting) {
       if (!formData.travel_mode || !formData.travel_miles) return null;
-      const f = BUSINESS_TRAVEL_FACTORS[formData.travel_mode]; if (!f) return null;
+      const f = yearFactors.BUSINESS_TRAVEL_FACTORS[formData.travel_mode]; if (!f) return null;
       return ((parseFloat(formData.travel_miles)||0) * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000).toFixed(4);
     }
     if (isMobileCombustion) {
@@ -163,6 +164,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     return null;
   };
 
+  const yearFactors = getYearFactors(formData.reporting_period);
   const calculatedEmissions = calcEmissions();
 
   const makeBase = () => ({
@@ -189,13 +191,13 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     }
     if (isUpstreamTransport) {
       const d = parseFloat(formData.travel_miles) || 0;
-      const t = formData.upstream_mode === "vehicle_mile" ? UPSTREAM_TRANSPORT_VEHICLE_MILE : UPSTREAM_TRANSPORT_TON_MILE;
+      const t = formData.upstream_mode === "vehicle_mile" ? yearFactors.UPSTREAM_TRANSPORT_VEHICLE_MILE : yearFactors.UPSTREAM_TRANSPORT_TON_MILE;
       const f = t[formData.travel_mode];
       return onSubmit({ ...makeBase(), scope: "scope_3", category: "Upstream Transport and Distribution", source: formData.travel_mode, amount: d, unit: f.unit, emission_factor: f.co2, co2e_tonnes: d * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000 });
     }
     if (isBusinessTravel || isCommuting) {
       const m = parseFloat(formData.travel_miles) || 0;
-      const f = BUSINESS_TRAVEL_FACTORS[formData.travel_mode];
+      const f = yearFactors.BUSINESS_TRAVEL_FACTORS[formData.travel_mode];
       return onSubmit({ ...makeBase(), scope: "scope_3", category: isBusinessTravel ? "Business Travel" : "Employee Commuting", source: formData.travel_mode, amount: m, unit: f.unit, emission_factor: f.co2, co2e_tonnes: m * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000 });
     }
     if (isPurchasedSteam) {
@@ -240,7 +242,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       const rawAmount = parseFloat(formData.electricity_kwh);
       const kWh = formData.electricity_unit === "MWh" ? rawAmount * 1000 : rawAmount;
       const mWh = kWh / 1000;
-      const s = EGRID_SUBREGIONS[formData.egrid_subregion];
+      const s = yearFactors.EGRID_SUBREGIONS[formData.egrid_subregion];
       const locFactor = s.co2 + (s.ch4*28) + (s.n2o*265);
       const locT = mWh * locFactor / 2204.62;
       const hasMarketFactors = formData.market_co2_factor !== "" || formData.market_ch4_factor !== "" || formData.market_n2o_factor !== "";
@@ -380,12 +382,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
                 </motion.div>
               )}
               {isWaste && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><WasteFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
-              {isUpstreamTransport && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><UpstreamTransportFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
-              {(isBusinessTravel || isCommuting) && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><BusinessTravelFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} isCommuting={isCommuting} /></motion.div>}
+              {isUpstreamTransport && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><UpstreamTransportFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} yearFactors={yearFactors} /></motion.div>}
+              {(isBusinessTravel || isCommuting) && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><BusinessTravelFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} isCommuting={isCommuting} yearFactors={yearFactors} /></motion.div>}
               {isOffsets && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><OffsetsFields formData={formData} setFormData={setFormData} /></motion.div>}
               {isPurchasedSteam && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedSteamFields formData={formData} setFormData={setFormData} /></motion.div>}
               {(isPurchasedHeating || isPurchasedCooling) && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedHeatingCoolingFields formData={formData} setFormData={setFormData} categoryLabel={isPurchasedHeating ? "Heating" : "Cooling"} /></motion.div>}
-              {isPurchasedElectricity && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedElectricityFields formData={formData} setFormData={setFormData} /></motion.div>}
+              {isPurchasedElectricity && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedElectricityFields formData={formData} setFormData={setFormData} yearFactors={yearFactors} /></motion.div>}
               {isPurchasedGases && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><PurchasedGasesFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {isStationaryCombustion && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><StationaryCombustionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
               {isMobileCombustion && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}><MobileCombustionFields formData={formData} setFormData={setFormData} calculatedEmissions={calculatedEmissions} /></motion.div>}
