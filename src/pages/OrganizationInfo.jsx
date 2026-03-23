@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
-import { Building2, Save, Download, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { Building2, Save, Download, ChevronDown, ChevronUp, Trash2, BarChart2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { exportToExcel } from "@/components/exports/ExcelExport";
 import { Link } from "react-router-dom";
@@ -107,6 +107,11 @@ export default function OrganizationInfoPage() {
             )}
             {selectedCompany && selectedCompany !== "all" && (
               <>
+                <Link to={`/CompanyDashboard?company=${encodeURIComponent(selectedCompany)}`}>
+                  <Button className="bg-slate-600 hover:bg-slate-500 text-white rounded-xl h-11 px-5">
+                    <BarChart2 className="w-4 h-4 mr-2" />Go to Emissions
+                  </Button>
+                </Link>
                 <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending} className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-11 px-5">
                   <Save className="w-4 h-4 mr-2" />{saved ? "Saved!" : saveMutation.isPending ? "Saving…" : "Save"}
                 </Button>
