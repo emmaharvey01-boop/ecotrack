@@ -164,15 +164,61 @@ export function StationaryCombustionFields({ formData, setFormData, calculatedEm
   );
 }
 
+const ON_ROAD_VEHICLE_TYPES = [
+  "Passenger Cars",
+  "Light-Duty Trucks",
+  "Motorcycles",
+  "Medium- and Heavy-Duty Trucks",
+  "Buses",
+];
+
+const OFF_ROAD_VEHICLE_TYPES = [
+  "Agricultural Equipment",
+  "Construction Equipment",
+  "Forklifts",
+  "Lawn and Garden Equipment",
+  "Recreational Equipment",
+  "Other Off-Road Equipment",
+];
+
 export function MobileCombustionFields({ formData, setFormData, calculatedEmissions }) {
+  const vehicleTypes = formData.mobile_road_type === "on_road" ? ON_ROAD_VEHICLE_TYPES
+    : formData.mobile_road_type === "off_road" ? OFF_ROAD_VEHICLE_TYPES : [];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 30 }, (_, i) => String(currentYear - i));
+
   return (
     <div className="space-y-4 pt-2">
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Vehicle Type</Label>
-        <Select value={formData.vehicle_type} onValueChange={(value) => setFormData({ ...formData, vehicle_type: value, source: value })}>
-          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select vehicle type" /></SelectTrigger>
+        <Label className="text-sm font-medium text-slate-700">On-Road or Off-Road</Label>
+        <Select value={formData.mobile_road_type || ""} onValueChange={(v) =>
+          setFormData({ ...formData, mobile_road_type: v, vehicle_type: "", source: "" })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select type" /></SelectTrigger>
           <SelectContent>
-            {VEHICLE_TYPES.map(v => <SelectItem key={v.name} value={v.name}>{v.name}</SelectItem>)}
+            <SelectItem value="on_road">On-Road</SelectItem>
+            <SelectItem value="off_road">Off-Road</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {formData.mobile_road_type && (
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-slate-700">Vehicle Type</Label>
+          <Select value={formData.vehicle_type} onValueChange={(v) =>
+            setFormData({ ...formData, vehicle_type: v, source: v })}>
+            <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select vehicle type" /></SelectTrigger>
+            <SelectContent>
+              {vehicleTypes.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-slate-700">Vehicle Year</Label>
+        <Select value={formData.vehicle_year || ""} onValueChange={(v) => setFormData({ ...formData, vehicle_year: v })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select year" /></SelectTrigger>
+          <SelectContent className="max-h-[250px]">
+            {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -184,8 +230,8 @@ export function MobileCombustionFields({ formData, setFormData, calculatedEmissi
             placeholder="Enter amount" className="h-11 rounded-xl border-slate-200" />
         </div>
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">Units</Label>
-          <Select value={formData.fuel_units} onValueChange={(value) => setFormData({ ...formData, fuel_units: value })}>
+          <Label className="text-sm font-medium text-slate-700">Fuel Units</Label>
+          <Select value={formData.fuel_units} onValueChange={(v) => setFormData({ ...formData, fuel_units: v })}>
             <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select unit" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="gallons">Gallons</SelectItem>
