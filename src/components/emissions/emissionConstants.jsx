@@ -207,3 +207,84 @@ export const EMPTY_FORM = {
   steam_market_co2_factor: "", steam_market_ch4_factor: "", steam_market_n2o_factor: "",
   steam_location_co2_factor: "", steam_location_ch4_factor: "", steam_location_n2o_factor: "",
 };
+
+// ─── 2024 EPA Emission Factors (eGRID2022, June 2024) ───────────────────────
+
+// Source: EPA eGRID2022, January 2024 (Table 6) - Total Output Emission Factors (lb per MWh)
+export const EGRID_SUBREGIONS_2024 = {
+  "ASCC Alaska Grid":         { co2: 1052.1, ch4: 0.088, n2o: 0.012 },
+  "ASCC Miscellaneous":       { co2: 495.8,  ch4: 0.023, n2o: 0.004 },
+  "WECC Southwest":           { co2: 776.0,  ch4: 0.051, n2o: 0.007 },
+  "WECC California":          { co2: 497.4,  ch4: 0.030, n2o: 0.004 },
+  "ERCOT All":                { co2: 771.1,  ch4: 0.049, n2o: 0.007 },
+  "FRCC All":                 { co2: 813.8,  ch4: 0.048, n2o: 0.006 },
+  "HICC Miscellaneous":       { co2: 1155.5, ch4: 0.124, n2o: 0.019 },
+  "HICC Oahu":                { co2: 1575.4, ch4: 0.163, n2o: 0.025 },
+  "MRO East":                 { co2: 1479.6, ch4: 0.133, n2o: 0.019 },
+  "MRO West":                 { co2: 936.5,  ch4: 0.102, n2o: 0.015 },
+  "NPCC New England":         { co2: 536.4,  ch4: 0.063, n2o: 0.008 },
+  "WECC Northwest":           { co2: 602.1,  ch4: 0.056, n2o: 0.008 },
+  "NPCC NYC/Westchester":     { co2: 885.2,  ch4: 0.023, n2o: 0.003 },
+  "NPCC Long Island":         { co2: 1200.7, ch4: 0.135, n2o: 0.018 },
+  "NPCC Upstate NY":          { co2: 274.6,  ch4: 0.015, n2o: 0.002 },
+  "Puerto Rico Miscellaneous":{ co2: 1593.5, ch4: 0.087, n2o: 0.014 },
+  "RFC East":                 { co2: 657.4,  ch4: 0.045, n2o: 0.006 },
+  "RFC Michigan":             { co2: 1216.4, ch4: 0.116, n2o: 0.016 },
+  "RFC West":                 { co2: 1000.1, ch4: 0.087, n2o: 0.012 },
+  "WECC Rockies":             { co2: 1124.9, ch4: 0.101, n2o: 0.014 },
+  "SPP North":                { co2: 952.6,  ch4: 0.100, n2o: 0.014 },
+  "SPP South":                { co2: 970.4,  ch4: 0.072, n2o: 0.010 },
+  "SERC Mississippi Valley":  { co2: 801.0,  ch4: 0.040, n2o: 0.006 },
+  "SERC Midwest":             { co2: 1369.9, ch4: 0.151, n2o: 0.022 },
+  "SERC South":               { co2: 893.3,  ch4: 0.064, n2o: 0.009 },
+  "SERC Tennessee Valley":    { co2: 933.1,  ch4: 0.082, n2o: 0.012 },
+  "SERC Virginia/Carolina":   { co2: 623.0,  ch4: 0.047, n2o: 0.007 },
+  "US Average":               { co2: 823.1,  ch4: 0.066, n2o: 0.009 },
+};
+
+// Source: EPA Emission Factors for GHG Inventories, June 5, 2024 (Table 10)
+export const BUSINESS_TRAVEL_FACTORS_2024 = {
+  "Passenger Car":                                  { co2: 0.306, ch4: 0.009,  n2o: 0.006,  unit: "vehicle-mile" },
+  "Light-Duty Truck":                               { co2: 0.405, ch4: 0.011,  n2o: 0.010,  unit: "vehicle-mile" },
+  "Motorcycle":                                     { co2: 0.376, ch4: 0.091,  n2o: 0.019,  unit: "vehicle-mile" },
+  "Intercity Rail - Northeast Corridor":            { co2: 0.058, ch4: 0.0055, n2o: 0.0007, unit: "passenger-mile" },
+  "Intercity Rail - Other Routes":                  { co2: 0.150, ch4: 0.0117, n2o: 0.0038, unit: "passenger-mile" },
+  "Intercity Rail - National Average":              { co2: 0.113, ch4: 0.0092, n2o: 0.0026, unit: "passenger-mile" },
+  "Commuter Rail":                                  { co2: 0.133, ch4: 0.0105, n2o: 0.0026, unit: "passenger-mile" },
+  "Transit Rail (i.e. Subway, Tram)":              { co2: 0.093, ch4: 0.0075, n2o: 0.0010, unit: "passenger-mile" },
+  "Bus":                                            { co2: 0.071, ch4: 0.005,  n2o: 0.0021, unit: "passenger-mile" },
+  "Air Short Haul (< 300 miles)":                  { co2: 0.207, ch4: 0.0064, n2o: 0.0066, unit: "passenger-mile" },
+  "Air Medium Haul (>= 300 miles, < 2300 miles)":  { co2: 0.129, ch4: 0.0006, n2o: 0.0041, unit: "passenger-mile" },
+  "Air Long Haul (>= 2300 miles)":                 { co2: 0.163, ch4: 0.0006, n2o: 0.0052, unit: "passenger-mile" },
+};
+
+// Source: EPA Emission Factors for GHG Inventories, June 5, 2024 (Table 8)
+export const UPSTREAM_TRANSPORT_VEHICLE_MILE_2024 = {
+  "Passenger Car":                { co2: 0.306, ch4: 0.009,  n2o: 0.006,  unit: "vehicle-mile" },
+  "Light-Duty Truck":             { co2: 0.405, ch4: 0.011,  n2o: 0.010,  unit: "vehicle-mile" },
+  "Medium- and Heavy-Duty Truck": { co2: 1.360, ch4: 0.012,  n2o: 0.038,  unit: "vehicle-mile" },
+};
+
+export const UPSTREAM_TRANSPORT_TON_MILE_2024 = {
+  "Medium- and Heavy-Duty Truck": { co2: 0.168, ch4: 0.0015, n2o: 0.0047, unit: "short ton-mile" },
+  "Rail":                         { co2: 0.022, ch4: 0.0017, n2o: 0.0005, unit: "short ton-mile" },
+  "Waterborne Craft":             { co2: 0.082, ch4: 0.0326, n2o: 0.0021, unit: "short ton-mile" },
+  "Aircraft":                     { co2: 0.905, ch4: 0,      n2o: 0.0279, unit: "short ton-mile" },
+};
+
+export function getYearFactors(year) {
+  if (year === "2024") {
+    return {
+      EGRID_SUBREGIONS: EGRID_SUBREGIONS_2024,
+      BUSINESS_TRAVEL_FACTORS: BUSINESS_TRAVEL_FACTORS_2024,
+      UPSTREAM_TRANSPORT_VEHICLE_MILE: UPSTREAM_TRANSPORT_VEHICLE_MILE_2024,
+      UPSTREAM_TRANSPORT_TON_MILE: UPSTREAM_TRANSPORT_TON_MILE_2024,
+    };
+  }
+  return {
+    EGRID_SUBREGIONS,
+    BUSINESS_TRAVEL_FACTORS,
+    UPSTREAM_TRANSPORT_VEHICLE_MILE,
+    UPSTREAM_TRANSPORT_TON_MILE,
+  };
+}
