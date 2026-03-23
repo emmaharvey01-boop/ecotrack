@@ -52,17 +52,23 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         "Fugitive Emissions": "fugitive_emissions",
         "Refrigeration and A/C Equipment Use": "fugitive_emissions", "Fire Suppression": "fugitive_emissions",
         "Process Emissions": "purchased_gases", "Purchased Gases": "purchased_gases", "Purchased Electricity": "purchased_electricity",
+        "Purchased Steam": "purchased_steam", "Purchased Heating": "purchased_heating", "Purchased Cooling": "purchased_cooling",
+        "Business Travel": "business_travel", "Employee Commuting": "commuting",
+        "Upstream Transport and Distribution": "upstream_transport",
+        "Waste": "waste", "Offsets": "offsets",
       };
-      setFormData({
+      const cat = catMap[editingRecord.category] || "";
+      const base = {
         ...EMPTY_FORM,
         company_name: editingRecord.company_name || "",
         scope: editingRecord.scope || "",
         scope_2_method: editingRecord.scope_2_method || "",
-        category: catMap[editingRecord.category] || "",
+        category: cat,
         source: editingRecord.source || "",
         amount: editingRecord.amount?.toString() || "",
         reporting_period: editingRecord.reporting_period || "",
         notes: editingRecord.notes || "",
+        // stationary / mobile combustion
         vehicle_type: editingRecord.source_area || "",
         fuel_usage: editingRecord.quantity_combusted?.toString() || "",
         fuel_units: editingRecord.combustion_units || "",
@@ -70,7 +76,53 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         fuel_state: editingRecord.fuel_state || "",
         combustion_units: editingRecord.combustion_units || "",
         quantity_combusted: editingRecord.quantity_combusted?.toString() || "",
-      });
+      };
+      // category-specific field restoration
+      if (cat === "purchased_electricity") {
+        Object.assign(base, {
+          electricity_kwh: editingRecord.amount?.toString() || "",
+          electricity_unit: editingRecord.unit || "kWh",
+          egrid_subregion: editingRecord.source || "",
+        });
+      } else if (cat === "purchased_gases") {
+        Object.assign(base, {
+          purchased_gas_type: editingRecord.source || "",
+          purchased_gas_amount: editingRecord.amount?.toString() || "",
+        });
+      } else if (cat === "business_travel" || cat === "commuting") {
+        Object.assign(base, {
+          travel_mode: editingRecord.source || "",
+          travel_miles: editingRecord.amount?.toString() || "",
+        });
+      } else if (cat === "upstream_transport") {
+        const unit = editingRecord.unit || "";
+        Object.assign(base, {
+          upstream_mode: unit.includes("ton") ? "ton_mile" : "vehicle_mile",
+          travel_mode: editingRecord.source || "",
+          travel_miles: editingRecord.amount?.toString() || "",
+        });
+      } else if (cat === "waste") {
+        const src = editingRecord.source || "";
+        const dashIdx = src.indexOf(" - ");
+        Object.assign(base, {
+          waste_material: dashIdx > -1 ? src.substring(0, dashIdx) : src,
+          waste_unit: editingRecord.unit || "short_tons",
+          waste_weight: editingRecord.amount?.toString() || "",
+        });
+      } else if (cat === "offsets") {
+        Object.assign(base, {
+          offsets_tonnes: Math.abs(editingRecord.co2e_tonnes || 0).toString(),
+          offsets_ghg_scope: editingRecord.source?.replace("Carbon Offsets - ", "") || "",
+        });
+      } else if (cat === "purchased_steam" || cat === "purchased_heating" || cat === "purchased_cooling") {
+        Object.assign(base, {
+          steam_source_area: editingRecord.source || "",
+          hc_source_area: editingRecord.source || "",
+          steam_purchased: editingRecord.amount?.toString() || "",
+          hc_purchased: editingRecord.amount?.toString() || "",
+        });
+      }
+      setFormData(base);
     } else if (!open) {
       setFormData({ ...EMPTY_FORM });
     }
