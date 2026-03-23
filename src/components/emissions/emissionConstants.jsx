@@ -188,7 +188,7 @@ export const WASTE_DISPOSAL_LABELS = {
   anaerobically_digested: "Anaerobically Digested",
 };
 
-export const REPORTING_PERIODS = ["2024", "2025", "2026", "2027", "2028"];
+export const REPORTING_PERIODS = ["2025", "2026", "2027", "2028", "2024"];
 
 export const EMPTY_FORM = {
   company_name: "", scope: "", scope_2_method: "", category: "",
