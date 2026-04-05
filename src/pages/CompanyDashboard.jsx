@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft, Building2, ClipboardList, BarChart2, Download, Check } from "lucide-react";
+import { Plus, ArrowLeft, Building2, ClipboardList, BarChart2, Download, Check, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import EmissionForm from "@/components/emissions/EmissionForm";
@@ -92,6 +93,18 @@ export default function CompanyDashboard() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["emissions"] }),
   });
 
+  const deleteCompanyMutation = useMutation({
+    mutationFn: async () => {
+      await Promise.all(records.map(r => base44.entities.EmissionRecord.delete(r.id)));
+      if (orgInfo) await base44.entities.OrganizationInfo.delete(orgInfo.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+      queryClient.invalidateQueries({ queryKey: ["orgInfo"] });
+      window.location.href = "/OrganizationInfo";
+    },
+  });
+
   const totals = useMemo(() => records.reduce((acc, r) => {
     const val = r.co2e_tonnes || 0;
     if (r.scope === "scope_1") acc.scope1 += val;
@@ -113,15 +126,38 @@ export default function CompanyDashboard() {
       <header className="bg-[#1e293b] border-b border-slate-700">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link to="/OrganizationInfo">
-              <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white rounded-lg px-2">
-                <ArrowLeft className="w-4 h-4 mr-1" />Back
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-emerald-400" />
-              <h1 className="text-white font-semibold text-lg">{company}</h1>
+            <div className="flex items-center gap-4 flex-1">
+              <Link to="/OrganizationInfo">
+                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white rounded-lg px-2">
+                  <ArrowLeft className="w-4 h-4 mr-1" />Back
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-emerald-400" />
+                <h1 className="text-white font-semibold text-lg">{company}</h1>
+              </div>
             </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="rounded-lg">
+                  <Trash2 className="w-4 h-4 mr-1" />Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete "{company}"?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all emission records ({records.length}) and organization info for <strong>{company}</strong>. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteCompanyMutation.mutate()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    {deleteCompanyMutation.isPending ? "Deleting…" : "Delete Everything"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
           {/* Step tabs */}
