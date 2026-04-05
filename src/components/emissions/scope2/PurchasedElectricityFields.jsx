@@ -16,6 +16,7 @@ export default function PurchasedElectricityFields({ formData, setFormData, year
   const subregionData = (yearFactors && yearFactors.EGRID_SUBREGIONS) || EGRID_SUBREGIONS;
   const unit = formData.electricity_unit || "kWh";
   const rawAmount = parseFloat(formData.electricity_kwh) || 0;
+  const hasMarketFactors = formData.market_co2_factor !== "" || formData.market_ch4_factor !== "" || formData.market_n2o_factor !== "";
   // Always work in kWh internally
   const kwh = unit === "MWh" ? rawAmount * 1000 : rawAmount;
   const mWh = kwh / 1000;

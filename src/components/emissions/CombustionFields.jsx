@@ -164,6 +164,17 @@ export function StationaryCombustionFields({ formData, setFormData, calculatedEm
   );
 }
 
+// Source: EPA Emission Factors for GHG Inventories, January 15, 2025 (Table 2)
+export const MOBILE_FUEL_TYPES = [
+  { name: "Motor Gasoline",             unit: "gallons", co2: 8.78   },
+  { name: "Diesel Fuel",                unit: "gallons", co2: 10.21  },
+  { name: "Biodiesel (B100)",           unit: "gallons", co2: 9.45   },
+  { name: "Ethanol (E100)",             unit: "gallons", co2: 5.75   },
+  { name: "Liquefied Natural Gas (LNG)",unit: "gallons", co2: 4.46   },
+  { name: "Propane (LPG)",              unit: "gallons", co2: 5.68   },
+  { name: "Compressed Natural Gas (CNG)", unit: "scf",  co2: 0.05444 },
+];
+
 const ON_ROAD_VEHICLE_TYPES = [
   "Passenger Cars",
   "Light-Duty Trucks",
@@ -185,6 +196,7 @@ export function MobileCombustionFields({ formData, setFormData, calculatedEmissi
   const vehicleTypes = formData.mobile_road_type === "on_road" ? ON_ROAD_VEHICLE_TYPES
     : formData.mobile_road_type === "off_road" ? OFF_ROAD_VEHICLE_TYPES : [];
 
+  const selectedFuel = MOBILE_FUEL_TYPES.find(f => f.name === formData.mobile_fuel_type);
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 30 }, (_, i) => String(currentYear - i));
 
@@ -214,6 +226,16 @@ export function MobileCombustionFields({ formData, setFormData, calculatedEmissi
         </div>
       )}
       <div className="space-y-2">
+        <Label className="text-sm font-medium text-slate-700">Fuel Type</Label>
+        <Select value={formData.mobile_fuel_type || ""} onValueChange={(v) =>
+          setFormData({ ...formData, mobile_fuel_type: v, fuel_units: MOBILE_FUEL_TYPES.find(f => f.name === v)?.unit || "" })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select fuel type" /></SelectTrigger>
+          <SelectContent>
+            {MOBILE_FUEL_TYPES.map(f => <SelectItem key={f.name} value={f.name}>{f.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Vehicle Year</Label>
         <Select value={formData.vehicle_year || ""} onValueChange={(v) => setFormData({ ...formData, vehicle_year: v })}>
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select year" /></SelectTrigger>
@@ -230,14 +252,10 @@ export function MobileCombustionFields({ formData, setFormData, calculatedEmissi
             placeholder="Enter amount" className="h-11 rounded-xl border-slate-200" />
         </div>
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">Fuel Units</Label>
-          <Select value={formData.fuel_units} onValueChange={(v) => setFormData({ ...formData, fuel_units: v })}>
-            <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select unit" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gallons">Gallons</SelectItem>
-              <SelectItem value="scf">SCF</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label className="text-sm font-medium text-slate-700">Units</Label>
+          <Input value={selectedFuel ? selectedFuel.unit : ""} readOnly
+            className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-500"
+            placeholder="Select fuel type first" />
         </div>
       </div>
       <div className="space-y-2">

@@ -196,7 +196,7 @@ export const EMPTY_FORM = {
   num_employees: "", offsets_tonnes: "", offsets_ghg_scope: "",
   waste_material: "", waste_disposal: "", waste_weight: "", waste_unit: "short_tons",
   source: "", amount: "", reporting_period: "", notes: "",
-  vehicle_type: "", vehicle_year: "", mobile_road_type: "", fuel_usage: "", fuel_units: "", miles_travelled: "",
+  vehicle_type: "", vehicle_year: "", mobile_road_type: "", mobile_fuel_type: "", fuel_usage: "", fuel_units: "", miles_travelled: "",
   fuel_combusted: "", fuel_state: "", combustion_units: "", quantity_combusted: "",
   refrigeration_method: "", gas_type: "", inventory_change: "", transfer_amount: "", capacity_change: "",
   fire_suppression_method: "", fire_suppression_gas: "", fire_inventory_change: "", fire_transfer_amount: "", fire_capacity_change: "",

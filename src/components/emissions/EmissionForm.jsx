@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Info } from "lucide-react";
-import { StationaryCombustionFields, MobileCombustionFields, RefrigerationFields, FireSuppressionFields, STATIONARY_COMBUSTION_FUELS, REFRIGERANT_GWP_FACTORS, FIRE_SUPPRESSION_GWP_FACTORS } from "./CombustionFields";
+import { StationaryCombustionFields, MobileCombustionFields, RefrigerationFields, FireSuppressionFields, STATIONARY_COMBUSTION_FUELS, REFRIGERANT_GWP_FACTORS, FIRE_SUPPRESSION_GWP_FACTORS, MOBILE_FUEL_TYPES } from "./CombustionFields";
 import OffsetsFields from "./OffsetsFields";
 import WasteFields from "./scope3/WasteFields";
 import UpstreamTransportFields from "./scope3/UpstreamTransportFields";
@@ -70,6 +70,8 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         notes: editingRecord.notes || "",
         // stationary / mobile combustion
         vehicle_type: editingRecord.source_area || "",
+        mobile_road_type: editingRecord.notes?.includes("On-Road") ? "on_road" : editingRecord.notes?.includes("Off-Road") ? "off_road" : "",
+        mobile_fuel_type: editingRecord.fuel_combusted || "",
         fuel_usage: editingRecord.quantity_combusted?.toString() || "",
         fuel_units: editingRecord.combustion_units || "",
         fuel_combusted: editingRecord.fuel_combusted || "",
@@ -180,10 +182,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       return ((parseFloat(formData.travel_miles)||0) * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000).toFixed(4);
     }
     if (isMobileCombustion) {
-      if (!formData.fuel_usage || !formData.fuel_units) return null;
-      // Table 2: Motor Gasoline = 8.78 kg CO2/gal, CNG = 0.05444 kg CO2/scf (EPA Jan 2025)
-      const ef = { gallons: 8.78, scf: 0.05444 };
-      return ((parseFloat(formData.fuel_usage) * (ef[formData.fuel_units] || 0)) / 1000).toFixed(4);
+      if (!formData.fuel_usage || !formData.mobile_fuel_type) return null;
+      const fuelDef = MOBILE_FUEL_TYPES.find(f => f.name === formData.mobile_fuel_type);
+      if (!fuelDef) return null;
+      return ((parseFloat(formData.fuel_usage) * fuelDef.co2) / 1000).toFixed(4);
     }
     if (isStationaryCombustion) {
       if (!formData.fuel_combusted || !formData.quantity_combusted || !formData.combustion_units) return null;
@@ -316,8 +318,11 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
 
     const record = { ...makeBase(), scope: formData.scope, scope_2_method: formData.scope === "scope_2" ? formData.scope_2_method : undefined, category: selectedCategory?.label || formData.category, source: formData.source };
     if (isMobileCombustion) {
-      const ef = { gallons: 8.78, scf: 0.05444 };
-      Object.assign(record, { source: formData.vehicle_type, source_area: formData.vehicle_type, fuel_combusted: formData.fuel_units === "gallons" ? "Gasoline" : "Natural Gas", fuel_state: formData.fuel_units === "gallons" ? "liquid" : "gas", quantity_combusted: parseFloat(formData.fuel_usage), combustion_units: formData.fuel_units, amount: parseFloat(formData.fuel_usage), unit: formData.fuel_units, emission_factor: ef[formData.fuel_units]||0, co2e_tonnes: parseFloat(calculatedEmissions)||0, notes: [formData.mobile_road_type === "on_road" ? "On-Road" : "Off-Road", formData.vehicle_year ? `Year: ${formData.vehicle_year}` : "", formData.miles_travelled ? `Miles: ${formData.miles_travelled}` : "", formData.notes].filter(Boolean).join(" | ") });
+      const fuelDef = MOBILE_FUEL_TYPES.find(f => f.name === formData.mobile_fuel_type) || {};
+      Object.assign(record, { source: formData.vehicle_type,
+        source_area: formData.vehicle_type, fuel_combusted: formData.mobile_fuel_type, fuel_state: fuelDef.unit === "scf" ? "gas" : "liquid",
+        quantity_combusted: parseFloat(formData.fuel_usage), combustion_units: fuelDef.unit, amount: parseFloat(formData.fuel_usage), unit: fuelDef.unit,
+        emission_factor: fuelDef.co2 || 0, co2e_tonnes: parseFloat(calculatedEmissions)||0, notes: [formData.mobile_road_type === "on_road" ? "On-Road" : "Off-Road", formData.vehicle_year ? `Year: ${formData.vehicle_year}` : "", formData.miles_travelled ? `Miles: ${formData.miles_travelled}` : "", formData.notes].filter(Boolean).join(" | ") });
     } else if (isStationaryCombustion) {
       const fd = STATIONARY_COMBUSTION_FACTORS[formData.fuel_combusted];
       Object.assign(record, { source: formData.fuel_combusted, fuel_combusted: formData.fuel_combusted, fuel_state: formData.fuel_state, quantity_combusted: parseFloat(formData.quantity_combusted), combustion_units: formData.combustion_units, amount: parseFloat(formData.quantity_combusted), unit: formData.combustion_units, emission_factor: fd?.co2PerMmBtu||0, co2e_tonnes: parseFloat(calculatedEmissions)||0 });
@@ -337,7 +342,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
   };
 
   const isSubmitDisabled = !formData.scope || !formData.category || !formData.reporting_period || (
-    isMobileCombustion ? (!formData.mobile_road_type || !formData.vehicle_type || !formData.fuel_usage || !formData.fuel_units)
+    isMobileCombustion ? (!formData.mobile_road_type || !formData.vehicle_type || !formData.mobile_fuel_type || !formData.fuel_usage)
     : isStationaryCombustion ? (!formData.fuel_combusted || !formData.fuel_state || !formData.quantity_combusted || !formData.combustion_units)
     : isFugitiveEmissions ? (!formData.fugitive_type || (
         formData.fugitive_type === "refrigeration" ? (!formData.refrigeration_method || (formData.refrigeration_method === "material_balance" && (!formData.gas_type || !formData.inventory_change || !formData.transfer_amount || !formData.capacity_change)))
