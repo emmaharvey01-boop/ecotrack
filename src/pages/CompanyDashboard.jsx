@@ -113,7 +113,7 @@ export default function CompanyDashboard() {
       <header className="bg-[#1e293b] border-b border-slate-700">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 mb-4">
-            <Link to={createPageUrl("Dashboard")}>
+            <Link to="/OrganizationInfo">
               <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white rounded-lg px-2">
                 <ArrowLeft className="w-4 h-4 mr-1" />Back
               </Button>
