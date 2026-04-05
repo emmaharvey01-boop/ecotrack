@@ -26,7 +26,7 @@ const STEPS = [
 export default function CompanyDashboard() {
   const urlParams = new URLSearchParams(window.location.search);
   const company = urlParams.get("company") || "";
-  const [activeStep, setActiveStep] = useState("emissions");
+  const [activeStep, setActiveStep] = useState("org");
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const queryClient = useQueryClient();
