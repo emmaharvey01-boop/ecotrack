@@ -63,7 +63,27 @@ export default function CompanyDashboard() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.EmissionRecord.update(id, data),
+    mutationFn: async ({ id, data, records: allRecs }) => {
+      if (Array.isArray(data)) {
+        // Find the companion record (same category/period, other scope_2_method)
+        const primary = data.find(r => r.scope_2_method === editingRecord?.scope_2_method) || data[0];
+        const secondary = data.find(r => r !== primary);
+        await base44.entities.EmissionRecord.update(id, primary);
+        if (secondary) {
+          const companion = (allRecs || []).find(r =>
+            r.id !== id &&
+            r.company_name === primary.company_name &&
+            r.category === primary.category &&
+            r.reporting_period === primary.reporting_period &&
+            r.scope_2_method === secondary.scope_2_method
+          );
+          if (companion) await base44.entities.EmissionRecord.update(companion.id, secondary);
+          else await base44.entities.EmissionRecord.create(secondary);
+        }
+      } else {
+        await base44.entities.EmissionRecord.update(id, data);
+      }
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["emissions"] }); setShowForm(false); setEditingRecord(null); },
   });
 
@@ -251,7 +271,7 @@ export default function CompanyDashboard() {
             ? data.map(r => ({ ...r, company_name: company }))
             : { ...data, company_name: company };
           editingRecord
-            ? updateMutation.mutate({ id: editingRecord.id, data: withCompany })
+            ? updateMutation.mutate({ id: editingRecord.id, data: withCompany, records: allRecords })
             : createMutation.mutate(withCompany);
         }}
         editingRecord={editingRecord}
