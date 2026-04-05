@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import { Building2, Save, Download, ChevronDown, ChevronUp, Trash2, BarChart2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { exportToExcel } from "@/components/exports/ExcelExport";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const Section = ({ title, children, defaultOpen = true }) => {
@@ -45,6 +45,7 @@ const NAICS_CODES = ["11","21","22","23","31-33","42","44-45","48-49","51","52",
 
 export default function OrganizationInfoPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [form, setForm] = useState({});
   const [saved, setSaved] = useState(false);
@@ -97,7 +98,7 @@ export default function OrganizationInfoPage() {
           </div>
           <div className="flex gap-3 flex-wrap">
             {companies.length > 0 && (
-              <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+              <Select value={selectedCompany} onValueChange={(v) => { setSelectedCompany(v); if (v && v !== "all") navigate(`/CompanyDashboard?company=${encodeURIComponent(v)}`); }}>
                 <SelectTrigger className="w-[200px] h-11 rounded-xl border-slate-600 bg-[#334155] text-white"><SelectValue placeholder="Select company" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Select a company…</SelectItem>
