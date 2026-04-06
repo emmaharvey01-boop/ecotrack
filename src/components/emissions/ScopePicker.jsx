@@ -16,6 +16,7 @@ const SCOPES = [
     dotColor: "bg-emerald-400",
     examples: ["Natural gas boilers", "Company vehicles", "Refrigerants"],
     categories: ["Stationary Combustion", "Mobile Sources", "Fugitive Emissions"],
+    side: "right",
   },
   {
     id: "scope_2",
@@ -30,6 +31,7 @@ const SCOPES = [
     dotColor: "bg-blue-400",
     examples: ["Purchased electricity", "District steam", "Heating & cooling"],
     categories: ["Purchased Electricity", "Purchased Steam", "Purchased Heating", "Purchased Cooling"],
+    side: "right",
   },
   {
     id: "scope_3",
@@ -44,20 +46,72 @@ const SCOPES = [
     dotColor: "bg-violet-400",
     examples: ["Business travel", "Employee commuting", "Waste & logistics"],
     categories: ["Business Travel", "Employee Commuting", "Upstream Transport", "Waste"],
+    side: "left",
   },
 ];
 
+function CategoriesPanel({ scope, isHovered }) {
+  const isLeft = scope.side === "left";
+  return (
+    <AnimatePresence>
+      {isHovered && (
+        <motion.div
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "auto" }}
+          exit={{ opacity: 0, width: 0 }}
+          transition={{ duration: 0.22 }}
+          className="overflow-hidden flex-shrink-0"
+        >
+          <div className={`${isLeft ? "pr-3" : "pl-3"} flex flex-col gap-2`}>
+            {scope.categories.map((cat, ci) => (
+              <motion.div
+                key={cat}
+                initial={{ opacity: 0, x: isLeft ? 12 : -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: ci * 0.07 }}
+                className="flex items-center gap-2"
+              >
+                {isLeft ? (
+                  <>
+                    <button className={`text-xs font-medium px-3 py-1.5 rounded-lg border whitespace-nowrap transition-colors ${scope.tagBg}`}>{cat}</button>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-px bg-white/20" />
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${scope.dotColor}`} />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${scope.dotColor}`} />
+                      <div className="w-4 h-px bg-white/20" />
+                    </div>
+                    <button className={`text-xs font-medium px-3 py-1.5 rounded-lg border whitespace-nowrap transition-colors ${scope.tagBg}`}>{cat}</button>
+                  </>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function ScopeCard({ scope, isHovered, isOther, onHover, onLeave, onSelectScope }) {
   const Icon = scope.icon;
+  const isLeft = scope.side === "left";
+
   return (
     <motion.div
-      className="flex items-center gap-0"
+      className="flex items-center"
       animate={{ opacity: isOther ? 0 : 1, scale: isOther ? 0.97 : 1 }}
       transition={{ duration: 0.18 }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      {/* Main card */}
+      {/* Categories on left side (Scope 3) */}
+      {isLeft && <CategoriesPanel scope={scope} isHovered={isHovered} />}
+
       <button
         onClick={() => onSelectScope(scope.id)}
         className={`text-left p-6 rounded-2xl bg-gradient-to-br ${scope.color} border ${scope.border} hover:scale-[1.02] transition-transform w-full flex-shrink-0`}
@@ -81,45 +135,8 @@ function ScopeCard({ scope, isHovered, isOther, onHover, onLeave, onSelectScope 
         </div>
       </button>
 
-      {/* Side categories panel */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, width: 0, x: -10 }}
-            animate={{ opacity: 1, width: "auto", x: 0 }}
-            exit={{ opacity: 0, width: 0, x: -10 }}
-            transition={{ duration: 0.22 }}
-            className="overflow-hidden flex-shrink-0"
-          >
-            <div className="pl-3 flex flex-col gap-2">
-              {/* connector line */}
-              <div className="relative flex flex-col gap-2">
-                {scope.categories.map((cat, ci) => (
-                  <motion.div
-                    key={cat}
-                    initial={{ opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: ci * 0.07 }}
-                    className="flex items-center gap-2"
-                  >
-                    {/* connector dot + line */}
-                    <div className="flex items-center gap-1.5">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${scope.dotColor}`} />
-                      <div className="w-4 h-px bg-white/20" />
-                    </div>
-                    <button
-                      onClick={() => onSelectScope(scope.id)}
-                      className={`text-xs font-medium px-3 py-1.5 rounded-lg border whitespace-nowrap transition-colors ${scope.tagBg}`}
-                    >
-                      {cat}
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Categories on right side (Scope 1 & 2) */}
+      {!isLeft && <CategoriesPanel scope={scope} isHovered={isHovered} />}
     </motion.div>
   );
 }
