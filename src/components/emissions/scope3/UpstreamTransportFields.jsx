@@ -16,7 +16,9 @@ export default function UpstreamTransportFields({ formData, setFormData, calcula
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select transport method" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="vehicle_mile">On-Road Transport (Vehicle Miles)</SelectItem>
+            <SelectItem value="vehicle_km">On-Road Transport (Vehicle Kilometers)</SelectItem>
             <SelectItem value="ton_mile">Product Transport (Short Ton Miles)</SelectItem>
+            <SelectItem value="tonne_km">Product Transport (Metric Tonne-km)</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -29,8 +31,17 @@ export default function UpstreamTransportFields({ formData, setFormData, calcula
           </Select>
         </div>
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">{formData.upstream_mode === "vehicle_mile" ? "Vehicle Miles" : "Short Ton Miles"}</Label>
-          <Input type="number" step="0.01" value={formData.travel_miles} onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })} placeholder={`Enter ${formData.upstream_mode === "vehicle_mile" ? "vehicle miles" : "short ton miles"}`} className="h-11 rounded-xl border-slate-200" />
+          <Label className="text-sm font-medium text-slate-700">
+            {formData.upstream_mode === "vehicle_mile" ? "Vehicle Miles" : formData.upstream_mode === "vehicle_km" ? "Vehicle Kilometers" : formData.upstream_mode === "tonne_km" ? "Metric Tonne-km" : "Short Ton Miles"}
+          </Label>
+          <Input type="number" step="0.01" value={formData.travel_miles} onChange={(e) => {
+            const val = e.target.value;
+            // Convert km to miles, tonne-km to short ton-miles for calculation
+            let miles = val;
+            if (formData.upstream_mode === "vehicle_km") miles = (parseFloat(val) * 0.621371).toString();
+            else if (formData.upstream_mode === "tonne_km") miles = (parseFloat(val) * 0.621371 / 1.10231).toString();
+            setFormData({ ...formData, travel_miles: miles, raw_distance: val });
+          }} placeholder={`Enter distance`} className="h-11 rounded-xl border-slate-200" />
         </div>
       </>)}
       {calculatedEmissions && (

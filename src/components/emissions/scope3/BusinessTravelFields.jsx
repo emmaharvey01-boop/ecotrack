@@ -10,6 +10,16 @@ export default function BusinessTravelFields({ formData, setFormData, calculated
   return (
     <div className="space-y-4 pt-2">
       <div className="space-y-2">
+        <Label className="text-sm font-medium text-slate-700">Distance Unit</Label>
+        <Select value={formData.distance_unit || "miles"} onValueChange={(v) => setFormData({ ...formData, distance_unit: v, travel_miles: "", commute_distance: "", raw_distance: "" })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="miles">Miles</SelectItem>
+            <SelectItem value="km">Kilometers (km)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
         <Label className="text-sm font-medium text-slate-700">Transport Mode</Label>
         <Select value={formData.travel_mode} onValueChange={(v) => setFormData({ ...formData, travel_mode: v })}>
           <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select transport mode" /></SelectTrigger>
@@ -21,11 +31,13 @@ export default function BusinessTravelFields({ formData, setFormData, calculated
       {isCommuting ? (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Avg. Commute Distance {formData.travel_mode && `(${travelFactors[formData.travel_mode]?.unit})`}</Label>
+            <Label className="text-sm font-medium text-slate-700">Avg. Commute Distance {formData.distance_unit === "km" ? "(km/employee)" : "(miles/employee)"}</Label>
             <Input type="number" step="0.01" value={formData.commute_distance} onChange={(e) => {
-              const dist = e.target.value, emp = formData.num_employees || "";
-              setFormData({ ...formData, commute_distance: dist, travel_miles: dist && emp ? (parseFloat(dist) * parseFloat(emp)).toString() : "" });
-            }} placeholder="Miles per employee" className="h-11 rounded-xl border-slate-200" />
+              const rawDist = e.target.value;
+              const distMiles = formData.distance_unit === "km" ? parseFloat(rawDist) * 0.621371 : parseFloat(rawDist);
+              const emp = formData.num_employees || "";
+              setFormData({ ...formData, commute_distance: rawDist, travel_miles: rawDist && emp ? (distMiles * parseFloat(emp)).toString() : "" });
+            }} placeholder={`${formData.distance_unit === "km" ? "km" : "miles"} per employee`} className="h-11 rounded-xl border-slate-200" />
           </div>
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-700">Number of Employees</Label>
@@ -36,9 +48,25 @@ export default function BusinessTravelFields({ formData, setFormData, calculated
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">Miles Travelled {formData.travel_mode && `(${travelFactors[formData.travel_mode]?.unit})`}</Label>
-          <Input type="number" step="0.01" value={formData.travel_miles} onChange={(e) => setFormData({ ...formData, travel_miles: e.target.value })} placeholder="Enter miles" className="h-11 rounded-xl border-slate-200" />
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Distance Unit</Label>
+            <Select value={formData.distance_unit || "miles"} onValueChange={(v) => setFormData({ ...formData, distance_unit: v, travel_miles: "", raw_distance: "" })}>
+              <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="miles">Miles</SelectItem>
+                <SelectItem value="km">Kilometers (km)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Distance {formData.distance_unit === "km" ? "(km)" : "(miles)"}</Label>
+            <Input type="number" step="0.01" value={formData.raw_distance || formData.travel_miles} onChange={(e) => {
+              const val = e.target.value;
+              const miles = formData.distance_unit === "km" ? (parseFloat(val) * 0.621371).toString() : val;
+              setFormData({ ...formData, raw_distance: val, travel_miles: miles });
+            }} placeholder={`Enter distance in ${formData.distance_unit === "km" ? "km" : "miles"}`} className="h-11 rounded-xl border-slate-200" />
+          </div>
         </div>
       )}
       {calculatedEmissions && (

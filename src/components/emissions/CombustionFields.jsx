@@ -148,11 +148,18 @@ export function StationaryCombustionFields({ formData, setFormData, calculatedEm
               <Select value={formData.combustion_units} onValueChange={(value) => setFormData({ ...formData, combustion_units: value })}>
                 <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue placeholder="Select unit" /></SelectTrigger>
                 <SelectContent>
+                  <optgroup label="Imperial">
                   <SelectItem value="therm">Therm</SelectItem>
                   <SelectItem value="mmBtu">mmBtu</SelectItem>
-                  <SelectItem value="SCF">SCF</SelectItem>
+                  <SelectItem value="SCF">SCF (ft³)</SelectItem>
                   <SelectItem value="short ton">Short Ton</SelectItem>
                   <SelectItem value="gallon">Gallon</SelectItem>
+                  </optgroup>
+                  <SelectItem value="GJ">GJ (Gigajoule)</SelectItem>
+                  <SelectItem value="MJ">MJ (Megajoule)</SelectItem>
+                  <SelectItem value="metric ton">Metric Ton</SelectItem>
+                  <SelectItem value="liter">Liter</SelectItem>
+                  <SelectItem value="m3">m³ (Cubic Meter)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

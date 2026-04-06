@@ -198,7 +198,12 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       else if (formData.combustion_units === "therm") mmBtu = q * 0.1;
       else if (formData.combustion_units === "SCF") mmBtu = q / (formData.fuel_combusted === "Propane Gas" ? 11000 : 1000);
       else if (formData.combustion_units === "short ton") mmBtu = q * 25;
+      else if (formData.combustion_units === "metric ton") mmBtu = q * 27.558; // 1 metric ton ≈ 1.10231 short tons * 25 mmBtu/short ton
       else if (formData.combustion_units === "gallon") mmBtu = q * (formData.fuel_combusted.includes("Fuel Oil") ? 0.138 : formData.fuel_combusted === "Kerosene" ? 0.135 : 0.09);
+      else if (formData.combustion_units === "liter") mmBtu = (q * 0.264172) * (formData.fuel_combusted.includes("Fuel Oil") ? 0.138 : formData.fuel_combusted === "Kerosene" ? 0.135 : 0.09);
+      else if (formData.combustion_units === "GJ") mmBtu = q * 0.947817;
+      else if (formData.combustion_units === "MJ") mmBtu = q * 0.000947817;
+      else if (formData.combustion_units === "m3") mmBtu = (q * 35.3147) / (formData.fuel_combusted === "Propane Gas" ? 11000 : 1000);
       else return null;
       return (mmBtu * fuel.co2PerMmBtu / 1000).toFixed(4);
     }
