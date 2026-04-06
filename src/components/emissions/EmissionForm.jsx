@@ -42,7 +42,7 @@ const SCOPE_3_CATEGORIES = [
 ];
 const OFFSETS_CATEGORIES = [{ value: "offsets", label: "Carbon Offsets", sources: [], guidance: "Report carbon offsets purchased to compensate for emissions. Enter tonnes of CO₂e offset and optionally specify which GHG scope the offset applies to. Offsets will be shown as negative emissions in your inventory." }];
 
-export default function EmissionForm({ open, onClose, onSubmit, editingRecord, isSubmitting }) {
+export default function EmissionForm({ open, onClose, onSubmit, editingRecord, isSubmitting, prefillScope }) {
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
 
   useEffect(() => {
@@ -127,8 +127,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       setFormData(base);
     } else if (!open) {
       setFormData({ ...EMPTY_FORM });
+    } else if (prefillScope && !editingRecord) {
+      setFormData({ ...EMPTY_FORM, scope: prefillScope });
     }
-  }, [editingRecord, open]);
+  }, [editingRecord, open, prefillScope]);
 
   const categories = formData.scope === "scope_1" ? SCOPE_1_CATEGORIES
     : formData.scope === "scope_2" ? SCOPE_2_CATEGORIES

@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import EmissionForm from "@/components/emissions/EmissionForm";
+import ScopePicker from "@/components/emissions/ScopePicker";
 import EmissionTable from "@/components/emissions/EmissionTable";
 import EmissionChart from "@/components/emissions/EmissionChart";
 import ScopeBreakdown from "@/components/emissions/ScopeBreakdown";
@@ -30,6 +31,7 @@ export default function CompanyDashboard() {
   const [activeStep, setActiveStep] = useState("org");
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [prefillScope, setPrefillScope] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: allRecords = [] } = useQuery({
@@ -200,13 +202,21 @@ export default function CompanyDashboard() {
 
         {activeStep === "emissions" && (
           <div>
+            {records.length === 0 ? (
+              <ScopePicker onSelectScope={(scopeId) => {
+                setEditingRecord(null);
+                setShowForm(true);
+                setPrefillScope(scopeId);
+              }} />
+            ) : (
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-white font-semibold text-lg">Emission Records</h2>
-              <Button onClick={() => { setEditingRecord(null); setShowForm(true); }} className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-10 px-4">
+              <Button onClick={() => { setEditingRecord(null); setShowForm(true); setPrefillScope(null); }} className="bg-[#1B4332] hover:bg-[#143728] text-white rounded-xl h-10 px-4">
                 <Plus className="w-4 h-4 mr-2" />Add Emission
               </Button>
             </div>
-
+            )}
+            {records.length > 0 && (<>
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
@@ -250,6 +260,7 @@ export default function CompanyDashboard() {
                 Continue to Additional Information
               </Button>
             </div>
+            </>)}
           </div>
         )}
 
@@ -301,7 +312,8 @@ export default function CompanyDashboard() {
 
       <EmissionForm
         open={showForm}
-        onClose={() => { setShowForm(false); setEditingRecord(null); }}
+        onClose={() => { setShowForm(false); setEditingRecord(null); setPrefillScope(null); }}
+        prefillScope={prefillScope}
         onSubmit={(data) => {
           const withCompany = Array.isArray(data)
             ? data.map(r => ({ ...r, company_name: company }))
