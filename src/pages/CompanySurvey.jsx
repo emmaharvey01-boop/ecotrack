@@ -36,15 +36,16 @@ export default function CompanySurvey() {
 
   const saveMutation = useMutation({
     mutationFn: (data) => base44.entities.OrganizationInfo.create(data),
-    onSuccess: (_, variables) => {
-      navigate(`/CompanyDashboard?company=${encodeURIComponent(variables.company_name)}`);
+    onSuccess: (_, variables, context) => {
+      const step = variables._goToEmissions ? "&step=emissions" : "";
+      navigate(`/CompanyDashboard?company=${encodeURIComponent(variables.company_name)}${step}`);
     },
   });
 
   const set = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
-  const handleProceedToInventory = () => {
-    saveMutation.mutate({ company_name: companyName });
+  const handleProceedToInventory = (goToEmissions = false) => {
+    saveMutation.mutate({ company_name: companyName, _goToEmissions: goToEmissions });
   };
 
   const handleSubmitOrgInfo = (e) => {
@@ -83,7 +84,7 @@ export default function CompanySurvey() {
             </Button>
             <Button
               disabled={!companyName.trim() || saveMutation.isPending}
-              onClick={handleProceedToInventory}
+              onClick={() => handleProceedToInventory(false)}
               className="h-12 px-7 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm"
             >
               {saveMutation.isPending ? "Saving..." : "Proceed to GHG Inventory"}
@@ -106,6 +107,7 @@ export default function CompanySurvey() {
           disabled={saveMutation.isPending}
           variant="outline"
           className="h-9 px-5 rounded-xl border-slate-500 text-slate-300 hover:bg-slate-700 hover:text-white text-sm"
+          onClick={() => handleProceedToInventory(true)}
         >
           <SkipForward className="w-4 h-4 mr-1.5" />
           Skip to GHG Inventory
