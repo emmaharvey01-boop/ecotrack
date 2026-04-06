@@ -6,7 +6,7 @@ const SCOPES = [
     id: "scope_1",
     label: "Scope 1",
     subtitle: "Direct Emissions",
-    description: "Emissions from sources owned or controlled by your organization — stationary combustion, mobile sources, fugitive emissions, and process emissions.",
+    description: "Emissions from sources owned or controlled by your organization: stationary combustion, mobile sources, fugitive emissions, and process emissions.",
     icon: Flame,
     color: "from-emerald-900 to-emerald-800",
     border: "border-emerald-700",
