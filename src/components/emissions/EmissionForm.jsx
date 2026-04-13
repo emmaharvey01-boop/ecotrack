@@ -262,7 +262,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       return onSubmit({ ...makeBase(), scope: "scope_3", category: isBusinessTravel ? "Business Travel" : "Employee Commuting", source: formData.travel_mode, amount: m, unit: f.unit, emission_factor: f.co2, co2e_tonnes: m * (f.co2 + (f.ch4/1000)*28 + (f.n2o/1000)*265) / 1000 });
     }
     if (isPurchasedSteam) {
-      const sp = parseFloat(formData.steam_purchased), eff = parseFloat(formData.steam_boiler_efficiency)/100;
+      const rawSp = parseFloat(formData.steam_purchased);
+      const steamUnit = formData.steam_energy_unit || "mmBtu";
+      const sp = steamUnit === "GJ" ? rawSp * 0.947817 : steamUnit === "MJ" ? rawSp * 0.000947817 : rawSp;
+      const eff = parseFloat(formData.steam_boiler_efficiency)/100;
       const mmBtu = sp / eff;
       const calcTonnes = (prefix) => {
         const c2 = formData[`${prefix}_co2_factor`], c4 = formData[`${prefix}_ch4_factor`], n2 = formData[`${prefix}_n2o_factor`];
@@ -280,7 +283,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
       ]);
     }
     if (isPurchasedHeating || isPurchasedCooling) {
-      const purchased = parseFloat(formData.hc_purchased), eff = parseFloat(formData.hc_boiler_efficiency)/100;
+      const rawHc = parseFloat(formData.hc_purchased);
+      const hcUnit = formData.hc_energy_unit || "mmBtu";
+      const purchased = hcUnit === "GJ" ? rawHc * 0.947817 : hcUnit === "MJ" ? rawHc * 0.000947817 : rawHc;
+      const eff = parseFloat(formData.hc_boiler_efficiency)/100;
       const mmBtu = purchased / eff;
       const calcT = (co2Key, ch4Key, n2oKey) => {
         const c2 = formData[co2Key], c4 = formData[ch4Key], n2 = formData[n2oKey];

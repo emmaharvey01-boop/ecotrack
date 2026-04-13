@@ -4,8 +4,15 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATIONARY_COMBUSTION_FACTORS } from "../emissionConstants";
 
+function toMmBtu(value, unit) {
+  const v = parseFloat(value) || 0;
+  if (unit === "GJ") return v * 0.947817;
+  if (unit === "MJ") return v * 0.000947817;
+  return v;
+}
+
 function calcSteamTonnes(formData, co2Key, ch4Key, n2oKey) {
-  const steamPurchased = parseFloat(formData.steam_purchased) || 0;
+  const steamPurchased = toMmBtu(formData.steam_purchased, formData.steam_energy_unit);
   const eff = parseFloat(formData.steam_boiler_efficiency) / 100;
   if (!eff) return "0.0000";
   const mmBtu = steamPurchased / eff;
@@ -50,8 +57,19 @@ export default function PurchasedSteamFields({ formData, setFormData }) {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">Steam Purchased (mmBtu)</Label>
-        <Input type="number" step="0.01" value={formData.steam_purchased} onChange={set("steam_purchased")} placeholder="Enter mmBtu" className="h-11 rounded-xl border-slate-200" />
+        <Label className="text-sm font-medium text-slate-700">Energy Unit</Label>
+        <Select value={formData.steam_energy_unit || "mmBtu"} onValueChange={(v) => setFormData({ ...formData, steam_energy_unit: v })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mmBtu">mmBtu</SelectItem>
+            <SelectItem value="GJ">GJ (Gigajoule)</SelectItem>
+            <SelectItem value="MJ">MJ (Megajoule)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-slate-700">Steam Purchased ({formData.steam_energy_unit || "mmBtu"})</Label>
+        <Input type="number" step="0.01" value={formData.steam_purchased} onChange={set("steam_purchased")} placeholder={`Enter ${formData.steam_energy_unit || "mmBtu"}`} className="h-11 rounded-xl border-slate-200" />
       </div>
 
       {/* Market-Based Supplier Factors */}

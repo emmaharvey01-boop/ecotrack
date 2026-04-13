@@ -4,8 +4,15 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATIONARY_COMBUSTION_FACTORS } from "../emissionConstants";
 
+function toMmBtu(value, unit) {
+  const v = parseFloat(value) || 0;
+  if (unit === "GJ") return v * 0.947817;
+  if (unit === "MJ") return v * 0.000947817;
+  return v;
+}
+
 function calcTonnes(formData, co2Key, ch4Key, n2oKey) {
-  const purchased = parseFloat(formData.hc_purchased) || 0;
+  const purchased = toMmBtu(formData.hc_purchased, formData.hc_energy_unit);
   const eff = parseFloat(formData.hc_boiler_efficiency) / 100;
   if (!eff || !purchased) return "0.0000";
   const mmBtu = purchased / eff;
@@ -61,8 +68,19 @@ export default function PurchasedHeatingCoolingFields({ formData, setFormData, c
         <Input type="number" step="0.01" value={formData.hc_boiler_efficiency || ""} onChange={(e) => setFormData({ ...formData, hc_boiler_efficiency: e.target.value })} placeholder="e.g., 80" className="h-11 rounded-xl border-slate-200" />
       </div>
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-slate-700">{categoryLabel} Purchased (mmBtu)</Label>
-        <Input type="number" step="0.01" value={formData.hc_purchased || ""} onChange={(e) => setFormData({ ...formData, hc_purchased: e.target.value })} placeholder="Enter mmBtu" className="h-11 rounded-xl border-slate-200" />
+        <Label className="text-sm font-medium text-slate-700">Energy Unit</Label>
+        <Select value={formData.hc_energy_unit || "mmBtu"} onValueChange={(v) => setFormData({ ...formData, hc_energy_unit: v })}>
+          <SelectTrigger className="h-11 rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mmBtu">mmBtu</SelectItem>
+            <SelectItem value="GJ">GJ (Gigajoule)</SelectItem>
+            <SelectItem value="MJ">MJ (Megajoule)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-slate-700">{categoryLabel} Purchased ({formData.hc_energy_unit || "mmBtu"})</Label>
+        <Input type="number" step="0.01" value={formData.hc_purchased || ""} onChange={(e) => setFormData({ ...formData, hc_purchased: e.target.value })} placeholder={`Enter ${formData.hc_energy_unit || "mmBtu"}`} className="h-11 rounded-xl border-slate-200" />
       </div>
       {factorInputs("hc_market", "Market-Based Emission Factors (Optional)")}
       {factorInputs("hc_location", "Location-Based Emission Factors (Optional)")}
