@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart2, FileDown, ArrowRight } from "lucide-react";
 import { createPageUrl } from "@/utils";
@@ -10,6 +12,9 @@ const FEATURES = [
 ];
 
 export default function GetStarted() {
+  const { data: orgInfoList = [] } = useQuery({ queryKey: ["orgInfo"], queryFn: () => base44.entities.OrganizationInfo.list() });
+  const hasOrgs = orgInfoList.length > 0;
+
   return (
     <div className="min-h-screen bg-gray-100 font-sans">
       {/* Navy Header */}
@@ -44,11 +49,13 @@ export default function GetStarted() {
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-              <Link to={createPageUrl("OrganizationInfo")}>
-                <Button variant="outline" className="rounded-xl h-12 px-7 font-bold text-sm border-gray-300 text-gray-700 hover:border-[#1a2744] hover:text-[#1a2744]">
-                  View Organizations
-                </Button>
-              </Link>
+              {hasOrgs && (
+                <Link to={createPageUrl("OrganizationInfo")}>
+                  <Button variant="outline" className="rounded-xl h-12 px-7 font-bold text-sm border-gray-300 text-gray-700 hover:border-[#1a2744] hover:text-[#1a2744]">
+                    View Organizations
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
 
