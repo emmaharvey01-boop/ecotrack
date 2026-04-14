@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Building2, BarChart2, FileDown, ArrowRight } from "lucide-react";
+import { Building2, BarChart2, FileDown, ArrowRight, Printer } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
 const FEATURES = [
@@ -30,6 +30,12 @@ export default function GetStarted() {
 
       {/* Hero */}
       <main className="max-w-5xl mx-auto px-6 py-14">
+        <div className="flex justify-end mb-4">
+          <Button variant="outline" onClick={() => window.print()} className="rounded-xl h-9 px-4 text-sm border-gray-300 text-gray-600 hover:border-[#1a2744] hover:text-[#1a2744] flex items-center gap-2">
+            <Printer className="w-4 h-4" />
+            Print / Save as PDF
+          </Button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-12">
           <div>
             <div className="inline-block bg-[#1a2744] text-blue-200 text-xs font-black tracking-widest uppercase px-3 py-1.5 rounded-full mb-5">

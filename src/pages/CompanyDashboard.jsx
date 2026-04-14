@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft, Building2, ClipboardList, BarChart2, Download, Check, Trash2 } from "lucide-react";
+import { Plus, ArrowLeft, Building2, ClipboardList, BarChart2, Download, Check, Trash2, Printer } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -203,6 +203,13 @@ export default function CompanyDashboard() {
 
         {activeStep === "emissions" && (
           <div>
+            {records.length > 0 && (
+              <div className="flex justify-end mb-2">
+                <Button variant="outline" size="sm" onClick={() => window.print()} className="rounded-lg border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
+                  <Printer className="w-4 h-4" />Print / Save as PDF
+                </Button>
+              </div>
+            )}
             {records.length === 0 ? (
               <ScopePicker onSelectScope={(scopeId) => {
                 setEditingRecord(null);
@@ -287,6 +294,11 @@ export default function CompanyDashboard() {
 
         {activeStep === "export" && (
           <div className="max-w-xl mx-auto text-center py-12">
+            <div className="flex justify-end mb-4">
+              <Button variant="outline" size="sm" onClick={() => window.print()} className="rounded-lg border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
+                <Printer className="w-4 h-4" />Print / Save as PDF
+              </Button>
+            </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-10">
               <Download className="w-14 h-14 mx-auto text-emerald-400 mb-4" />
               <h2 className="text-white text-2xl font-bold mb-2">Export GHG Report</h2>
