@@ -27,7 +27,7 @@ const STEPS = [
 
 export default function CompanyDashboard() {
   const urlParams = new URLSearchParams(window.location.search);
-  const company = urlParams.get("company") || "";
+  const [company, setCompany] = useState(urlParams.get("company") || "");
   const initialStep = urlParams.get("step") || "org";
   const [activeStep, setActiveStep] = useState(initialStep);
   const [showForm, setShowForm] = useState(false);
@@ -196,7 +196,7 @@ export default function CompanyDashboard() {
           <OrgInfoForm
             company={company}
             orgInfo={orgInfo}
-            onSaved={() => { queryClient.invalidateQueries({ queryKey: ["orgInfo"] }); }}
+            onSaved={(newName) => { queryClient.invalidateQueries({ queryKey: ["orgInfo"] }); if (newName) setCompany(newName); }}
             onNext={() => setActiveStep("emissions")}
           />
         )}

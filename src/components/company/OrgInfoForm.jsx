@@ -51,12 +51,32 @@ export default function OrgInfoForm({ company, orgInfo, onSaved, onNext }) {
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      if (orgInfo) return base44.entities.OrganizationInfo.update(orgInfo.id, data);
-      return base44.entities.OrganizationInfo.create(data);
+      const oldName = company;
+      const newName = data.company_name;
+      if (orgInfo) {
+        await base44.entities.OrganizationInfo.update(orgInfo.id, data);
+        // If name changed, update all emission records and drafts
+        if (oldName && newName && oldName !== newName) {
+          const [emissions, drafts] = await Promise.all([
+            base44.entities.EmissionRecord.filter({ company_name: oldName }),
+            base44.entities.DraftEmissionRecord.filter({ company_name: oldName }),
+          ]);
+          await Promise.all([
+            ...emissions.map(r => base44.entities.EmissionRecord.update(r.id, { company_name: newName })),
+            ...drafts.map(r => base44.entities.DraftEmissionRecord.update(r.id, { company_name: newName })),
+          ]);
+          // Navigate to updated company URL
+          window.history.replaceState(null, "", `/CompanyDashboard?company=${encodeURIComponent(newName)}`);
+        }
+      } else {
+        await base44.entities.OrganizationInfo.create(data);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orgInfo"] });
-      onSaved?.();
+      queryClient.invalidateQueries({ queryKey: ["emissions"] });
+      queryClient.invalidateQueries({ queryKey: ["drafts"] });
+      onSaved?.(form.company_name);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     },
