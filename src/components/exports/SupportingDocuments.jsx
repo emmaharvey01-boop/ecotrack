@@ -4,7 +4,7 @@ import { Download, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function SupportingDocuments({ billRecords }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <motion.div
