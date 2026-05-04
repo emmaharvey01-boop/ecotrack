@@ -4,15 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Upload, FileText, Loader2, Sparkles, X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const EGRID_SUBREGIONS = [
-  "AKGD","AKMS","AZNM","CAMX","ERCT","FRCC","HIMS","HIOA","MROE","MROW",
-  "NEWE","NWPP","NYCW","NYLI","NYUP","RFCE","RFCM","RFCW","RMPA","SPNO",
-  "SPSO","SRMV","SRMW","SRSO","SRTV","SRVC"
-];
+// Maps short codes / keywords → full eGRID subregion names used in emissionConstants
+const EGRID_CODE_MAP = {
+  "AKGD": "ASCC Alaska Grid",
+  "AKMS": "ASCC Miscellaneous",
+  "AZNM": "WECC Southwest",
+  "CAMX": "WECC California",
+  "ERCT": "ERCOT All",
+  "FRCC": "FRCC All",
+  "HIMS": "HICC Miscellaneous",
+  "HIOA": "HICC Oahu",
+  "MROE": "MRO East",
+  "MROW": "MRO West",
+  "NEWE": "NPCC New England",
+  "NWPP": "WECC Northwest",
+  "NYCW": "NPCC NYC/Westchester",
+  "NYLI": "NPCC Long Island",
+  "NYUP": "NPCC Upstate NY",
+  "RFCE": "RFC East",
+  "RFCM": "RFC Michigan",
+  "RFCW": "RFC West",
+  "RMPA": "WECC Rockies",
+  "SPNO": "SPP North",
+  "SPSO": "SPP South",
+  "SRMV": "SERC Mississippi Valley",
+  "SRMW": "SERC Midwest",
+  "SRSO": "SERC South",
+  "SRTV": "SERC Tennessee Valley",
+  "SRVC": "SERC Virginia/Carolina",
+};
+
+const EGRID_FULL_NAMES = Object.values(EGRID_CODE_MAP);
 
 // Map bill type → scope/category fields for the emission form
 function mapBillToFormFields(data) {
-  const period = data.billing_period || "";
+  const period = extractReportingYear(data.billing_period || "");
   const notes = [data.supplier_name, data.account_number, data.notes].filter(Boolean).join(" | ");
 
   if (data.bill_type === "electricity") {
@@ -112,7 +138,19 @@ function normalizeSteamUnit(unit = "") {
 function matchEgridSubregion(suggestion = "") {
   if (!suggestion) return "";
   const upper = suggestion.toUpperCase();
-  return EGRID_SUBREGIONS.find(r => upper.includes(r)) || "";
+  // Try matching short code first (e.g. "CAMX")
+  for (const [code, fullName] of Object.entries(EGRID_CODE_MAP)) {
+    if (upper.includes(code)) return fullName;
+  }
+  // Try matching full name substring
+  const matched = EGRID_FULL_NAMES.find(name => upper.includes(name.toUpperCase()));
+  return matched || "";
+}
+
+// Convert billing period like "January 2024" or "Jan 2024" → "2024"
+function extractReportingYear(period = "") {
+  const match = period.match(/\b(20\d{2})\b/);
+  return match ? match[1] : "";
 }
 
 export default function BillUploader({ onExtracted }) {
