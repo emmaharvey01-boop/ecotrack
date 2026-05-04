@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Info } from "lucide-react";
+import BillUploader from "./BillUploader";
 import { StationaryCombustionFields, MobileCombustionFields, RefrigerationFields, FireSuppressionFields, STATIONARY_COMBUSTION_FUELS, REFRIGERANT_GWP_FACTORS, FIRE_SUPPRESSION_GWP_FACTORS, MOBILE_FUEL_TYPES } from "./CombustionFields";
 import OffsetsFields from "./OffsetsFields";
 import WasteFields from "./scope3/WasteFields";
@@ -382,6 +383,9 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="p-6 space-y-5 overflow-y-auto flex-1">
+            {!editingRecord && (
+              <BillUploader onExtracted={(fields) => setFormData(f => ({ ...f, ...fields }))} />
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-slate-700">Scope</Label>
