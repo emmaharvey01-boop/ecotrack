@@ -153,7 +153,7 @@ function extractReportingYear(period = "") {
   return match ? match[1] : "";
 }
 
-export default function BillUploader({ onExtracted }) {
+export default function BillUploader({ onExtracted, onFileUploaded }) {
   const [status, setStatus] = useState("idle"); // idle | uploading | extracting | done | error
   const [errorMsg, setErrorMsg] = useState("");
   const [extractedSummary, setExtractedSummary] = useState(null);
@@ -174,6 +174,7 @@ export default function BillUploader({ onExtracted }) {
     try {
       const uploaded = await base44.integrations.Core.UploadFile({ file });
       file_url = uploaded.file_url;
+      onFileUploaded?.(file_url);
     } catch {
       setErrorMsg("Failed to upload file. Please try again.");
       setStatus("error");

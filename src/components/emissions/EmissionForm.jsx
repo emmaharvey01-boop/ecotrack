@@ -233,6 +233,7 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
     company_name: formData.company_name,
     reporting_period: formData.reporting_period,
     notes: formData.notes,
+    ...(formData.bill_file_url ? { bill_file_url: formData.bill_file_url } : {}),
   });
 
   const handleSubmit = (e) => {
@@ -384,7 +385,10 @@ export default function EmissionForm({ open, onClose, onSubmit, editingRecord, i
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="p-6 space-y-5 overflow-y-auto flex-1">
             {!editingRecord && (
-              <BillUploader onExtracted={(fields) => setFormData(f => ({ ...f, ...fields }))} />
+              <BillUploader
+                onExtracted={(fields) => setFormData(f => ({ ...f, ...fields }))}
+                onFileUploaded={(url) => setFormData(f => ({ ...f, bill_file_url: url }))}
+              />
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

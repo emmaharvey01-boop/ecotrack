@@ -286,8 +286,8 @@ export default function CompanyDashboard() {
         )}
 
         {activeStep === "export" && (
-          <div className="max-w-xl mx-auto text-center py-12">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-10">
+          <div className="max-w-xl mx-auto py-12 space-y-6">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-10 text-center">
               <Download className="w-14 h-14 mx-auto text-emerald-400 mb-4" />
               <h2 className="text-white text-2xl font-bold mb-2">Export GHG Report</h2>
               <p className="text-slate-400 mb-2">
@@ -307,6 +307,40 @@ export default function CompanyDashboard() {
                 <Download className="w-5 h-5 mr-2" />Download Report (.csv)
               </Button>
             </motion.div>
+
+            {/* Supporting Documents */}
+            {(() => {
+              const billRecords = records.filter(r => r.bill_file_url);
+              if (billRecords.length === 0) return null;
+              return (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-6">
+                  <h3 className="text-white font-semibold text-lg mb-1">Supporting Documents</h3>
+                  <p className="text-slate-400 text-sm mb-4">Uploaded utility bills as proof of emissions data for regulators ({billRecords.length} file{billRecords.length !== 1 ? "s" : ""}).</p>
+                  <div className="space-y-2">
+                    {billRecords.map((r, i) => (
+                      <a
+                        key={r.id}
+                        href={r.bill_file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-900/60 flex items-center justify-center flex-shrink-0">
+                            <Download className="w-4 h-4 text-emerald-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-white text-sm font-medium truncate">{r.category} — {r.source}</p>
+                            <p className="text-slate-400 text-xs">{r.reporting_period}{r.scope_2_method ? ` · ${r.scope_2_method.replace("_", "-")}` : ""}</p>
+                          </div>
+                        </div>
+                        <span className="text-emerald-400 text-xs font-medium flex-shrink-0 group-hover:underline">Open PDF</span>
+                      </a>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })()}
           </div>
         )}
       </main>

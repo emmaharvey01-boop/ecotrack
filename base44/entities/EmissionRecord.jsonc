@@ -1,0 +1,94 @@
+{
+  "name": "EmissionRecord",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Name of the company for this emission record"
+    },
+    "scope": {
+      "type": "string",
+      "enum": [
+        "scope_1",
+        "scope_2"
+      ],
+      "description": "Emission scope category"
+    },
+    "scope_2_method": {
+      "type": "string",
+      "enum": [
+        "market_based",
+        "location_based"
+      ],
+      "description": "Calculation method for Scope 2 emissions"
+    },
+    "category": {
+      "type": "string",
+      "description": "Specific emission category within scope"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source of the emission (e.g., Natural Gas, Fleet Vehicles)"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount of activity (e.g., kWh, liters, miles)"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement for the amount"
+    },
+    "emission_factor": {
+      "type": "number",
+      "description": "CO2e emission factor per unit"
+    },
+    "co2e_tonnes": {
+      "type": "number",
+      "description": "Calculated CO2 equivalent in tonnes"
+    },
+    "reporting_period": {
+      "type": "string",
+      "description": "Reporting period (e.g., Q1 2024, 2024)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or documentation"
+    },
+    "source_area": {
+      "type": "string",
+      "description": "Source area for the emission"
+    },
+    "fuel_combusted": {
+      "type": "string",
+      "description": "Type of fuel combusted"
+    },
+    "fuel_state": {
+      "type": "string",
+      "enum": [
+        "solid",
+        "liquid",
+        "gas"
+      ],
+      "description": "Physical state of the fuel"
+    },
+    "quantity_combusted": {
+      "type": "number",
+      "description": "Quantity of fuel combusted"
+    },
+    "combustion_units": {
+      "type": "string",
+      "description": "Units for quantity combusted (SCF, therm, MmBTU, etc.)"
+    },
+    "bill_file_url": {
+      "type": "string",
+      "description": "URL of the uploaded utility bill PDF used as proof of emissions"
+    }
+  },
+  "required": [
+    "scope",
+    "category",
+    "source",
+    "co2e_tonnes",
+    "reporting_period"
+  ]
+}
