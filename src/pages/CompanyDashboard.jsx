@@ -17,6 +17,7 @@ import { Leaf, Zap, Activity, TrendingDown } from "lucide-react";
 import OrgInfoForm from "@/components/company/OrgInfoForm";
 import AdditionalInfoForm from "@/components/company/AdditionalInfoForm";
 import { exportToExcel } from "@/components/exports/ExcelExport";
+import SupportingDocuments from "@/components/exports/SupportingDocuments";
 
 const STEPS = [
   { id: "org", label: "Organization Info", icon: ClipboardList },
@@ -313,32 +314,7 @@ export default function CompanyDashboard() {
               const billRecords = records.filter(r => r.bill_file_url);
               if (billRecords.length === 0) return null;
               return (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#1e293b] rounded-2xl border border-slate-700 p-6">
-                  <h3 className="text-white font-semibold text-lg mb-1">Supporting Documents</h3>
-                  <p className="text-slate-400 text-sm mb-4">Uploaded utility bills as proof of emissions data for regulators ({billRecords.length} file{billRecords.length !== 1 ? "s" : ""}).</p>
-                  <div className="space-y-2">
-                    {billRecords.map((r, i) => (
-                      <a
-                        key={r.id}
-                        href={r.bill_file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-900/60 flex items-center justify-center flex-shrink-0">
-                            <Download className="w-4 h-4 text-emerald-400" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-white text-sm font-medium truncate">{r.category} — {r.source}</p>
-                            <p className="text-slate-400 text-xs">{r.reporting_period}{r.scope_2_method ? ` · ${r.scope_2_method.replace("_", "-")}` : ""}</p>
-                          </div>
-                        </div>
-                        <span className="text-emerald-400 text-xs font-medium flex-shrink-0 group-hover:underline">Open PDF</span>
-                      </a>
-                    ))}
-                  </div>
-                </motion.div>
+                <SupportingDocuments billRecords={billRecords} />
               );
             })()}
           </div>
