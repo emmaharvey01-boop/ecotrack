@@ -170,17 +170,33 @@ export default function BillUploader({ onExtracted }) {
     setErrorMsg("");
     setExtractedSummary(null);
 
-    // Upload the file
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    let file_url;
+    try {
+      const uploaded = await base44.integrations.Core.UploadFile({ file });
+      file_url = uploaded.file_url;
+    } catch {
+      setErrorMsg("Failed to upload file. Please try again.");
+      setStatus("error");
+      return;
+    }
 
     setStatus("extracting");
 
-    // Call backend to extract data
-    const response = await base44.functions.invoke("extractBillEmissions", { file_url });
-    const { data } = response.data;
+    let response;
+    try {
+      response = await base44.functions.invoke("extractBillEmissions", { file_url });
+    } catch (err) {
+      const msg = err?.response?.status === 502 || err?.response?.status === 504
+        ? "The bill took too long to process. Please try again or fill in the form manually."
+        : "Could not read the bill. Please try again or fill in the form manually.";
+      setErrorMsg(msg);
+      setStatus("error");
+      return;
+    }
 
+    const data = response?.data?.data;
     if (!data) {
-      setErrorMsg("Could not extract data from this bill. Please check the file and try again.");
+      setErrorMsg("Could not extract data from this bill. Please fill in the form manually.");
       setStatus("error");
       return;
     }
