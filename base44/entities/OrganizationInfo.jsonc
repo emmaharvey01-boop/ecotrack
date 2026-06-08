@@ -1,0 +1,310 @@
+{
+  "name": "OrganizationInfo",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Name of the entity"
+    },
+    "ein": {
+      "type": "string",
+      "description": "Employer Identification Number (EIN)"
+    },
+    "naics_code": {
+      "type": "string",
+      "description": "Primary industry NAICS code"
+    },
+    "website": {
+      "type": "string",
+      "description": "Entity website URL"
+    },
+    "annual_revenue": {
+      "type": "number",
+      "description": "Annual revenue in USD"
+    },
+    "street_address": {
+      "type": "string",
+      "description": "Headquarter office street address"
+    },
+    "city": {
+      "type": "string",
+      "description": "Headquarter office city"
+    },
+    "state": {
+      "type": "string",
+      "description": "Headquarter office state/province"
+    },
+    "country": {
+      "type": "string",
+      "description": "Headquarter office country"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "Headquarter office postal code"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Name of the entity contact person"
+    },
+    "contact_title": {
+      "type": "string",
+      "description": "Title/position of the entity contact person"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Phone number of the entity contact person (10 digits)"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email address of the entity contact person"
+    },
+    "verification_date": {
+      "type": "string",
+      "description": "Date of verification (yyyy-mm-dd)"
+    },
+    "third_party_verifier_name": {
+      "type": "string",
+      "description": "Name of the 3rd party verifier's organization"
+    },
+    "third_party_verifier_contact": {
+      "type": "string",
+      "description": "Name of the 3rd party verifier contact"
+    },
+    "third_party_verifier_email": {
+      "type": "string",
+      "description": "Email address of the 3rd party verifier"
+    },
+    "third_party_verifier_phone": {
+      "type": "string",
+      "description": "Telephone number of the 3rd party verifier (10 digits)"
+    },
+    "third_party_verifier_address": {
+      "type": "string",
+      "description": "Address of the 3rd party verifier"
+    },
+    "inventory_start_date": {
+      "type": "string",
+      "description": "Start date of the reporting period (yyyy-mm-dd)"
+    },
+    "inventory_end_date": {
+      "type": "string",
+      "description": "End date of the reporting period (yyyy-mm-dd)"
+    },
+    "consolidation_approach": {
+      "type": "string",
+      "enum": [
+        "Equity Share",
+        "Financial Control",
+        "Organizational Control"
+      ],
+      "description": "Consolidation approach the company uses"
+    },
+    "equity_share_percentage": {
+      "type": "number",
+      "description": "Percentage of equity shares (if Equity Share approach)"
+    },
+    "equity_share_entities": {
+      "type": "string",
+      "description": "List of obligated entities/facilities under Equity Share approach"
+    },
+    "control_entities": {
+      "type": "string",
+      "description": "List of obligated entities/facilities under Financial or Organizational Control"
+    },
+    "subsidiary_reports_separately": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ],
+      "description": "Does your subsidiary report separately from the parent company?"
+    },
+    "regions_excluded": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ],
+      "description": "Are any regions or specific facilities excluded from your organizational boundary?"
+    },
+    "regions_excluded_details": {
+      "type": "string",
+      "description": "Details of excluded regions/facilities"
+    },
+    "scope1_stationary_combustion": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope1_process_emissions": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope1_mobile_combustion": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope1_fugitive_emissions": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_location_electricity": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_location_heating": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_location_cooling": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_market_electricity": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_market_heating": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_market_cooling": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "includes_direct_biogenic": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "includes_indirect_biogenic": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "facilities_excluded_inventory": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "facilities_excluded_details": {
+      "type": "string"
+    },
+    "scope1_third_party_verified": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope1_verification_explanation": {
+      "type": "string"
+    },
+    "scope1_limited_assurance": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope1_assurance_explanation": {
+      "type": "string"
+    },
+    "scope2_third_party_verified": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_verification_explanation": {
+      "type": "string"
+    },
+    "scope2_limited_assurance": {
+      "type": "string",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "scope2_assurance_explanation": {
+      "type": "string"
+    },
+    "scope1_emission_factors_source": {
+      "type": "string"
+    },
+    "scope1_emission_factor_other": {
+      "type": "string"
+    },
+    "scope2_emission_factors_source": {
+      "type": "string"
+    },
+    "scope2_emission_factor_other": {
+      "type": "string"
+    },
+    "gwp_factors_source": {
+      "type": "string"
+    },
+    "calculation_approach": {
+      "type": "string"
+    },
+    "calculation_tools": {
+      "type": "string"
+    },
+    "sources_excluded_materiality": {
+      "type": "string"
+    },
+    "materiality_threshold": {
+      "type": "number"
+    },
+    "mrr_field": {
+      "type": "string",
+      "description": "California MRR facility ID numbers"
+    },
+    "reporting_year": {
+      "type": "string",
+      "description": "Year for emissions factors (yyyy)"
+    },
+    "other_emission_factor_source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "company_name"
+  ]
+}

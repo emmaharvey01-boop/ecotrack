@@ -6,6 +6,8 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { LearningModeProvider } from '@/lib/LearningModeContext';
+import LearningMode from './pages/LearningMode';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -58,6 +60,7 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/LearningMode" element={<LearningMode />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -68,6 +71,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <LearningModeProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
@@ -75,6 +79,7 @@ function App() {
         </Router>
         <Toaster />
       </QueryClientProvider>
+      </LearningModeProvider>
     </AuthProvider>
   )
 }

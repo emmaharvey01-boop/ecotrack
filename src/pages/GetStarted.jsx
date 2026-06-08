@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Building2, BarChart2, FileDown, ArrowRight } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import LearningModeToggle from "@/components/LearningModeToggle";
 
 const FEATURES = [
   { icon: Building2, title: "Organization Setup", desc: "Enter entity details, contacts, and reporting boundaries." },
@@ -19,12 +20,15 @@ export default function GetStarted() {
     <div className="min-h-screen bg-gray-100 font-sans">
       {/* Navy Header */}
       <header className="bg-[#1a2744] text-white">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center gap-3">
-          <Building2 className="w-7 h-7 opacity-90" />
-          <div>
-            <h1 className="text-2xl font-black tracking-tight leading-tight">GHG Inventory Platform</h1>
-            <p className="text-blue-200 text-sm">Greenhouse Gas Emissions Reporting Tool</p>
+        <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Building2 className="w-7 h-7 opacity-90" />
+            <div>
+              <h1 className="text-2xl font-black tracking-tight leading-tight">GHG Inventory Platform</h1>
+              <p className="text-blue-200 text-sm">Greenhouse Gas Emissions Reporting Tool</p>
+            </div>
           </div>
+          <LearningModeToggle />
         </div>
       </header>
 

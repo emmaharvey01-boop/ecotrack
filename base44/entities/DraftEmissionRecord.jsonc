@@ -1,0 +1,33 @@
+{
+  "name": "DraftEmissionRecord",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Name of the company for this draft"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Emission scope category"
+    },
+    "scope_2_method": {
+      "type": "string",
+      "description": "Calculation method for Scope 2 emissions"
+    },
+    "category": {
+      "type": "string",
+      "description": "Specific emission category within scope"
+    },
+    "draft_data": {
+      "type": "object",
+      "description": "All form data saved as draft"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "company_name"
+  ]
+}

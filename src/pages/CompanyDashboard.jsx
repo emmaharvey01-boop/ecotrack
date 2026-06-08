@@ -18,6 +18,7 @@ import OrgInfoForm from "@/components/company/OrgInfoForm";
 import AdditionalInfoForm from "@/components/company/AdditionalInfoForm";
 import { exportToExcel } from "@/components/exports/ExcelExport";
 import SupportingDocuments from "@/components/exports/SupportingDocuments";
+import LearningModeToggle from "@/components/LearningModeToggle";
 
 const STEPS = [
   { id: "org", label: "Organization Info", icon: ClipboardList },
@@ -141,6 +142,7 @@ export default function CompanyDashboard() {
                 <h1 className="text-white font-semibold text-lg">{company}</h1>
               </div>
             </div>
+            <LearningModeToggle />
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" size="sm" className="rounded-lg">
